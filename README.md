@@ -1,2 +1,2 @@
-# ProjetoIntegrado
-Repositório contendo códigos desenvolvidos para a disciplina de Projeto Integrado
+# ProjetoIntegrado - StreetAnalyzer
+## Software para análise das vias
