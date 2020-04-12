@@ -1,16 +1,13 @@
-package com.street.analyzer.appWakeUp;
+package com.street.analyzer.wakeUp;
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
-import com.street.analyzer.location.MapsActivity;
 
 class RequestPermissions extends AppCompatActivity {
 
@@ -36,14 +33,6 @@ class RequestPermissions extends AppCompatActivity {
                 context,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                 PERMISSION_ID
-        );
-    }
-
-    //Check if location is enable in device
-    boolean isLocationEnabled(){
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
         );
     }
 

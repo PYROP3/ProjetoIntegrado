@@ -1,4 +1,4 @@
-package com.street.analyzer.appWakeUp;
+package com.street.analyzer.wakeUp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,14 +28,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void temp(View v){
+        //TODO: Check if user consent the permissions
         startActivity(new Intent(this, MapsActivity.class));
     }
 
     private void checkUserPermissions(){
         if(mRequestPermissions.checkPermission()){
-            if(isLocationEnabled()){
-                Toast.makeText(this, TAG + "PERMISSION GRANT", Toast.LENGTH_SHORT).show();
-            }else{
+            if(!isLocationEnabled()){
                 Toast.makeText(this, "Please, turn on device location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);

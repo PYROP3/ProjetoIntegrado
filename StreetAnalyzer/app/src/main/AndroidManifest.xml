@@ -34,7 +34,7 @@
         <activity
             android:name=".location.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".appWakeUp.LoginActivity">
+        <activity android:name=".wakeUp.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
