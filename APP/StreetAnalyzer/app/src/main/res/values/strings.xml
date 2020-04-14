@@ -1,10 +1,8 @@
 <resources>
-
     <!-- App -->
     <string name="app_name">StreetAnalyzer</string>
 
     <!-- Google Maps API -->
     <string name="title_activity_maps">Map</string>
     <string name="google_api_key">AIzaSyA1bj_c5SUPi1iIduEGSGRhZSt9vmsE64Y</string>
-
 </resources>
