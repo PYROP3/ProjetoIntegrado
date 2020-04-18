@@ -89,6 +89,8 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 
 app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     var data = req.body;
+
+    res.send("OK")
 });
 
 // =================================== End page require =================================== 

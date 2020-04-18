@@ -89,3 +89,4 @@ node_modules/
 
 # Temporary files
 tmp/
+SERVER/overlay/graphics/*.png

@@ -7,6 +7,7 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "jquery-slotmachine": "^4.0.1",
+    "jws": "^4.0.0",
     "mongodb": "^3.3.5",
     "request-cookie": "^0.0.2"
   },
