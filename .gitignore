@@ -83,3 +83,9 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# Node modules
+node_modules/
+
+# Temporary files
+tmp/

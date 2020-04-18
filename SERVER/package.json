@@ -1,0 +1,28 @@
+{
+  "name": "projeto_integrado",
+  "version": "1.0.0",
+  "description": "University project",
+  "main": "Server.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "jquery-slotmachine": "^4.0.1",
+    "mongodb": "^3.3.5",
+    "request-cookie": "^0.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node Server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PYROP3/ProjetoIntegrado.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PYROP3/ProjetoIntegrado/issues"
+  },
+  "homepage": "https://github.com/PYROP3/ProjetoIntegrado#readme"
+}
