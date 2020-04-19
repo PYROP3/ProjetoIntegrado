@@ -64,11 +64,11 @@ def roundDown(x):
 coord_dtype = float
 
 parser = argparse.ArgumentParser(description='Retrieve required segment from overlay.')
-parser.add_argument('x_min',          type=coord_dtype, nargs=1, help='Minimum X coordinate of bounding box')
-parser.add_argument('y_min',          type=coord_dtype, nargs=1, help='Minimum Y coordinate of bounding box')
-parser.add_argument('x_max',          type=coord_dtype, nargs=1, help='Maximum X coordinate of bounding box')
-parser.add_argument('y_max',          type=coord_dtype, nargs=1, help='Maximum Y coordinate of bounding box')
-parser.add_argument('overlay_folder', type=str,         nargs=1, help='Path to overlay folder')
+parser.add_argument('x_min',            type=coord_dtype, nargs=1, help='Minimum X coordinate of bounding box')
+parser.add_argument('y_min',            type=coord_dtype, nargs=1, help='Minimum Y coordinate of bounding box')
+parser.add_argument('x_max',            type=coord_dtype, nargs=1, help='Maximum X coordinate of bounding box')
+parser.add_argument('y_max',            type=coord_dtype, nargs=1, help='Maximum Y coordinate of bounding box')
+parser.add_argument('--overlay_folder', type=str,         nargs=1, help='Path to overlay folder')
 parser.add_argument('--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
 
 if DEBUG: print("Args: " + str(sys.argv))
@@ -82,57 +82,6 @@ req_x_min = min(args.x_min[0], args.x_max[0])
 req_x_max = max(args.x_min[0], args.x_max[0])
 req_y_min = min(args.y_min[0], args.y_max[0])
 req_y_max = max(args.y_min[0], args.y_max[0])
-
-# sign_x_min = sign(req_x_min)
-# sign_x_max = sign(req_x_max)
-# sign_y_min = sign(req_y_min)
-# sign_y_max = sign(req_y_max)
-
-# point_quads = [
-#     quad(req_x_min, req_y_min),
-#     quad(req_x_max, req_y_max)
-# ]
-
-# required_corners = [
-#     [math.floor(req_x_min / resolution), math.floor(req_y_min / resolution)],
-#     [math.ceil(req_x_max / resolution), math.ceil(req_y_max / resolution)]
-# ]
-
-# if DEBUG: print(point_quads[0] + " : " + str(required_corners[0]))
-# if DEBUG: print(point_quads[1] + " : " + str(required_corners[1]))
-
-# required_delta_x = abs(required_corners[1][0] - required_corners[0][0]) + 0
-# required_delta_y = abs(required_corners[1][1] - required_corners[0][1]) + 0
-
-# if DEBUG: print("Deltas: " + str(required_delta_x) + ", " + str(required_delta_y))
-
-# overlay_canvas = np.zeros((required_delta_y * dpb, required_delta_x * dpb, 3), dtype=np.uint8)
-
-# if DEBUG: print("Overlay shape: " + str(overlay_canvas.shape))
-
-# __x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
-# __y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
-# for _x in range(required_delta_x):
-#     x = _x + __x - sign(req_x_min)
-#     for _y in range(required_delta_y):
-#         y = _y + __y - sign(req_y_min)
-#         overlay_alias = "{}_{}_{}_sigma_mu.png".format(quad(x, y), abs(x), abs(y))
-#         if DEBUG: print("Opening {}".format(overlay_alias))
-#         try:
-#             with Image.open(args.overlay_folder[0]+"graphics/"+overlay_alias).convert("RGB") as temp_overlay:
-#                 aux = np.asarray(temp_overlay)
-#                 if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
-#                 overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
-#         except:
-#             if DEBUG: print("[PYTHON] creating new segment (source_mode = {})".format(str(source_mode)))
-#             if source_mode: # Source mode (for testing cropping)
-#                 img = Image.new("RGB", (dpb,dpb), ((x+y)%2*255,0,(x+y)%2*255))
-#                 d = ImageDraw.Draw(img)
-#                 d.text((20,20), overlay_alias, font=fnt, fill=(127,127,127,255))
-#             else: # Sigma-mu mode (for testing maths)
-#                 img = Image.new("RGB", (dpb,dpb), (127,255,0))
-#             aux = np.asarray(img)
-#             overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
 
 overlay_canvas = segments.load_segments (
     req_x_min, 

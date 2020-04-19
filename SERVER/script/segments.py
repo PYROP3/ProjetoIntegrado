@@ -78,10 +78,10 @@ def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_appen
         x = _x + __x - __sign(min_x)
         for _y in range(required_delta_y):
             y = _y + __y - __sign(min_y)
-            overlay_alias = "{}_{}_{}{}.png".format(__quad(x, y), abs(x), abs(y), alias_append)
+            overlay_alias = "{}_{}_{}{}".format(__quad(x, y), abs(x), abs(y), alias_append)
             if DEBUG: print("Opening {}".format(overlay_alias))
             try: # Get segment if it exists
-                with Image.open(overlay_path+"graphics/"+overlay_alias).convert("RGB") as temp_overlay:
+                with Image.open(overlay_path+"graphics/"+overlay_alias+".png").convert("RGB") as temp_overlay:
                     aux = np.asarray(temp_overlay)
                     if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
                     overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
