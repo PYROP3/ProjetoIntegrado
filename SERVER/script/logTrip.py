@@ -9,7 +9,7 @@ from scipy.ndimage.filters import gaussian_filter
 
 import segments
 
-DEBUG = False
+DEBUG = True
 
 resolution = 0.01
 dpb = 500 # Dots per block; each image should be (dpb x dpb)
@@ -35,19 +35,25 @@ test_mode = "_sigma_mu"
 
 graphics_folder = "C:/Users/Usuario/Documents/GitHub/ProjetoIntegrado/SERVER/overlay/graphics/"
 
-def coords(s):
+def coord_list_dtype(s):
     try:
-        lat, lon = map(float, s.split(' '))
-        return lon, lat
+        x = list(map(lambda p: list(map(float, p.split(','))), s.split(' ')))
+        return x
     except:
-        raise argparse.ArgumentTypeError("Coordinates must be x,y :[{}]".format(s))
+        raise argparse.ArgumentTypeError("Coordinates must be (x0,y0 x1,y1 ... xn,yn) :[{}]".format(s))
 
-quality_dtype = float
+def quality_dtype(s):
+    try:
+        x = list(map(float, s.split(' ')))
+        return x
+    except:
+        raise argparse.ArgumentTypeError("Qualities must be (x y ... z) :[{}]".format(s))
+
 
 parser = argparse.ArgumentParser(description='Store quality information for a series of coordinates.')
-parser.add_argument('--coordinates',    type=coords,        nargs='+', help='List of coordinates (x, y)', required=True)
-parser.add_argument('--quality',        type=quality_dtype, nargs='+', help='List of quality data',       required=True)
-parser.add_argument('--overlay_folder', type=str,           nargs=1,   help='Path to overlay folder',     required=True)
+parser.add_argument('--coordinates',    type=coord_list_dtype, nargs='+', help='List of coordinates (x, y)', required=True)
+parser.add_argument('--quality',        type=quality_dtype,    nargs='+', help='List of quality data',       required=True)
+parser.add_argument('--overlay_folder', type=str,              nargs=1,   help='Path to overlay folder',     required=True)
 parser.add_argument('--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
 
 if DEBUG: print("Args: " + str(sys.argv))
@@ -56,14 +62,19 @@ args = parser.parse_args(sys.argv[1:])
 
 DEBUG = args.DEBUG
 
+if DEBUG: print("Arg parsed: " + str(args))
+
+global_coordinates = args.coordinates[0]
+global_quality     = args.quality[0]
+
 # Check for mismatched coord and quality lists
-if (len(args.coordinates) != len(args.quality) + 1): exit(1)
+if (len(global_coordinates) != len(global_quality) + 1): exit(1)
 
 # Find bounding box of all coordinates
-req_x_min = min([c[0] for c in args.coordinates])
-req_y_min = min([c[1] for c in args.coordinates])
-req_x_max = max([c[0] for c in args.coordinates])
-req_y_max = max([c[1] for c in args.coordinates])
+req_x_min = min([c[0] for c in global_coordinates])
+req_y_min = min([c[1] for c in global_coordinates])
+req_x_max = max([c[0] for c in global_coordinates])
+req_y_max = max([c[1] for c in global_coordinates])
 
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
@@ -78,7 +89,7 @@ if DEBUG: print("Vert: {}, Horiz: {}".format(lower - upper, right - left))
 
 #update_mask = np.zeros((abs(upper - lower) + (2 * cover_radius) + 2, abs(right - left) + (2 * cover_radius) + 2, 2) - 1
 update_mask = np.zeros(overlay_canvas.shape)
-update_mask_height, update_mask_width = update_mask.shape
+update_mask_height, update_mask_width, _ = update_mask.shape
 
 update_mask[:,:,util_channel] = 0
 
@@ -90,7 +101,7 @@ for _x in range(2 * cover_radius + 1):
         __y = _y - cover_radius
         if ((__x ** 2 + __y ** 2) <= cover_radius ** 2):
             offsets.append([__x, __y])
-# print("Generated offsets: " + str(offsets))
+if DEBUG: print("Generated offsets: " + str(offsets))
 
 required_corners = segments.expand_corners(req_x_min, req_y_min, req_x_max, req_y_max, resolution=resolution)
 
@@ -98,12 +109,12 @@ required_delta_x = abs(required_corners[1][0] - required_corners[0][0])
 required_delta_y = abs(required_corners[1][1] - required_corners[0][1])
 
 # Iterate over all the quality data
-for i in range(len(args.quality)):
-    q = args.quality[i]
+for i in range(len(global_quality)):
+    q = global_quality[i]
     #segment_points = []
-    p0 = args.coordinates[i]
-    p1 = args.coordinates[i+1]
-    print("P0 = " + str(p0))
+    p0 = global_coordinates[i]
+    p1 = global_coordinates[i+1]
+    if DEBUG: print("P0 = " + str(p0))
     x00 = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p0[0] / resolution, 0, required_delta_x * dpb))
     y00 = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p0[1] / resolution, required_delta_y * dpb, 0))
     x0  = x00

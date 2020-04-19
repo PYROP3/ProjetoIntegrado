@@ -27,7 +27,7 @@ function parseCookies (request) {
 }
 
 // Static pages
-app.use(express.static('htmls'));
+//app.use(express.static('htmls'));
 
 function fetchFile(filename) { return path.join(__dirname + filename); }
 
@@ -89,7 +89,46 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     var data = req.body;
 
-    res.send("OK")
+    console.log("[Server] Coordinates : " + data["pontos"])
+    console.log("[Server] Quality     : " + data["scores"])
+
+    console.log("[Server][debug] --coordinates "    + data["pontos"].map(coord => coord.join(",")).join(" "))
+    console.log("[Server][debug] --quality "        + data["scores"].join(" "))
+    console.log("[Server][debug] --overlay_folder " + fetchFile("/overlay/"))
+
+    // res.send("OK");
+
+    const python = spawn(
+        Constants.PYTHON_BIN, 
+        [
+            fetchFile(Constants.SCRIPT_LOG_TRIP),
+            "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
+            "--quality"        , data["scores"].join(" "),
+            "--overlay_folder" , fetchFile("/overlay/"),
+            "--DEBUG"
+        ]
+    );
+
+    var pythonData = ""
+
+    // collect data from script
+    python.stdout.on('data', function (data) {
+        console.log('[Server] Pipe data from python script : ' + data);
+        pythonData += data.toString();
+    });
+
+    // in close event we are sure that stream from child process is closed
+    python.on('close', (code) => {
+        console.log(`[Server] Script exit code : ${code}`);
+
+        if (code != 0) {
+            res.status(500).send("Internal error");
+            return;
+        }
+        
+        res.send("Obrigado pela contribuição, " + data["usuario"] + "!")
+    });
+
 });
 
 // =================================== End page require =================================== 
