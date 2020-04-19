@@ -84,7 +84,7 @@ for _x in range(required_delta_x):
     x = _x + __x - sign(req_x_min)
     for _y in range(required_delta_y):
         y = _y + __y - sign(req_y_min)
-        overlay_alias = "{}_{}_{}.png".format(quad(x, y), abs(x), abs(y))
+        overlay_alias = "{}_{}_{}_sigma_mu.png".format(quad(x, y), abs(x), abs(y))
         with Image.open(args.overlay_folder[0]+"graphics/"+overlay_alias).convert("RGB") as temp_overlay:
             aux = np.asarray(temp_overlay)
             if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
@@ -94,14 +94,16 @@ if DEBUG: print("Done!")
 
 overlay_canvas_img = Image.fromarray(overlay_canvas)
 
+if DEBUG: overlay_canvas_img.show()
+
 # print("__x = {}, __x_ = {}".format(__x, __x_))
 # print("__y = {}, __y_ = {}".format(__y, __y_))
 
-(left, upper, right, lower) = (
+(left, lower, right, upper) = (
     int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_min / resolution, 0, required_delta_x * dpb)),
-    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_min / resolution, 0, required_delta_y * dpb)),
+    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_min / resolution, required_delta_y * dpb, 0)),
     int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_max / resolution, 0, required_delta_x * dpb)),
-    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_max / resolution, 0, required_delta_y * dpb))
+    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_max / resolution, required_delta_y * dpb, 0))
 )
 
 if DEBUG: print("Cropping {}, {}, {}, {}".format(left, upper, right, lower))
@@ -112,7 +114,7 @@ if DEBUG:
     ellipse_rad = 10
 
     d.ellipse([left-ellipse_rad, upper-ellipse_rad, left+ellipse_rad, upper+ellipse_rad],   fill=(255,0,0))
-    d.ellipse([right-ellipse_rad, lower-ellipse_rad, right+ellipse_rad, lower+ellipse_rad], fill=(0,255,0))
+    d.ellipse([right-ellipse_rad, lower-ellipse_rad, right+ellipse_rad, lower+ellipse_rad], fill=(0,0,255))
 
     overlay_canvas_img.show()
 

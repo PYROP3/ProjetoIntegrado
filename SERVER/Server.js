@@ -55,13 +55,13 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 
     // collect data from script
     python.stdout.on('data', function (data) {
-        console.log('Pipe data from python script : ' + data);
+        console.log('[Server] Pipe data from python script : ' + data);
         overlayNonce += data.toString();
     });
 
     // in close event we are sure that stream from child process is closed
     python.on('close', (code) => {
-        console.log(`child process close all stdio with code ${code}`);
+        console.log(`[Server] Script exit code : ${code}`);
 
         if (code != 0) {
             res.status(400).send("Bad request");
