@@ -123,25 +123,21 @@ for _x in range(required_delta_x):
 if DEBUG: print("Done!")
 
 # Convert sigma-mu to gradient
-
-if (np.max(overlay_canvas[:,:,util_channel]) == 0):
-    print("None active!")
-else:
-    print("Found active!")
-
-print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
+if DEBUG:
+    if (np.max(overlay_canvas[:,:,util_channel]) == 0):
+        print("None active!")
+    else:
+        print("Found active!")
+    print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
 
 aux_canvas = overlay_canvas[:,:,:]
-aux_canvas[:,:,r_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], v_red_sigmoid(overlay_canvas[:,:,mu_channel] / 255.), empty_gray)
-aux_canvas[:,:,g_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"],    v_gre_bell(overlay_canvas[:,:,mu_channel] / 255.), empty_gray)
-aux_canvas[:,:,b_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], v_blu_sigmoid(overlay_canvas[:,:,mu_channel] / 255.), empty_gray)
+aux_canvas[:,:,r_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_red_sigmoid(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
+aux_canvas[:,:,g_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(   v_gre_bell(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
+aux_canvas[:,:,b_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_blu_sigmoid(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
 
 overlay_canvas_img = Image.fromarray(aux_canvas)
 
 if DEBUG: overlay_canvas_img.show()
-
-# print("__x = {}, __x_ = {}".format(__x, __x_))
-# print("__y = {}, __y_ = {}".format(__y, __y_))
 
 (left, lower, right, upper) = (
     int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_min / resolution, 0, required_delta_x * dpb)),
