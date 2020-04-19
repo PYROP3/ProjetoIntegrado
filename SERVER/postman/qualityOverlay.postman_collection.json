@@ -1,0 +1,62 @@
+{
+	"info": {
+		"_postman_id": "2debf8c9-4022-464c-90fe-801a4012322c",
+		"name": "qualityOverlay",
+		"description": "requests testing the GET /qualityOverlay API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "main",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "26c92b2b-063c-4fa7-8e93-dfadbf511a5e",
+						"exec": [
+							"pm.test(\"Status is 200/OK\", function() {",
+							"   pm.response.to.have.status(200); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_addr}}:{{server_port}}/qualityOverlay?minLatitude=-22.882195&minLongitude=-47.118313&maxLatitude=-22.902195&maxLongitude=-47.098313",
+					"protocol": "http",
+					"host": [
+						"{{server_addr}}"
+					],
+					"port": "{{server_port}}",
+					"path": [
+						"qualityOverlay"
+					],
+					"query": [
+						{
+							"key": "minLatitude",
+							"value": "-22.882195"
+						},
+						{
+							"key": "minLongitude",
+							"value": "-47.118313"
+						},
+						{
+							"key": "maxLatitude",
+							"value": "-22.902195"
+						},
+						{
+							"key": "maxLongitude",
+							"value": "-47.098313"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
