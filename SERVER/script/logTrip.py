@@ -122,7 +122,9 @@ if DEBUG: print("Cropping L:{}, U:{}, R:{}, D:{}".format(left, upper, right, low
 if DEBUG: print("Vert: {}, Horiz: {}".format(lower - upper, right - left))
 
 #update_mask = np.zeros((abs(upper - lower) + (2 * cover_radius) + 2, abs(right - left) + (2 * cover_radius) + 2, 2) - 1
-update_mask = np.zeros(overlay_canvas.shape) - 1
+update_mask = np.zeros(overlay_canvas.shape)
+
+update_mask[:,:,util_channel] = 0
 
 # Generate offsets to cover radius
 offsets = []
@@ -191,8 +193,10 @@ gaussed = update_mask
 # for _ in range(gauss_runs):
 #     gaussed = gaussian_filter(gaussed, sigma=gauss_sigma)
 
+print("Mu  mask min = {}, max = {}".format(np.min(gaussed[:,:,mu_channel]), np.max(gaussed[:,:,mu_channel])))
+print("Sig mask min = {}, max = {}".format(np.min(gaussed[:,:,sig_channel]), np.max(gaussed[:,:,sig_channel])))
+
 mu_mask  = np.uint8(gaussed[:,:,mu_channel]*255) #1:-1,1:-1
-print("Sig mask min = {}, max = {}".format(np.min(gaussed[:,:,mu_channel]), np.max(gaussed[:,:,mu_channel])))
 sig_mask = np.uint8(np.sqrt(gaussed[:,:,mu_channel])*255)
 # print("Shapes: ")
 # print("Canvas: " + str(overlay_canvas.shape))
@@ -200,8 +204,16 @@ sig_mask = np.uint8(np.sqrt(gaussed[:,:,mu_channel])*255)
 # print("Mu_mask: " + str(mu_mask.shape))
 # overlay_canvas[upper-cover_radius:lower+cover_radius, left-cover_radius:right+cover_radius,  mu_channel] = np.where( mu_mask > 0,  mu_mask, overlay_canvas[upper-cover_radius:lower+cover_radius, left-cover_radius:right+cover_radius,  mu_channel]) 
 # overlay_canvas[upper-cover_radius:lower+cover_radius, left-cover_radius:right+cover_radius, sig_channel] = np.where(sig_mask > 0, sig_mask, overlay_canvas[upper-cover_radius:lower+cover_radius, left-cover_radius:right+cover_radius, sig_channel]) 
-overlay_canvas[:,:,  mu_channel] = np.where( mu_mask > 0,  mu_mask, overlay_canvas[:,:,  mu_channel]) 
-overlay_canvas[:,:, sig_channel] = np.where(sig_mask > 0, sig_mask, overlay_canvas[:,:, sig_channel]) 
+overlay_canvas[:,:,   mu_channel] = np.where(update_mask[:,:,util_channel] == util_masks["visited"],  mu_mask, overlay_canvas[:,:,  mu_channel]) 
+overlay_canvas[:,:,  sig_channel] = np.where(update_mask[:,:,util_channel] == util_masks["visited"], sig_mask, overlay_canvas[:,:, sig_channel]) 
+overlay_canvas[:,:, util_channel] = update_mask[:,:,util_channel]
+
+if (np.max(overlay_canvas[:,:,util_channel]) == 0):
+    print("None active!")
+else:
+    print("Found active!")
+
+print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
 
 # Convert back to image
 overlay_canvas_img = Image.fromarray(overlay_canvas)
@@ -216,7 +228,7 @@ for _x in range(required_delta_x):
     x = _x + __x - sign(req_x_min)
     for _y in range(required_delta_y):
         y = _y + __y - sign(req_y_min)
-        overlay_alias = "{}_{}_{}{}_save.png".format(quad(x, y), abs(x), abs(y), test_mode)
+        overlay_alias = "{}_{}_{}{}.png".format(quad(x, y), abs(x), abs(y), test_mode)
         if DEBUG: print("Saving as {}".format(overlay_alias))
         overlay_segment = Image.fromarray(overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
         overlay_segment.save(graphics_folder+overlay_alias, format="PNG")
