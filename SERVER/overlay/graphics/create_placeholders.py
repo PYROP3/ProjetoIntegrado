@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 k = 1
 fnt = ImageFont.truetype('arial.ttf', 40)
 
-source_mode = False
+source_mode = True
 
 lx = 4696
 ly = 2280

@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import os
 import sys
 import argparse
@@ -6,6 +6,8 @@ import json
 import math
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
+
+import segments
 
 DEBUG = False
 
@@ -18,6 +20,9 @@ util_channel = 2
 util_masks = {
     "visited":1
 }
+
+source_mode = False
+fnt = ImageFont.truetype('arial.ttf', 40)
 
 e_sq = math.e**2
 gauss_sigma  = 7
@@ -76,48 +81,62 @@ req_y_max = max([c[1] for c in args.coordinates])
 
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
-point_quads = [
-    quad(req_x_min, req_y_min),
-    quad(req_x_max, req_y_max)
-]
+# point_quads = [
+#     quad(req_x_min, req_y_min),
+#     quad(req_x_max, req_y_max)
+# ]
 
-required_corners = [
-    [math.floor(req_x_min / resolution), math.floor(req_y_min / resolution)],
-    [math.ceil(req_x_max / resolution), math.ceil(req_y_max / resolution)]
-]
+# required_corners = [
+#     [math.floor(req_x_min / resolution), math.floor(req_y_min / resolution)],
+#     [math.ceil(req_x_max / resolution), math.ceil(req_y_max / resolution)]
+# ]
 
-if DEBUG: print(point_quads[0] + " : " + str(required_corners[0]))
-if DEBUG: print(point_quads[1] + " : " + str(required_corners[1]))
+# if DEBUG: print(point_quads[0] + " : " + str(required_corners[0]))
+# if DEBUG: print(point_quads[1] + " : " + str(required_corners[1]))
 
-required_delta_x = abs(required_corners[1][0] - required_corners[0][0]) + 0
-required_delta_y = abs(required_corners[1][1] - required_corners[0][1]) + 0
+# required_delta_x = abs(required_corners[1][0] - required_corners[0][0]) + 0
+# required_delta_y = abs(required_corners[1][1] - required_corners[0][1]) + 0
 
-if DEBUG: print("Deltas: " + str(required_delta_x) + ", " + str(required_delta_y))
+# if DEBUG: print("Deltas: " + str(required_delta_x) + ", " + str(required_delta_y))
 
-overlay_canvas = np.zeros((required_delta_y * dpb, required_delta_x * dpb, 3), dtype=np.uint8)
+# overlay_canvas = np.zeros((required_delta_y * dpb, required_delta_x * dpb, 3), dtype=np.uint8)
 
-if DEBUG: print("Overlay shape: " + str(overlay_canvas.shape))
+# if DEBUG: print("Overlay shape: " + str(overlay_canvas.shape))
 
-__x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
-__y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
-for _x in range(required_delta_x):
-    x = _x + __x - sign(req_x_min)
-    for _y in range(required_delta_y):
-        y = _y + __y - sign(req_y_min)
-        overlay_alias = "{}_{}_{}{}.png".format(quad(x, y), abs(x), abs(y), test_mode)
-        with Image.open(graphics_folder+overlay_alias).convert("RGB") as temp_overlay:
-            aux = np.asarray(temp_overlay)
-            if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
-            overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux
+# __x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
+# __y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
+# for _x in range(required_delta_x):
+#     x = _x + __x - sign(req_x_min)
+#     for _y in range(required_delta_y):
+#         y = _y + __y - sign(req_y_min)
+#         overlay_alias = "{}_{}_{}{}.png".format(quad(x, y), abs(x), abs(y), test_mode)
+#         try:
+#             with Image.open(graphics_folder+overlay_alias).convert("RGB") as temp_overlay:
+#                 aux = np.asarray(temp_overlay)
+#                 if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
+#                 overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
+#         except:
+#             if DEBUG: print("[PYTHON] creating new segment (source_mode = {})".format(str(source_mode)))
+#             if source_mode: # Source mode (for testing cropping)
+#                 img = Image.new("RGB", (dpb,dpb), ((x+y)%2*255,0,(x+y)%2*255))
+#                 d = ImageDraw.Draw(img)
+#                 d.text((20,20), overlay_alias, font=fnt, fill=(127,127,127,255))
+#             else: # Sigma-mu mode (for testing maths)
+#                 img = Image.new("RGB", (dpb,dpb), (127,255,0))
+#             aux = np.asarray(img)
+#             overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
+overlay_canvas = segments.load_segments(req_x_min, req_y_min, req_x_max, req_y_max, DEBUG=DEBUG)
 
 if DEBUG: print("Done!")
 
-(left, lower, right, upper) = (
-    int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_min / resolution, 0, required_delta_x * dpb)),
-    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_min / resolution, required_delta_y * dpb, 0)),
-    int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_max / resolution, 0, required_delta_x * dpb)),
-    int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_max / resolution, required_delta_y * dpb, 0))
-)
+# (left, lower, right, upper) = (
+#     int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_min / resolution, 0, required_delta_x * dpb)),
+#     int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_min / resolution, required_delta_y * dpb, 0)),
+#     int(rangeMap(required_corners[0][0], required_corners[1][0], req_x_max / resolution, 0, required_delta_x * dpb)),
+#     int(rangeMap(required_corners[0][1], required_corners[1][1], req_y_max / resolution, required_delta_y * dpb, 0))
+# )
+(left, lower, right, upper) = segments.bounding_box(req_x_min, req_y_min, req_x_max, req_y_max, resolution=resolution, dpb=dpb)
+
 if DEBUG: print("Cropping L:{}, U:{}, R:{}, D:{}".format(left, upper, right, lower))
 if DEBUG: print("Vert: {}, Horiz: {}".format(lower - upper, right - left))
 
@@ -135,6 +154,11 @@ for _x in range(2 * cover_radius + 1):
         if ((__x ** 2 + __y ** 2) <= cover_radius ** 2):
             offsets.append([__x, __y])
 #rint("Generated offsets: " + str(offsets))
+
+required_corners = segments.expand_corners(req_x_min, req_y_min, req_x_max, req_y_max, resolution=resolution)
+
+required_delta_x = abs(required_corners[1][0] - required_corners[0][0])
+required_delta_y = abs(required_corners[1][1] - required_corners[0][1])
 
 # Iterate over all the quality data
 for i in range(len(args.quality)):

@@ -88,5 +88,9 @@ lint/tmp/
 node_modules/
 
 # Temporary files
-tmp/
+SERVER/tmp/*.jpg
+SERVER/tmp/*.png
+SERVER/tmp/*.jpeg
 SERVER/overlay/graphics/*.png
+
+*.pyc

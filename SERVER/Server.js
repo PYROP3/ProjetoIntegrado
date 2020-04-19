@@ -41,13 +41,13 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     const python = spawn(
         Constants.PYTHON_BIN, 
         [
-            Constants.SCRIPT_SLICE_OVERLAY, 
+            fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
             parseFloat(query.minLongitude), // x_min
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
             parseFloat(query.maxLatitude),  // y_max
             fetchFile("/overlay/"),         // overlay_folder
-            "campinas"                      // overlay
+            "--DEBUG"
         ]
     );
 
