@@ -62,7 +62,7 @@ def expand_corners(min_x, min_y, max_x, max_y, resolution=resolution):
         [math.ceil(max_x / resolution), math.ceil(max_y / resolution)]
     ]
 
-def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_append="", dpb=dpb, overlay_path="", DEBUG=False):
+def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_append="", dpb=dpb, overlay_path="", DEBUG=False, source_mode=False):
 
     required_corners = expand_corners(min_x, min_y, max_x, max_y, resolution=resolution)
 

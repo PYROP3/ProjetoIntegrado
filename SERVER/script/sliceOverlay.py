@@ -35,7 +35,8 @@ util_masks = {
     "visited":1
 }
 
-source_mode = False
+source_mode = True
+run_mode = "source"
 fnt = ImageFont.truetype('arial.ttf', 40)
 
 r_channel = 0
@@ -44,7 +45,6 @@ b_channel = 2
 
 empty_gray = 200
 
-run_mode = "source"
 
 def rangeMap(min1, max1, val1, min2, max2):
     return min2 + (val1 - min1) * (max2 - min2)/(max1 - min1)
@@ -142,7 +142,8 @@ overlay_canvas = segments.load_segments (
     resolution=resolution, 
     alias_append="_"+run_mode, 
     overlay_path=args.overlay_folder[0],
-    DEBUG=DEBUG
+    DEBUG=DEBUG,
+    source_mode=source_mode
 )
 
 if DEBUG: print("Done!")
