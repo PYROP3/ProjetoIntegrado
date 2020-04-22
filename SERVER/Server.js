@@ -46,7 +46,9 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
             parseFloat(query.maxLatitude),  // y_max
+            "--overlay",
             fetchFile("/overlay/"),         // overlay_folder
+            //"--DEBUG"
         ]
     );
 
@@ -105,7 +107,7 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
             "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
             "--quality"        , data["scores"].join(" "),
             "--overlay_folder" , fetchFile("/overlay/"),
-            "--DEBUG"
+            //"--DEBUG"
         ]
     );
 

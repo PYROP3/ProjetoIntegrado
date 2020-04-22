@@ -13,8 +13,8 @@ DEBUG = True
 
 resolution = 0.01
 dpb = 500 # Dots per block; each image should be (dpb x dpb)
-mu_channel = 0
-sig_channel = 1
+mu_channel   = 0
+sig_channel  = 1
 util_channel = 2
 
 util_masks = {
@@ -128,7 +128,7 @@ for i in range(len(global_quality)):
     dy = -abs(y1 - y0)
     sy = 1 if y0 < y1 else -1
     err = dx + dy
-    print("Bresenham: dx={}, sx={}, dy={}, sy={}, err={}".format(dx, sx, dy, sy, err))
+    if DEBUG: print("Bresenham: dx={}, sx={}, dy={}, sy={}, err={}".format(dx, sx, dy, sy, err))
     while (x1 != x0 or y1 != y0):
         # Process (x0, y0)
         canvas_x = x0
@@ -138,14 +138,13 @@ for i in range(len(global_quality)):
         if DEBUG: print("Canvas @ {},{} => mu = {}[sto {}]; sig = {}[sto {}]".format(canvas_x, canvas_y, prev_mu, overlay_canvas[canvas_y,canvas_x,mu_channel], prev_sig,overlay_canvas[canvas_y,canvas_x,sig_channel]))
         new_mu   = (prev_sig * q + e_sq * prev_mu) / (prev_sig + e_sq)
         new_sig  = (prev_sig * e_sq              ) / (prev_sig + e_sq)
-        #print("Updating mask @ {},{}".format(x0, y0))
         update_mask[y0, x0,   mu_channel] = new_mu
         update_mask[y0, x0,  sig_channel] = new_sig
         update_mask[y0, x0, util_channel] = util_masks["visited"]
         for o in offsets:
             nx = x0 + o[0] - 1
             ny = y0 + o[1] - 1
-            #print("Testing point {},{}".format(nx, ny))
+            if DEBUG: print("Testing point {},{}".format(nx, ny))
             if (nx >= 0 and nx < update_mask_width and ny >= 0 and ny < update_mask_height):
                 update_mask[ny, nx,   mu_channel] = new_mu
                 update_mask[ny, nx,  sig_channel] = new_sig
