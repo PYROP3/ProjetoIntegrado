@@ -78,7 +78,7 @@ def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_appen
         x = _x + __x - __sign(min_x)
         for _y in range(required_delta_y):
             y = _y + __y - __sign(min_y)
-            overlay_alias = "{}_{}_{}{}".format(__quad(x, y), abs(x), abs(y), alias_append)
+            overlay_alias = "{}_{}_{}{}".format(__quad(x, y), abs(y), abs(x), alias_append)
             if DEBUG: print("Opening {}".format(overlay_alias))
             try: # Get segment if it exists
                 with Image.open(overlay_path+"graphics/"+overlay_alias+".png").convert("RGB") as temp_overlay:
@@ -110,3 +110,20 @@ def bounding_box(min_x, min_y, max_x, max_y, resolution=resolution, dpb=dpb):
         int(__rangeMap(required_corners[0][0], required_corners[1][0], max_x / resolution, 0, required_delta_x * dpb)),
         int(__rangeMap(required_corners[0][1], required_corners[1][1], max_y / resolution, required_delta_y * dpb, 0))
     )
+
+def save_overlay(min_x, min_y, max_x, max_y, canvas, resolution=resolution, dpb=dpb, overlay_path="", DEBUG=False):
+    required_corners = expand_corners(min_x, min_y, max_x, max_y, resolution=resolution)
+
+    required_delta_x = abs(required_corners[1][0] - required_corners[0][0])
+    required_delta_y = abs(required_corners[1][1] - required_corners[0][1])
+
+    __x =  math.ceil(min_x / resolution) if min_x > 0 else math.floor(min_x / resolution)
+    __y =  math.ceil(min_y / resolution) if min_y > 0 else math.floor(min_y / resolution)
+    for _x in range(required_delta_x):
+        x = _x + __x - __sign(min_x)
+        for _y in range(required_delta_y):
+            y = _y + __y - __sign(min_y)
+            overlay_alias = "{}_{}_{}{}".format(__quad(x, y), abs(y), abs(x), "_sigma_mu")
+            if DEBUG: print("Saving as {}".format(overlay_alias))
+            overlay_segment = Image.fromarray(canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
+            overlay_segment.save(overlay_path+"graphics/"+overlay_alias+".png", format="PNG")

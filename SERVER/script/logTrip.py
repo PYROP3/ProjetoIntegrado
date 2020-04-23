@@ -9,7 +9,7 @@ from scipy.ndimage.filters import gaussian_filter
 
 import segments
 
-DEBUG = True
+DEBUG = False
 
 resolution = 0.01
 dpb = 500 # Dots per block; each image should be (dpb x dpb)
@@ -33,11 +33,9 @@ cover_radius = 5
 
 test_mode = "_sigma_mu"
 
-graphics_folder = "C:/Users/Usuario/Documents/GitHub/ProjetoIntegrado/SERVER/overlay/graphics/"
-
 def coord_list_dtype(s):
     try:
-        x = list(map(lambda p: list(map(float, p.split(','))), s.split(' ')))
+        x = list(map(lambda p: list(map(float, p.split(',')))[::-1], s.split(' ')))
         return x
     except:
         raise argparse.ArgumentTypeError("Coordinates must be (x0,y0 x1,y1 ... xn,yn) :[{}]".format(s))
@@ -88,7 +86,10 @@ if DEBUG: print("Cropping L:{}, U:{}, R:{}, D:{}".format(left, upper, right, low
 if DEBUG: print("Vert: {}, Horiz: {}".format(lower - upper, right - left))
 
 #update_mask = np.zeros((abs(upper - lower) + (2 * cover_radius) + 2, abs(right - left) + (2 * cover_radius) + 2, 2) - 1
-update_mask = np.zeros(overlay_canvas.shape)
+try:
+    update_mask = np.zeros(overlay_canvas.shape)
+except ValueError:
+    exit(8)
 update_mask_height, update_mask_width, _ = update_mask.shape
 
 update_mask[:,:,util_channel] = 0
@@ -144,7 +145,7 @@ for i in range(len(global_quality)):
         for o in offsets:
             nx = x0 + o[0] - 1
             ny = y0 + o[1] - 1
-            if DEBUG: print("Testing point {},{}".format(nx, ny))
+            # if DEBUG: print("Testing point {},{}".format(nx, ny))
             if (nx >= 0 and nx < update_mask_width and ny >= 0 and ny < update_mask_height):
                 update_mask[ny, nx,   mu_channel] = new_mu
                 update_mask[ny, nx,  sig_channel] = new_sig
@@ -164,8 +165,9 @@ gaussed = update_mask
 # for _ in range(gauss_runs):
 #     gaussed = gaussian_filter(gaussed, sigma=gauss_sigma)
 
-print("Mu  mask min = {}, max = {}".format(np.min(gaussed[:,:,mu_channel]), np.max(gaussed[:,:,mu_channel])))
-print("Sig mask min = {}, max = {}".format(np.min(gaussed[:,:,sig_channel]), np.max(gaussed[:,:,sig_channel])))
+if DEBUG:
+    print("Mu  mask min = {}, max = {}".format(np.min(gaussed[:,:,mu_channel]), np.max(gaussed[:,:,mu_channel])))
+    print("Sig mask min = {}, max = {}".format(np.min(gaussed[:,:,sig_channel]), np.max(gaussed[:,:,sig_channel])))
 
 mu_mask  = np.uint8(gaussed[:,:,mu_channel]*255) #1:-1,1:-1
 sig_mask = np.uint8(np.sqrt(gaussed[:,:,mu_channel])*255)
@@ -173,30 +175,43 @@ overlay_canvas[:,:,   mu_channel] = np.where(update_mask[:,:,util_channel] == ut
 overlay_canvas[:,:,  sig_channel] = np.where(update_mask[:,:,util_channel] == util_masks["visited"], sig_mask, overlay_canvas[:,:, sig_channel]) 
 overlay_canvas[:,:, util_channel] = update_mask[:,:,util_channel]
 
-if (np.max(overlay_canvas[:,:,util_channel]) == 0):
-    print("None active!")
-else:
-    print("Found active!")
+if DEBUG:
+    if (np.max(overlay_canvas[:,:,util_channel]) == 0):
+        print("None active!")
+    else:
+        print("Found active!")
 
-print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
+    print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
 
 # Convert back to image
-overlay_canvas_img = Image.fromarray(overlay_canvas)
-if DEBUG: overlay_canvas_img.show()
+if DEBUG:
+    overlay_canvas_img = Image.fromarray(overlay_canvas)
+    overlay_canvas_img.show()
 
 # _ = input("Press enter to continue ")
 
 # Split back into pieces and overwrite disk data
-__x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
-__y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
-for _x in range(required_delta_x):
-    x = _x + __x - segments.__sign(req_x_min)
-    for _y in range(required_delta_y):
-        y = _y + __y - segments.__sign(req_y_min)
-        overlay_alias = "{}_{}_{}{}.png".format(segments.__quad(x, y), abs(x), abs(y), test_mode)
-        if DEBUG: print("Saving as {}".format(overlay_alias))
-        overlay_segment = Image.fromarray(overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
-        overlay_segment.save(graphics_folder+overlay_alias, format="PNG")
+segments.save_overlay(
+    req_x_min, 
+    req_y_min, 
+    req_x_max, 
+    req_y_max, 
+    overlay_canvas, 
+    resolution=resolution, 
+    dpb=dpb, 
+    overlay_path=args.overlay_folder[0],
+    DEBUG=DEBUG
+)
+# __x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
+# __y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
+# for _x in range(required_delta_x):
+#     x = _x + __x - segments.__sign(req_x_min)
+#     for _y in range(required_delta_y):
+#         y = _y + __y - segments.__sign(req_y_min)
+#         overlay_alias = "{}_{}_{}{}.png".format(segments.__quad(x, y), abs(y), abs(x), test_mode)
+#         if DEBUG: print("Saving as {}".format(overlay_alias))
+#         overlay_segment = Image.fromarray(overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
+#         overlay_segment.save(graphics_folder+overlay_alias, format="PNG")
         
 
 # with io.BytesIO() as output:

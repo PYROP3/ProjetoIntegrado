@@ -46,7 +46,7 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
             parseFloat(query.maxLatitude),  // y_max
-            "--overlay",
+            "--overlay_folder",
             fetchFile("/overlay/"),         // overlay_folder
             //"--DEBUG"
         ]
