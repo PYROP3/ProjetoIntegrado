@@ -6,26 +6,38 @@ import json
 import math
 import numpy as np
 import segments
+from gradients import interpolationGradient
+
+G = interpolationGradient()
+G.add([235, 64, 52], 0)
+G.add([235, 140, 52], 0.33)
+G.add([235, 223, 52], 0.67)
+G.add([162, 235, 52], 1)
+G.sort()
 
 DEBUG = False
 
 resolution = 0.01
 dpb = 500 # Dots per block; each image should be (dpb x dpb)
 
-def red_sigmoid(x):
-    return 1. / (1. + math.exp(10*x-5))
+# def red_sigmoid(x):
+#     return 1. / (1. + math.exp(10*x-5))
 
-v_red_sigmoid = np.vectorize(red_sigmoid)
+# v_red_sigmoid = np.vectorize(red_sigmoid)
 
-def blu_sigmoid(x):
-    return 1. / (1. + math.exp(5-10*x))
+# def blu_sigmoid(x):
+#     return 1. / (1. + math.exp(5-10*x))
 
-v_blu_sigmoid = np.vectorize(blu_sigmoid)
+# v_blu_sigmoid = np.vectorize(blu_sigmoid)
 
-def gre_bell(x):
-    return 0.5*math.exp(-10*((x-0.5)**2))
+# def gre_bell(x):
+#     return 0.5*math.exp(-10*((x-0.5)**2))
 
-v_gre_bell = np.vectorize(gre_bell)
+# v_gre_bell = np.vectorize(gre_bell)
+
+v_red_channel = np.vectorize(G.colorizeR)
+v_gre_channel = np.vectorize(G.colorizeG)
+v_blu_channel = np.vectorize(G.colorizeB)
 
 mu_channel = 0
 sig_channel = 1
@@ -108,9 +120,9 @@ if run_mode == "sigma-mu":
             print("Found active!")
         print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
 
-    aux_canvas[:,:,r_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_red_sigmoid(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
-    aux_canvas[:,:,g_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(   v_gre_bell(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
-    aux_canvas[:,:,b_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_blu_sigmoid(overlay_canvas[:,:,mu_channel] / 255.) * 255), empty_gray)
+    aux_canvas[:,:,r_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_red_channel(overlay_canvas[:,:,mu_channel] / 255.)), empty_gray)
+    aux_canvas[:,:,g_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_gre_channel(overlay_canvas[:,:,mu_channel] / 255.)), empty_gray)
+    aux_canvas[:,:,b_channel] = np.where(overlay_canvas[:,:,util_channel] == util_masks["visited"], np.uint8(v_blu_channel(overlay_canvas[:,:,mu_channel] / 255.)), empty_gray)
 
 overlay_canvas_img = Image.fromarray(aux_canvas)
 
