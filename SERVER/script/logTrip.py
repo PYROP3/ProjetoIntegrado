@@ -22,7 +22,6 @@ util_masks = {
 }
 
 source_mode = False
-fnt = ImageFont.truetype('arial.ttf', 40)
 
 e_sq = math.e**2
 gauss_sigma  = 7

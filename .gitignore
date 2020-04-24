@@ -94,3 +94,7 @@ SERVER/tmp/*.jpeg
 SERVER/overlay/graphics/*.png
 
 *.pyc
+
+# Jupyter
+SERVER/jupyter/.ipynb_checkpoints/
+SERVER/jupyter/*.txt

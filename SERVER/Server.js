@@ -29,7 +29,7 @@ function parseCookies (request) {
 // Static pages
 //app.use(express.static('htmls'));
 
-function fetchFile(filename) { return path.join(__dirname + filename); }
+function fetchFile(filename) { return path.join(__dirname + "/" + filename); }
 
 // =================================== Requests ===================================
 
@@ -56,8 +56,13 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 
     // collect data from script
     python.stdout.on('data', function (data) {
-        console.log('[Server] Pipe data from python script : ' + data);
+        console.log('[Server][python/stdout] : ' + data);
         overlayNonce += data.toString();
+    });
+
+    // collect error data from script (for debugging)
+    python.stderr.on('data', function (data) {
+        console.log('[Server][python/stderr] :' + data);
     });
 
     // in close event we are sure that stream from child process is closed
@@ -117,6 +122,11 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     python.stdout.on('data', function (data) {
         console.log('[Server] Pipe data from python script : ' + data);
         pythonData += data.toString();
+    });
+
+    // collect error data from script (for debugging)
+    python.stderr.on('data', function (data) {
+        console.log('[Server][python/stderr] :' + data);
     });
 
     // in close event we are sure that stream from child process is closed

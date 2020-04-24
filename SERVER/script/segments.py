@@ -33,7 +33,10 @@ util_masks = {
 }
 
 source_mode = False
-fnt = ImageFont.truetype('arial.ttf', 40)
+try:
+    fnt = ImageFont.truetype('arial.ttf', 40)
+except OSError:
+    fnt = ImageFont.load_default()
 
 r_channel = 0
 g_channel = 1
