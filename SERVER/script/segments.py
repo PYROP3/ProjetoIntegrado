@@ -6,7 +6,7 @@ import json
 import math
 import numpy as np
 
-resolution = 0.01
+resolution = 0.01 # Arclength (in degrees) corresponding to each segment side - 0.01deg ~ 1Km
 dpb = 500 # Dots per block; each image should be (dpb x dpb)
 
 def red_sigmoid(x):
@@ -72,7 +72,10 @@ def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_appen
     required_delta_x = abs(required_corners[1][0] - required_corners[0][0]) + 0
     required_delta_y = abs(required_corners[1][1] - required_corners[0][1]) + 0
 
-    overlay_canvas = np.zeros((required_delta_y * dpb, required_delta_x * dpb, 3), dtype=np.uint8)
+    try:
+        overlay_canvas = np.zeros((required_delta_y * dpb, required_delta_x * dpb, 3), dtype=np.uint8)
+    except ValueError:
+        raise MemoryError
 
     __x =  math.ceil(min_x / resolution) if min_x > 0 else math.floor(min_x / resolution)
     __y =  math.ceil(min_y / resolution) if min_y > 0 else math.floor(min_y / resolution)
