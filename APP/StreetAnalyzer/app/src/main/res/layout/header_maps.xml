@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_height="160dp"
+    android:layout_width="match_parent"
+    android:background="@color/black"
+    android:padding="20dp">
+
+    <ImageView
+        android:src="@drawable/start_icon"
+        android:layout_width="75dp"
+        android:layout_height="75dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Street Analyzer"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="fulano@ciclano.com.br"
+        android:textColor="@color/white"
+        />
+
+    <!--No background vai ser uma imagem bonitinha a criar e o icone do cara-->
+
+</LinearLayout>

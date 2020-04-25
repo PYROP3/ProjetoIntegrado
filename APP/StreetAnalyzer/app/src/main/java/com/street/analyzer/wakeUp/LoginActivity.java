@@ -15,7 +15,6 @@ import com.street.analyzer.R;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private final String TAG = "[TOAST TEST]";
     private RequestPermissions mRequestPermissions;
 
     @Override
