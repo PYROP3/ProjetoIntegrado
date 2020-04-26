@@ -6,4 +6,13 @@
     <string name="title_activity_maps">Map</string>
     <string name="google_api_key">AIzaSyA1bj_c5SUPi1iIduEGSGRhZSt9vmsE64Y</string>
     <string name="btn_start">Start</string>
+
+    <!-- Side menu -->
+    <string name="side_settings">Settings</string>
+    <string name="side_my_information">My information</string>
+    <string name="side_about_us">About us</string>
+    <string name="side_statistics">Statistics</string>
+    <string name="side_user_icon">User icon</string>
+    <string name="side_default_name">Roberto Justos</string>
+    <string name="side_default_email">roberj@bol.com.br</string>
 </resources>

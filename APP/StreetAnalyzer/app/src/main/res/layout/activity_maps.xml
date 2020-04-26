@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="@color/white"
-        app:headerLayout="@layout/header_maps"
+        app:headerLayout="@layout/header_menu_maps"
         app:menu="@menu/menu_maps"
         android:layout_gravity="start"/>
 </androidx.drawerlayout.widget.DrawerLayout>

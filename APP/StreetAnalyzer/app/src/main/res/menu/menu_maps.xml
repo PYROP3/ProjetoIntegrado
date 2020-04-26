@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/a" android:title="Street Analyzer"/>
-    <item android:id="@+id/b" android:title="Street Analyzer"/>
-    <item android:id="@+id/c" android:title="Street Analyzer"/>
-    <item android:id="@+id/d" android:title="Street Analyzer"/>
-    <item android:id="@+id/e" android:title="Street Analyzer"/>
+    <item
+        android:id="@+id/a"
+        android:title="@string/side_my_information"
+        />
+    <item
+        android:id="@+id/b"
+        android:title="@string/side_statistics"
+    />
+    <item
+        android:id="@+id/d"
+        android:title="@string/side_settings"
+    />
+    <item
+        android:id="@+id/e"
+        android:title="@string/side_about_us"
+    />
 </menu>
