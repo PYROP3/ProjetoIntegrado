@@ -22,6 +22,10 @@
             "English":{
                 "PrettyName": "Unknown Error",
                 "Description": "Operation failed due to an unexpected error"
+            },
+            "Portugues":{
+                "PrettyName": "Erro Desconhecido",
+                "Description": "Operação falhou devido a um erro inesperado"
             }
         }
     },
@@ -33,6 +37,10 @@
             "English":{
                 "PrettyName": "Unknown Error",
                 "Description": "Operation failed due to an error"
+            },
+            "Portugues":{
+                "PrettyName": "Erro Desconhecido",
+                "Description": "Operação falhou devido a um erro"
             }
         }
     },
@@ -44,6 +52,10 @@
             "English":{
                 "PrettyName": "Insufficient storage",
                 "Description": "The request was too big to process"
+            },
+            "Portugues":{
+                "PrettyName": "Espaço insuficiente",
+                "Description": "A requisição foi muito grande para processar"
             }
         }
     },
@@ -55,6 +67,10 @@
             "English":{
                 "PrettyName": "Argument Type Error",
             "Description": "One of the supplied arguments is in an unexpected format"
+            },
+            "Portugues":{
+                "PrettyName": "Erro de tipo de argumento",
+                "Description": "Um dos argumentos fornecidos está em um formato inexperado"
             }
         }
     }
