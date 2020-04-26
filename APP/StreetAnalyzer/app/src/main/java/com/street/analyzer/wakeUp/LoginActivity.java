@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         checkUserPermissions();
     }
 
-    public void temp(View v){
+    public void onClickStartMap(View v){
         //TODO: Check if user consent the permissions
         startActivity(new Intent(this, MapsActivity.class));
     }

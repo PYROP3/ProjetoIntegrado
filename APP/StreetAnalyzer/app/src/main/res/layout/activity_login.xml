@@ -22,48 +22,49 @@
         android:layout_gravity="center"
         android:layout_marginTop="350dp"
         android:alpha="0.5"
-        android:drawableLeft="@drawable/ic_person"
+        android:drawableStart="@drawable/ic_person"
         android:drawablePadding="10dp"
-        android:hint="Username"
+        android:hint="@string/username"
         android:inputType="textEmailAddress"
         android:padding="10dp"
         android:singleLine="false"
         android:textColor="@color/white"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/textPass"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:hint="Password"
+        android:hint="@string/password"
         android:layout_gravity="center"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:alpha="0.5"
-        android:drawableLeft="@drawable/ic_lock"
+        android:drawableStart="@drawable/ic_lock"
         android:drawablePadding="10dp"
         android:layout_marginTop="10dp"
         android:padding="10dp"
-    />
+        android:autofillHints="" />
 
-    <Button
-        android:layout_width="250dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center"
-        android:text="Sign In"
-        android:textColor="@color/white"
-        android:background="@drawable/button_shape"
-        android:layout_marginTop="50dp"
-    />
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/button_shape"
+            android:onClick="onClickStartMap"
+            android:text="@string/sign_in"
+            android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Don't have an account yet? Sign Up"
+        android:text="@string/create_account"
         android:layout_marginTop="40dp"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:textColor="@color/white"
     />
 
