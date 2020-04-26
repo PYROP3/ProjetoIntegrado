@@ -19,8 +19,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: npm install, build, and test
-      with:
-        path: SERVER
+      working-directory: ./SERVER
       run: |
         npm ci
         npm run build --if-present
