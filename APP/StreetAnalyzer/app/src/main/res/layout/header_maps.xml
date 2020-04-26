@@ -4,11 +4,11 @@
     android:orientation="vertical"
     android:layout_height="160dp"
     android:layout_width="match_parent"
-    android:background="@color/black"
+    android:background="@drawable/street_background"
     android:padding="20dp">
 
     <ImageView
-        android:src="@drawable/start_icon"
+        android:src="@drawable/user_icon"
         android:layout_width="75dp"
         android:layout_height="75dp"/>
 
@@ -27,6 +27,5 @@
         android:textColor="@color/white"
         />
 
-    <!--No background vai ser uma imagem bonitinha a criar e o icone do cara-->
 
 </LinearLayout>
