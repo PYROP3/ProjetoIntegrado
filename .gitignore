@@ -83,3 +83,18 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# Node modules
+node_modules/
+
+# Temporary files
+SERVER/tmp/*.jpg
+SERVER/tmp/*.png
+SERVER/tmp/*.jpeg
+SERVER/overlay/graphics/*.png
+
+*.pyc
+
+# Jupyter
+SERVER/jupyter/.ipynb_checkpoints/
+SERVER/jupyter/*.txt
