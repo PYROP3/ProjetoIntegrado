@@ -2,31 +2,60 @@
     {
         "id":0,
         "Name": "Success",
-        "PrettyName": "Success",
-        "Description": "Operation succeeded"
+        "HttpReturn": 200,
+        "Data": {
+            "English":{
+                "PrettyName": "Success",
+                "Description": "Operation succeeded"
+            },
+            "Portugues":{
+                "PrettyName": "Sucesso",
+                "Description": "Operação bem-sucedida"
+            }
+        }
     },
     {
         "id":1,
         "Name": "UnknownError",
-        "PrettyName": "Unknown Error",
-        "Description": "Operation failed due to an unexpected error"
+        "HttpReturn": 500,
+        "Data": {
+            "English":{
+                "PrettyName": "Unknown Error",
+                "Description": "Operation failed due to an unexpected error"
+            }
+        }
     },
     {
         "id":2,
         "Name": "UnknownScriptError",
-        "PrettyName": "Unknown Error",
-        "Description": "Operation failed due to an error"
+        "HttpReturn": 500,
+        "Data": {
+            "English":{
+                "PrettyName": "Unknown Error",
+                "Description": "Operation failed due to an error"
+            }
+        }
     },
     {
         "id":3,
         "Name": "MemoryError",
-        "PrettyName": "Memory Error",
-        "Description": "The request was too big to process"
+        "HttpReturn": 507,
+        "Data": {
+            "English":{
+                "PrettyName": "Insufficient storage",
+                "Description": "The request was too big to process"
+            }
+        }
     },
     {
         "id":4,
         "Name": "ArgumentTypeError",
-        "PrettyName": "Argument Type Error",
-        "Description": "One of the supplied arguments is in an unexpected format"
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Argument Type Error",
+            "Description": "One of the supplied arguments is in an unexpected format"
+            }
+        }
     }
 ]

@@ -29,6 +29,18 @@ function parseCookies (request) {
 
 function fetchFile(filename) { return path.join(__dirname + "/" + filename); }
 
+// Error handling
+function sendErrorMessage(code, request, response) {
+    let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
+    let error = JSON.parse(rawdata)[code];
+    let errorData = error["Data"][request.header("Locale") != null ? request.header("Locale") : Constants.DEFAULT_LOCALE];
+    let thisErr = {
+        "Error": errorData["PrettyName"],
+        "Description": errorData["Description"],
+    }
+    response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
+}
+
 // =================================== Requests ===================================
 
 app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
@@ -70,13 +82,7 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
         console.log(`[Server] Script exit code : ${code}`);
 
         if (code != 0) {
-            let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
-            let error = JSON.parse(rawdata)[code];
-            let thisErr = {
-                "Error": error["PrettyName"],
-                "Description": error["Description"],
-            }
-            res.status(400 + code).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
+            sendErrorMessage(code, req, res);
             return;
         }
 
@@ -139,13 +145,7 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
         console.log(`[Server] Script exit code : ${code}`);
 
         if (code != 0) {
-            let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
-            let error = JSON.parse(rawdata)[code];
-            let thisErr = {
-                "Error": error["PrettyName"],
-                "Description": error["Description"],
-            }
-            res.status(400 + code).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
+            sendErrorMessage(code, req, res);
             return;
         }
         
@@ -162,3 +162,10 @@ if (port == undefined) port = 8080;
 
 app.listen(port);
 console.log("[Server] Listening on port " + port);
+
+// var rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
+// var error = JSON.parse(rawdata)[code];
+// var thisErr = {
+//     "Error": error["PrettyName"],
+//     "Description": error["Description"],
+// }
