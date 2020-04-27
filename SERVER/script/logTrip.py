@@ -7,12 +7,11 @@ import math
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 
+from errorHandler import ErrorHandler
 import segments
 
 DEBUG = False
 
-resolution = 0.01
-dpb = 500 # Dots per block; each image should be (dpb x dpb)
 mu_channel   = 0
 sig_channel  = 1
 util_channel = 2
@@ -22,15 +21,14 @@ util_masks = {
 }
 
 source_mode = False
+run_mode = "sigma_mu"
 
 e_sq = math.e**2
 gauss_sigma  = 7
 gauss_factor = 10
 gauss_runs   = 3
 
-cover_radius = 5
-
-test_mode = "_sigma_mu"
+brush_radius = 5
 
 def coord_list_dtype(s):
     try:
@@ -51,11 +49,17 @@ parser = argparse.ArgumentParser(description='Store quality information for a se
 parser.add_argument('--coordinates',    type=coord_list_dtype, nargs='+', help='List of coordinates (x, y)', required=True)
 parser.add_argument('--quality',        type=quality_dtype,    nargs='+', help='List of quality data',       required=True)
 parser.add_argument('--overlay_folder', type=str,              nargs=1,   help='Path to overlay folder',     required=True)
+parser.add_argument('--errors_file',    type=str,         nargs=1, help='Path to errors JSON file')
 parser.add_argument('--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
 
 if DEBUG: print("Args: " + str(sys.argv))
 
-args = parser.parse_args(sys.argv[1:])
+try:
+    args = parser.parse_args(sys.argv[1:])
+except argparse.ArgumentTypeError:
+    exit(99)
+
+err = ErrorHandler(args.errors_file[0])
 
 DEBUG = args.DEBUG
 
@@ -75,35 +79,43 @@ req_y_max = max([c[1] for c in global_coordinates])
 
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
-overlay_canvas = segments.load_segments(req_x_min, req_y_min, req_x_max, req_y_max, DEBUG=DEBUG)
-
+overlay_canvas = segments.load_segments (
+    req_x_min, 
+    req_y_min, 
+    req_x_max, 
+    req_y_max, 
+    alias_append="_"+run_mode, 
+    overlay_path=args.overlay_folder[0],
+    DEBUG=DEBUG,
+    source_mode=source_mode
+)
 if DEBUG: print("Done!")
 
-(left, lower, right, upper) = segments.bounding_box(req_x_min, req_y_min, req_x_max, req_y_max, resolution=resolution, dpb=dpb)
+(left, lower, right, upper) = segments.bounding_box(req_x_min, req_y_min, req_x_max, req_y_max)
 
 if DEBUG: print("Cropping L:{}, U:{}, R:{}, D:{}".format(left, upper, right, lower))
 if DEBUG: print("Vert: {}, Horiz: {}".format(lower - upper, right - left))
 
-#update_mask = np.zeros((abs(upper - lower) + (2 * cover_radius) + 2, abs(right - left) + (2 * cover_radius) + 2, 2) - 1
 try:
     update_mask = np.zeros(overlay_canvas.shape)
 except ValueError:
-    exit(8)
+    err.exitOnError("MemoryError")
+
 update_mask_height, update_mask_width, _ = update_mask.shape
 
 update_mask[:,:,util_channel] = 0
 
 # Generate offsets to cover radius
 offsets = []
-for _x in range(2 * cover_radius + 1):
-    __x = _x - cover_radius
-    for _y in range(2 * cover_radius + 1):
-        __y = _y - cover_radius
-        if ((__x ** 2 + __y ** 2) <= cover_radius ** 2):
+for _x in range(2 * brush_radius + 1):
+    __x = _x - brush_radius
+    for _y in range(2 * brush_radius + 1):
+        __y = _y - brush_radius
+        if ((__x ** 2 + __y ** 2) <= brush_radius ** 2):
             offsets.append([__x, __y])
 if DEBUG: print("Generated offsets: " + str(offsets))
 
-required_corners = segments.expand_corners(req_x_min, req_y_min, req_x_max, req_y_max, resolution=resolution)
+required_corners = segments.expand_corners(req_x_min, req_y_min, req_x_max, req_y_max)
 
 required_delta_x = abs(required_corners[1][0] - required_corners[0][0])
 required_delta_y = abs(required_corners[1][1] - required_corners[0][1])
@@ -111,10 +123,10 @@ required_delta_y = abs(required_corners[1][1] - required_corners[0][1])
 # Iterate over all the quality data
 for i in range(len(global_quality)):
     q = global_quality[i]
-    #segment_points = []
     p0 = global_coordinates[i]
     p1 = global_coordinates[i+1]
     if DEBUG: print("P0 = " + str(p0))
+
     x00 = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p0[0] / resolution, 0, required_delta_x * dpb))
     y00 = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p0[1] / resolution, required_delta_y * dpb, 0))
     x0  = x00
@@ -122,6 +134,7 @@ for i in range(len(global_quality)):
     x1  = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p1[0] / resolution, 0, required_delta_x * dpb))
     y1  = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p1[1] / resolution, required_delta_y * dpb, 0))
     if DEBUG: print("[{}] Processing q={} @ ({},{}) - ({},{}) Orig ({} x {})".format(i, q, x0, y0, x1, y1, str(p0), str(p1)))
+
     # Bresenhams algorithm
     dx = abs(x1 - x0)
     sx = 1 if x0 < x1 else -1
@@ -144,7 +157,6 @@ for i in range(len(global_quality)):
         for o in offsets:
             nx = x0 + o[0] - 1
             ny = y0 + o[1] - 1
-            # if DEBUG: print("Testing point {},{}".format(nx, ny))
             if (nx >= 0 and nx < update_mask_width and ny >= 0 and ny < update_mask_height):
                 update_mask[ny, nx,   mu_channel] = new_mu
                 update_mask[ny, nx,  sig_channel] = new_sig
@@ -187,8 +199,6 @@ if DEBUG:
     overlay_canvas_img = Image.fromarray(overlay_canvas)
     overlay_canvas_img.show()
 
-# _ = input("Press enter to continue ")
-
 # Split back into pieces and overwrite disk data
 segments.save_overlay(
     req_x_min, 
@@ -201,17 +211,6 @@ segments.save_overlay(
     overlay_path=args.overlay_folder[0],
     DEBUG=DEBUG
 )
-# __x =  math.ceil(req_x_min / resolution) if req_x_min > 0 else math.floor(req_x_min / resolution)
-# __y =  math.ceil(req_y_min / resolution) if req_y_min > 0 else math.floor(req_y_min / resolution)
-# for _x in range(required_delta_x):
-#     x = _x + __x - segments.__sign(req_x_min)
-#     for _y in range(required_delta_y):
-#         y = _y + __y - segments.__sign(req_y_min)
-#         overlay_alias = "{}_{}_{}{}.png".format(segments.__quad(x, y), abs(y), abs(x), test_mode)
-#         if DEBUG: print("Saving as {}".format(overlay_alias))
-#         overlay_segment = Image.fromarray(overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
-#         overlay_segment.save(graphics_folder+overlay_alias, format="PNG")
-        
 
 # with io.BytesIO() as output:
 #     overlay.save(output, format='PNG')
