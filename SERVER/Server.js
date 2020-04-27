@@ -55,6 +55,18 @@ const logger = winston.createLogger({
     }));
   }
 
+// Error handling
+function sendErrorMessage(code, request, response) {
+    let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
+    let error = JSON.parse(rawdata)[code];
+    let errorData = error["Data"][request.header("Locale") != null ? request.header("Locale") : Constants.DEFAULT_LOCALE];
+    let thisErr = {
+        "Error": errorData["PrettyName"],
+        "Description": errorData["Description"],
+    }
+    response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
+}
+
 // =================================== Requests ===================================
 
 app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
@@ -72,29 +84,31 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
             parseFloat(query.maxLatitude),  // y_max
             "--overlay_folder",
             fetchFile("/overlay/"),         // overlay_folder
+            "--errors_file",
+            fetchFile(Constants.SCRIPT_ERRORS_PATH),
             //"--DEBUG"
         ]
     );
 
     var overlayNonce = ""
 
-    // collect data from script
+    // Collect data from script
     python.stdout.on('data', function (data) {
         logger.debug('[Server][qualityOverlay][python/stdout] : ' + data);
         overlayNonce += data.toString();
     });
 
-    // collect error data from script (for debugging)
+    // Collect error data from script (for debugging)
     python.stderr.on('data', function (data) {
         logger.error('[Server][qualityOverlay][python/stderr] :' + data);
     });
 
-    // in close event we are sure that stream from child process is closed
+    // Send status of operation to user on close
     python.on('close', (code) => {
         logger.debug(`[Server][qualityOverlay] Script exit code : ${code}`);
 
         if (code != 0) {
-            res.status(400).send("Bad request");
+            sendErrorMessage(code, req, res);
             return;
         }
 
@@ -129,8 +143,6 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     logger.debug("[Server][logTrip][debug] --quality "        + data["scores"].join(" "))
     logger.debug("[Server][logTrip][debug] --overlay_folder " + fetchFile("/overlay/"))
 
-    // res.send("OK");
-
     const python = spawn(
         Constants.PYTHON_BIN, 
         [
@@ -138,29 +150,30 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
             "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
             "--quality"        , data["scores"].join(" "),
             "--overlay_folder" , fetchFile("/overlay/"),
+            "--errors_file"    , fetchFile(Constants.SCRIPT_ERRORS_PATH),
             //"--DEBUG"
         ]
     );
 
     var pythonData = ""
 
-    // collect data from script
+    // Collect data from script
     python.stdout.on('data', function (data) {
         logger.debug('[Server] Pipe data from python script : ' + data);
         pythonData += data.toString();
     });
 
-    // collect error data from script (for debugging)
+    // Collect error data from script (for debugging)
     python.stderr.on('data', function (data) {
         logger.error('[Server][python/stderr] :' + data);
     });
 
-    // in close event we are sure that stream from child process is closed
+    // Send status of operation to user on close
     python.on('close', (code) => {
         logger.debug(`[Server] Script exit code : ${code}`);
 
         if (code != 0) {
-            res.status(500).send("Internal error");
+            sendErrorMessage(code, req, res);
             return;
         }
         
@@ -177,3 +190,10 @@ if (port == undefined) port = 8080;
 
 app.listen(port);
 logger.info("[Server] Listening on port " + port);
+
+// var rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
+// var error = JSON.parse(rawdata)[code];
+// var thisErr = {
+//     "Error": error["PrettyName"],
+//     "Description": error["Description"],
+// }
