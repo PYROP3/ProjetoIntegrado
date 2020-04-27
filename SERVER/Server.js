@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const Constants = require("./util/Constants");
 const {spawn} = require('child_process');
-const fs = require('fs')
+const fs = require('fs');
+const winston = require('winston');
 
 const path = require('path');
 
@@ -29,6 +30,31 @@ function parseCookies (request) {
 
 function fetchFile(filename) { return path.join(__dirname + "/" + filename); }
 
+// Winston config
+const logger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+      //
+      // - Write to all logs with level `info` and below to `combined.log` 
+      // - Write all logs error (and below) to `error.log`.
+      //
+      new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'error.log'), level: 'error' }),
+      new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'combined.log') })
+    ]
+  });
+   
+  //
+  // If we're not in production then log to the `console` with the format:
+  // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+  // 
+  if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+      format: winston.format.simple()
+    }));
+  }
+
 // Error handling
 function sendErrorMessage(code, request, response) {
     let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
@@ -46,7 +72,7 @@ function sendErrorMessage(code, request, response) {
 app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     var query = req.query;
 
-    console.log("[Server] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
+    logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
 
     const python = spawn(
         Constants.PYTHON_BIN, 
@@ -68,18 +94,18 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 
     // Collect data from script
     python.stdout.on('data', function (data) {
-        console.log('[Server][python/stdout] : ' + data);
+        logger.debug('[Server][qualityOverlay][python/stdout] : ' + data);
         overlayNonce += data.toString();
     });
 
     // Collect error data from script (for debugging)
     python.stderr.on('data', function (data) {
-        console.log('[Server][python/stderr] :' + data);
+        logger.error('[Server][qualityOverlay][python/stderr] :' + data);
     });
 
     // Send status of operation to user on close
     python.on('close', (code) => {
-        console.log(`[Server] Script exit code : ${code}`);
+        logger.debug(`[Server][qualityOverlay] Script exit code : ${code}`);
 
         if (code != 0) {
             sendErrorMessage(code, req, res);
@@ -108,12 +134,14 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     var data = req.body;
 
-    console.log("[Server] Coordinates : " + data["pontos"])
-    console.log("[Server] Quality     : " + data["scores"])
+    logger.info("[Server][logTrip] Trip log requested")
 
-    console.log("[Server][debug] --coordinates "    + data["pontos"].map(coord => coord.join(",")).join(" "))
-    console.log("[Server][debug] --quality "        + data["scores"].join(" "))
-    console.log("[Server][debug] --overlay_folder " + fetchFile("/overlay/"))
+    logger.debug("[Server][logTrip] Coordinates : " + data["pontos"])
+    logger.debug("[Server][logTrip] Quality     : " + data["scores"])
+
+    logger.debug("[Server][logTrip][debug] --coordinates "    + data["pontos"].map(coord => coord.join(",")).join(" "))
+    logger.debug("[Server][logTrip][debug] --quality "        + data["scores"].join(" "))
+    logger.debug("[Server][logTrip][debug] --overlay_folder " + fetchFile("/overlay/"))
 
     const python = spawn(
         Constants.PYTHON_BIN, 
@@ -131,18 +159,18 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
 
     // Collect data from script
     python.stdout.on('data', function (data) {
-        console.log('[Server] Pipe data from python script : ' + data);
+        logger.debug('[Server] Pipe data from python script : ' + data);
         pythonData += data.toString();
     });
 
     // Collect error data from script (for debugging)
     python.stderr.on('data', function (data) {
-        console.log('[Server][python/stderr] :' + data);
+        logger.error('[Server][python/stderr] :' + data);
     });
 
     // Send status of operation to user on close
     python.on('close', (code) => {
-        console.log(`[Server] Script exit code : ${code}`);
+        logger.debug(`[Server] Script exit code : ${code}`);
 
         if (code != 0) {
             sendErrorMessage(code, req, res);
@@ -161,7 +189,7 @@ let port = process.env.PORT;
 if (port == undefined) port = 8080;
 
 app.listen(port);
-console.log("[Server] Listening on port " + port);
+logger.info("[Server] Listening on port " + port);
 
 // var rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
 // var error = JSON.parse(rawdata)[code];

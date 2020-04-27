@@ -10,6 +10,9 @@ const SCRIPT_PATH = "script/"
 const SCRIPT_SLICE_OVERLAY = SCRIPT_PATH + "sliceOverlay.py"
 const SCRIPT_LOG_TRIP      = SCRIPT_PATH + "logTrip.py"
 
+// Log storage
+const LOG_STORAGE_PATH = "log/"
+
 // Error data
 const SCRIPT_ERRORS_PATH   = SCRIPT_PATH + "errorCodes.json"
 
@@ -23,5 +26,6 @@ module.exports = {
     SCRIPT_ERRORS_PATH:      SCRIPT_ERRORS_PATH,
     SCRIPT_SLICE_OVERLAY:    SCRIPT_SLICE_OVERLAY,
     SCRIPT_LOG_TRIP:         SCRIPT_LOG_TRIP,
+    LOG_STORAGE_PATH:        LOG_STORAGE_PATH,
     DEFAULT_LOCALE:          DEFAULT_LOCALE
 }
