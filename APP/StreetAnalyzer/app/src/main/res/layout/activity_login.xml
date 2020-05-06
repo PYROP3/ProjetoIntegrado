@@ -29,9 +29,9 @@
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/usernameField_marginTop"
         android:alpha="0.5"
-        android:drawableLeft="@drawable/ic_person"
+        android:drawableStart="@drawable/ic_person"
         android:drawablePadding="10dp"
-        android:hint="Username"
+        android:hint="@string/username"
         android:inputType="textEmailAddress"
         android:padding="10dp"
         android:singleLine="false"
@@ -40,17 +40,19 @@
         android:textSize="@dimen/textSizeField"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:autofillHints=""/>
 
     <EditText
         android:id="@+id/textPass"
         android:layout_width="@dimen/editText_layout_width"
         android:layout_height="wrap_content"
+        android:hint="@string/password"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/passwordField_marginTop"
 
         android:alpha="0.5"
-        android:drawableLeft="@drawable/ic_lock"
+        android:drawableStart="@drawable/ic_lock"
         android:drawablePadding="10dp"
         android:hint="Password"
         android:inputType="textPassword"
@@ -60,7 +62,8 @@
         android:textSize="@dimen/textSizeField"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textEmail" />
+        app:layout_constraintTop_toBottomOf="@id/textEmail"
+        android:autofillHints=""/>
 
     <Button
         android:id="@+id/button"
@@ -74,13 +77,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textPass"
-        app:layout_constraintVertical_bias="0.23" />
+        app:layout_constraintVertical_bias="0.23"
+        android:onClick="onClickStartMap"
+        android:text="@string/sign_in"/>
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Don't have an account yet? Sign Up"
+        android:text="@string/create_account"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
