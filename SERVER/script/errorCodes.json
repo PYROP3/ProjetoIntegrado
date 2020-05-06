@@ -70,7 +70,7 @@
             },
             "Portugues":{
                 "PrettyName": "Erro de tipo de argumento",
-                "Description": "Um dos argumentos fornecidos está em um formato inexperado"
+                "Description": "Um dos argumentos fornecidos está em um formato inesperado"
             }
         }
     },
