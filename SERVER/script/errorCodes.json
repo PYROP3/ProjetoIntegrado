@@ -99,7 +99,7 @@
                 "Description": "Maximum and minimun are reversed"
             },
             "Portugues":{
-                "PrettyName": "Espaço insuficiente",
+                "PrettyName": "Valores invertidos",
                 "Description": "Máximo e mínimo estão invertidos"
             }
         }
