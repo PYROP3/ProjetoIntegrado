@@ -19,16 +19,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <Button
-        android:id="@+id/btnStartRecord"
-        android:text="@string/btn_start"
-        android:background="@drawable/start_icon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/btnStartRecord"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/start_icon"
+            android:onClick="onClickStartRecord"
+            android:text="@string/btn_start" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
