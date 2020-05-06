@@ -77,6 +77,12 @@ req_y_min = min([c[1] for c in global_coordinates])
 req_x_max = max([c[0] for c in global_coordinates])
 req_y_max = max([c[1] for c in global_coordinates])
 
+req_quality_min = [c[0] for c in global_quality]
+req_quality_max = [c[1] for c in global_quality]
+
+if req_x_min < -90 or req_x_max > 90 or req_y_max > 180 or req_y_min < -180 or req_quality_min < 0 or req_quality_max > 1:
+    raise err.exitOnError("LimitsError")
+
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
 overlay_canvas = segments.load_segments (

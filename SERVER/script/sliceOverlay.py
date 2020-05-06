@@ -70,10 +70,10 @@ err = ErrorHandler(args.errors_file[0])
 DEBUG = DEBUG or args.DEBUG
 
 # Get values from args
-req_x_min = min(args.x_min[0], args.x_max[0])
-req_x_max = max(args.x_min[0], args.x_max[0])
-req_y_min = min(args.y_min[0], args.y_max[0])
-req_y_max = max(args.y_min[0], args.y_max[0])
+req_x_min = args.x_min[0]
+req_x_max = args.x_max[0]
+req_y_min = args.y_min[0]
+req_y_max = args.y_max[0]
 
 try:
     overlay_canvas = segments.load_segments (
@@ -88,6 +88,12 @@ try:
     )
 except MemoryError:
     err.exitOnError("MemoryError")
+
+if req_x_min < -90 or req_x_max > 90 or req_y_max > 180 or req_y_min < -180:
+    raise err.exitOnError("LimitsError")
+
+if req_x_min > req_x_max  or req_y_max < req_y_min:
+    raise err.exitOnError("InvertedValues")
 
 if DEBUG: print("Done!")
 

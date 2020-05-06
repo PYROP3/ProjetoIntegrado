@@ -73,5 +73,35 @@
                 "Description": "Um dos argumentos fornecidos está em um formato inexperado"
             }
         }
+    },
+    {
+        "id":5,
+        "Name": "LimitsError",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Coordinate outside the coverage limits",
+                "Description": "One of the supplied arguments is exceeding the real coordinates"
+            },
+            "Portugues":{
+                "PrettyName": "Coordenada fora dos limites de cobertura",
+                "Description": "Um dos argumentos fornecidos está ultrapassando as coordenadas reais"
+            }
+        }
+    },
+    {
+        "id":6,
+        "Name": "InvertedValues",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Misplaced Values",
+                "Description": "Maximum and minimun are reversed"
+            },
+            "Portugues":{
+                "PrettyName": "Espaço insuficiente",
+                "Description": "Máximo e mínimo estão invertidos"
+            }
+        }
     }
 ]
