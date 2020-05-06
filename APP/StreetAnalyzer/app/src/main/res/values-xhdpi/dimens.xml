@@ -1,0 +1,10 @@
+<resources>
+	<dimen name="passwordField_marginTop">6dp</dimen>
+	<dimen name="usernameField_marginTop">216dp</dimen>
+	<dimen name="textSizeButton">8.4sp</dimen>
+	<dimen name="textSizeField">10.8sp</dimen>
+	<dimen name="textSizeTitle">20.4sp</dimen>
+	<dimen name="button_layout_width">150dp</dimen>
+	<dimen name="editText_layout_width">180dp</dimen>
+	<dimen name="button_layout_height">36dp</dimen>
+</resources>

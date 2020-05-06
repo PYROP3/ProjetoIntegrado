@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="usernameField_marginTop">360dp</dimen>
+    <dimen name="passwordField_marginTop">10dp</dimen>
+    <dimen name="editText_layout_width">300dp</dimen>
+    <dimen name="button_layout_width">250dp</dimen>
+    <dimen name="button_layout_height">60dp</dimen>
+
+    <dimen name="textSizeField">18sp</dimen>
+    <dimen name="textSizeButton">14sp</dimen>
+    <dimen name="textSizeTitle">34sp</dimen>
+</resources>
