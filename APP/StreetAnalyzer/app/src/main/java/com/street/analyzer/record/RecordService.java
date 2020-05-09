@@ -25,7 +25,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.street.analyzer.R;
-import com.street.analyzer.Utils.Constants;
+import com.street.analyzer.utils.Constants;
 import com.street.analyzer.location.MapsActivity;
 
 import java.util.ArrayList;
@@ -38,7 +38,10 @@ public class RecordService extends Service implements SensorEventListener {
     private ArrayList<Values> data = new ArrayList<>();
 
     private Values mValues;
+
+    private SensorManager mSensorManager;
     private LocationCallback mLocationCallback;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     @Nullable
     @Override
@@ -51,7 +54,7 @@ public class RecordService extends Service implements SensorEventListener {
         super.onCreate();
         mValues = new Values();
 
-       registerSensor();
+       registerSensorListener();
        registerLocaleListener();
     }
 
@@ -74,18 +77,18 @@ public class RecordService extends Service implements SensorEventListener {
         return START_NOT_STICKY;
     }
 
-    private void registerSensor(){
-        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    private void registerSensorListener(){
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        if(sensorManager == null){
+        if(mSensorManager == null){
             Toast.makeText(this, "Null service!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, sensor, Constants.ACCELEROMETER_REGISTER_TIME);
-        sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-        sensorManager.registerListener(this, sensor, Constants.GRAVITY_REGISTER_TIME);
+        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, sensor, Constants.ACCELEROMETER_REGISTER_TIME);
+        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        mSensorManager.registerListener(this, sensor, Constants.GRAVITY_REGISTER_TIME);
     }
 
     private void registerLocaleListener(){
@@ -94,8 +97,7 @@ public class RecordService extends Service implements SensorEventListener {
                 .setFastestInterval(Constants.LOCATION_UPDATE_FASTEST_INTERVAL)
                 .setPriority(Constants.LOCATION_PRIORITY_HIGH);
 
-        FusedLocationProviderClient fusedLocationProviderClient =
-                LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         mLocationCallback = new LocationCallback(){
             @Override
@@ -103,22 +105,15 @@ public class RecordService extends Service implements SensorEventListener {
                 if(locationResult == null)
                     return;
                 mValues.registerPositionChange(locationResult.getLastLocation());
-                showMessage();
             }
         };;
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
-    }
-
-    private void showMessage(){
-        Toast.makeText(this, "LOCATION CHANGE", Toast.LENGTH_SHORT).show();
+        mFusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         switch (event.sensor.getType()){
             case Sensor.TYPE_ACCELEROMETER:
-
                 mGravity[0] = mAlpha * mGravity[0] + (1 - mAlpha) * event.values[0];
                 mGravity[1] = mAlpha * mGravity[1] + (1 - mAlpha) * event.values[1];
                 mGravity[2] = mAlpha * mGravity[2] + (1 - mAlpha) * event.values[2];
@@ -130,7 +125,6 @@ public class RecordService extends Service implements SensorEventListener {
                 mValues.registerAccelerometerData(event.values);
 
                 data.add(mValues);
-
                 break;
             case Sensor.TYPE_GRAVITY:
                 mGravity[0] = event.values[0];
@@ -157,5 +151,11 @@ public class RecordService extends Service implements SensorEventListener {
                 manager.createNotificationChannel(serviceChannel);
             }
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        mSensorManager.unregisterListener(this);
+        mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
     }
 }
