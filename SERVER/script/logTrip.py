@@ -44,6 +44,13 @@ def accel_dtype(s):
     except:
         raise argparse.ArgumentTypeError("Qualities must be (x0,y0,z0 x1,y1,z1 ... xn,yn,zn) :[{}]".format(s))
 
+def pseudoSigmoid(value, k=10):
+    return 2 - 2 / (1 + math.exp(-value / k))
+
+def convertAccelerometerData(data):
+    _mags = [np.fft.fft([tupla[0]**2 + tupla[1]**2 + tupla[2]**2 for tupla in segment]) for segment in data]
+    _res  = [np.fft.fftfreq(len(x))[np.argmax(np.abs(x))] for x in _mags]
+    return [pseudoSigmoid(freq) for freq in _res]
 
 parser = argparse.ArgumentParser(description='Store quality information for a series of coordinates.')
 parser.add_argument(      '--coordinates',    type=coord_list_dtype, nargs='+', help='List of coordinates (x, y)', required=True)
@@ -66,7 +73,7 @@ DEBUG = args.DEBUG
 if DEBUG: print("Arg parsed: " + str(args))
 
 global_coordinates = args.coordinates[0]
-global_accelData   = args.accel_data
+global_accelData   = [x[0] for x in args.accel_data] #FIXME
 # global_quality     = args.quality[0]
 
 # Check for mismatched coord and quality lists
@@ -78,13 +85,10 @@ req_y_min = min([c[1] for c in global_coordinates])
 req_x_max = max([c[0] for c in global_coordinates])
 req_y_max = max([c[1] for c in global_coordinates])
 
-err.exitOnError("UnknownScriptError")
+if DEBUG: print(global_accelData)
 
-req_quality_min = [c[0] for c in global_quality]
-req_quality_max = [c[1] for c in global_quality]
-
-if req_x_min < -90 or req_x_max > 90 or req_y_max > 180 or req_y_min < -180 or req_quality_min < 0 or req_quality_max > 1:
-    err.exitOnError("LimitsError")
+global_quality = convertAccelerometerData(global_accelData)
+if DEBUG: print(global_quality)
 
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
@@ -136,12 +140,12 @@ for i in range(len(global_quality)):
     p1 = global_coordinates[i+1]
     if DEBUG: print("P0 = " + str(p0))
 
-    x00 = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p0[0] / resolution, 0, required_delta_x * dpb))
-    y00 = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p0[1] / resolution, required_delta_y * dpb, 0))
+    x00 = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p0[0] / segments.resolution, 0, required_delta_x * segments.dpb))
+    y00 = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p0[1] / segments.resolution, required_delta_y * segments.dpb, 0))
     x0  = x00
     y0  = y00
-    x1  = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p1[0] / resolution, 0, required_delta_x * dpb))
-    y1  = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p1[1] / resolution, required_delta_y * dpb, 0))
+    x1  = int(segments.__rangeMap(required_corners[0][0], required_corners[1][0], p1[0] / segments.resolution, 0, required_delta_x * segments.dpb))
+    y1  = int(segments.__rangeMap(required_corners[0][1], required_corners[1][1], p1[1] / segments.resolution, required_delta_y * segments.dpb, 0))
     if DEBUG: print("[{}] Processing q={} @ ({},{}) - ({},{}) Orig ({} x {})".format(i, q, x0, y0, x1, y1, str(p0), str(p1)))
 
     # Bresenhams algorithm
@@ -214,9 +218,7 @@ segments.save_overlay(
     req_y_min, 
     req_x_max, 
     req_y_max, 
-    overlay_canvas, 
-    resolution=resolution, 
-    dpb=dpb, 
+    overlay_canvas,
     overlay_path=args.overlay_folder[0],
     DEBUG=DEBUG
 )
