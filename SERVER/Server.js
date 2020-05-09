@@ -136,23 +136,23 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
 
     logger.info("[Server][logTrip] Trip log requested")
 
-    logger.debug("[Server][logTrip] Coordinates : " + data["pontos"])
-    logger.debug("[Server][logTrip] Quality     : " + data["scores"])
+    logger.debug("[Server][logTrip] Coordinates : " + JSON.stringify(data["pontos"]))
+    logger.debug("[Server][logTrip] Accel data  : " + JSON.stringify(data["dados"]))
 
-    logger.debug("[Server][logTrip][debug] --coordinates "    + data["pontos"].map(coord => coord.join(",")).join(" "))
-    logger.debug("[Server][logTrip][debug] --quality "        + data["scores"].join(" "))
-    logger.debug("[Server][logTrip][debug] --overlay_folder " + fetchFile("/overlay/"))
+    let py_args = [
+        fetchFile(Constants.SCRIPT_LOG_TRIP),
+        "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
+        "--overlay_folder" , fetchFile("/overlay/"),
+        "--errors_file"    , fetchFile(Constants.SCRIPT_ERRORS_PATH),
+        //"--DEBUG"
+    ]
 
+    py_args = py_args.concat([].concat.apply([], data["dados"].map(line => ["--accel_data", line.map(data => data.join(",")).join(" ")])))
+
+    logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
         Constants.PYTHON_BIN, 
-        [
-            fetchFile(Constants.SCRIPT_LOG_TRIP),
-            "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
-            "--quality"        , data["scores"].join(" "),
-            "--overlay_folder" , fetchFile("/overlay/"),
-            "--errors_file"    , fetchFile(Constants.SCRIPT_ERRORS_PATH),
-            //"--DEBUG"
-        ]
+        py_args
     );
 
     var pythonData = ""

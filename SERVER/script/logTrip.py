@@ -37,20 +37,20 @@ def coord_list_dtype(s):
     except:
         raise argparse.ArgumentTypeError("Coordinates must be (x0,y0 x1,y1 ... xn,yn) :[{}]".format(s))
 
-def quality_dtype(s):
+def accel_dtype(s):
     try:
-        x = list(map(float, s.split(' ')))
+        x = list(map(lambda p: list(map(float, p.split(',')))[::-1], s.split(' ')))
         return x
     except:
-        raise argparse.ArgumentTypeError("Qualities must be (x y ... z) :[{}]".format(s))
+        raise argparse.ArgumentTypeError("Qualities must be (x0,y0,z0 x1,y1,z1 ... xn,yn,zn) :[{}]".format(s))
 
 
 parser = argparse.ArgumentParser(description='Store quality information for a series of coordinates.')
-parser.add_argument('--coordinates',    type=coord_list_dtype, nargs='+', help='List of coordinates (x, y)', required=True)
-parser.add_argument('--quality',        type=quality_dtype,    nargs='+', help='List of quality data',       required=True)
-parser.add_argument('--overlay_folder', type=str,              nargs=1,   help='Path to overlay folder',     required=True)
-parser.add_argument('--errors_file',    type=str,         nargs=1, help='Path to errors JSON file')
-parser.add_argument('--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
+parser.add_argument(      '--coordinates',    type=coord_list_dtype, nargs='+', help='List of coordinates (x, y)', required=True)
+parser.add_argument('-d', '--accel_data',     type=accel_dtype,      nargs='+', help='List of accelerometer data', required=True, action='append')
+parser.add_argument(      '--overlay_folder', type=str,              nargs=1,   help='Path to overlay folder',     required=True)
+parser.add_argument(      '--errors_file',    type=str,         nargs=1, help='Path to errors JSON file')
+parser.add_argument(      '--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
 
 if DEBUG: print("Args: " + str(sys.argv))
 
@@ -66,10 +66,11 @@ DEBUG = args.DEBUG
 if DEBUG: print("Arg parsed: " + str(args))
 
 global_coordinates = args.coordinates[0]
-global_quality     = args.quality[0]
+global_accelData   = args.accel_data
+# global_quality     = args.quality[0]
 
 # Check for mismatched coord and quality lists
-if (len(global_coordinates) != len(global_quality) + 1): exit(1)
+if (len(global_coordinates) != len(global_accelData) + 1): exit(1)
 
 # Find bounding box of all coordinates
 req_x_min = min([c[0] for c in global_coordinates])
@@ -77,11 +78,13 @@ req_y_min = min([c[1] for c in global_coordinates])
 req_x_max = max([c[0] for c in global_coordinates])
 req_y_max = max([c[1] for c in global_coordinates])
 
+err.exitOnError("UnknownScriptError")
+
 req_quality_min = [c[0] for c in global_quality]
 req_quality_max = [c[1] for c in global_quality]
 
 if req_x_min < -90 or req_x_max > 90 or req_y_max > 180 or req_y_min < -180 or req_quality_min < 0 or req_quality_max > 1:
-    raise err.exitOnError("LimitsError")
+    err.exitOnError("LimitsError")
 
 if DEBUG: print("Bounding box from {},{} to {},{}".format(req_x_min, req_y_min, req_x_max, req_y_max))
 
