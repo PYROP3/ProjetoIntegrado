@@ -3,28 +3,20 @@ package com.street.analyzer.location;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.icu.text.Collator;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.material.navigation.NavigationView;
 import com.street.analyzer.R;
-import com.street.analyzer.Utils.Constants;
 import com.street.analyzer.record.RecordService;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,

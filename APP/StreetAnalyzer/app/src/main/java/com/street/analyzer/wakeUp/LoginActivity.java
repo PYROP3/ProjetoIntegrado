@@ -7,13 +7,17 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.street.analyzer.location.MapsActivity;
 import com.street.analyzer.R;
+import com.street.analyzer.utils.Constants;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private final String TAG = Constants.TAG;
 
     private RequestPermissions mRequestPermissions;
 
@@ -28,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onClickStartMap(View v){
         //TODO: Check if user consent the permissions
+        Log.d(TAG, "Logging");
         startActivity(new Intent(this, MapsActivity.class));
     }
 

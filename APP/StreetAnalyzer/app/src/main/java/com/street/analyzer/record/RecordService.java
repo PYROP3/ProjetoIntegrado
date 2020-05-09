@@ -11,9 +11,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -29,15 +31,16 @@ import com.street.analyzer.utils.Constants;
 import com.street.analyzer.location.MapsActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecordService extends Service implements SensorEventListener {
+
+    private final String TAG = Constants.TAG;
 
     private float mAlpha = (float)0.8;
     private float mGravity[] = new float[]{(float)9.81, (float)9.81, (float)9.81};
 
-    private ArrayList<Values> data = new ArrayList<>();
-
-    private Values mValues;
+    private StorageManager mStorageManager;
 
     private SensorManager mSensorManager;
     private LocationCallback mLocationCallback;
@@ -52,7 +55,9 @@ public class RecordService extends Service implements SensorEventListener {
     @Deprecated
     public void onCreate() {
         super.onCreate();
-        mValues = new Values();
+        mStorageManager = new StorageManager(this);
+
+        Log.d(TAG, "Registering listeners and starting service");
 
        registerSensorListener();
        registerLocaleListener();
@@ -102,11 +107,12 @@ public class RecordService extends Service implements SensorEventListener {
         mLocationCallback = new LocationCallback(){
             @Override
             public void onLocationResult(LocationResult locationResult){
-                if(locationResult == null)
-                    return;
-                mValues.registerPositionChange(locationResult.getLastLocation());
+                if(locationResult == null) return;
+                Location location = locationResult.getLastLocation();
+                mStorageManager.registerPositionChange(location.getLatitude(), location.getLongitude());
+                Log.d(TAG, "New location registered");
             }
-        };;
+        };
         mFusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
     }
 
@@ -122,9 +128,7 @@ public class RecordService extends Service implements SensorEventListener {
                 event.values[1] = event.values[1]- mGravity[1];
                 event.values[2] = event.values[2]- mGravity[2];
 
-                mValues.registerAccelerometerData(event.values);
-
-                data.add(mValues);
+                mStorageManager.registerAccelerometerData(event.values);
                 break;
             case Sensor.TYPE_GRAVITY:
                 mGravity[0] = event.values[0];
@@ -155,6 +159,7 @@ public class RecordService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy(){
+        Log.d(TAG, "onDestroy: Unregistering listeners");
         mSensorManager.unregisterListener(this);
         mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
     }

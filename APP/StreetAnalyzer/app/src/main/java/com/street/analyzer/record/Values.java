@@ -1,52 +1,29 @@
 package com.street.analyzer.record;
 
 import android.location.Location;
+import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-class Values {
+class Values implements Serializable {
 
-    private ArrayList<AccelerometerDataLogger> mAccelerometerData;
-    private ArrayList<Integer> mNumberItems;
-    private ArrayList<Location> mPositions;
+    private ArrayList<Float> mXValue = new ArrayList<>();
+    private ArrayList<Float> mYValue = new ArrayList<>();
+    private ArrayList<Float> mZValue = new ArrayList<>();
 
-    private AccelerometerDataLogger mAccelerometerValue;
-    private int mCounter;
+    private ArrayList<Double> mLatitude  = new ArrayList<>();
+    private ArrayList<Double> mLongitude  = new ArrayList<>();
+    private ArrayList<Integer> mNumberItems = new ArrayList<>();
 
-    Values(){
-        mAccelerometerData = new ArrayList<>();
-        mNumberItems = new ArrayList<>();
-        mPositions = new ArrayList<>();
-
-        mAccelerometerValue = new AccelerometerDataLogger();
-        mCounter = 0;
+    Values(ArrayList x, ArrayList y, ArrayList z, ArrayList itens
+            , ArrayList latitude, ArrayList longitude){
+        mXValue = x;
+        mYValue = y;
+        mZValue = z;
+        mNumberItems = itens;
+        mLatitude = latitude;
+        mLongitude = longitude;
     }
 
-     void registerAccelerometerData(float[] data){
-        mAccelerometerValue.saveData(data);
-        mAccelerometerData.add(mAccelerometerValue);
-        mCounter++;
-    }
-
-    void registerPositionChange(Location location){
-        mPositions.add(location);
-        mNumberItems.add(mCounter);
-        mCounter = 0;
-    }
 }
-
-class AccelerometerDataLogger{
-
-    private float[] data = new float[3];
-
-    void saveData(float[] received){
-        data[0] = received[0]; data[1] = received[1]; data[2] = received[2];
-    }
-
-    float[] getData(){
-        return data;
-    }
-}
-
