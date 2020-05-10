@@ -2,7 +2,7 @@ name: Run tests
 
 on: [push]
 
-jobs:  
+jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -12,6 +12,9 @@ jobs:
     steps:
     - name: Git checkout
       uses: actions/checkout@v1
+
+    - name: Install pylint
+      run: pip install pylint
 
     - name: npm install, build, and test
       working-directory: ./SERVER
