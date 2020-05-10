@@ -15,6 +15,9 @@
     <string name="side_user_icon">User icon</string>
     <string name="side_default_name">Roberto Justos</string>
     <string name="side_default_email">roberj@bol.com.br</string>
+
+    <!-- Login Activity -->
+    <string name="app_title">Street Analyzer</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Don\'t have an account yet? Sign Up</string>
     <string name="password">Password</string>

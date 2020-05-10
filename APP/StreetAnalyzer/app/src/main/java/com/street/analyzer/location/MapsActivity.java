@@ -18,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.street.analyzer.R;
 import com.street.analyzer.record.RecordService;
+import com.street.analyzer.serverCommunication.CustomOkHttpClient;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {

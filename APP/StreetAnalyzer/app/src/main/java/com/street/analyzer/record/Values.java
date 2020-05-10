@@ -8,20 +8,17 @@ import java.util.ArrayList;
 
 class Values implements Serializable {
 
-    private ArrayList<Float> mXValue = new ArrayList<>();
-    private ArrayList<Float> mYValue = new ArrayList<>();
-    private ArrayList<Float> mZValue = new ArrayList<>();
+    private ArrayList<Float> mXValue;
+    private ArrayList<Float> mYValue;
+    private ArrayList<Float> mZValue;
 
-    private ArrayList<Double> mLatitude  = new ArrayList<>();
-    private ArrayList<Double> mLongitude  = new ArrayList<>();
-    private ArrayList<Integer> mNumberItems = new ArrayList<>();
+    private ArrayList<Double> mLatitude;
+    private ArrayList<Double> mLongitude;
 
-    Values(ArrayList x, ArrayList y, ArrayList z, ArrayList itens
-            , ArrayList latitude, ArrayList longitude){
+    Values(ArrayList x, ArrayList y, ArrayList z, ArrayList latitude, ArrayList longitude){
         mXValue = x;
         mYValue = y;
         mZValue = z;
-        mNumberItems = itens;
         mLatitude = latitude;
         mLongitude = longitude;
     }

@@ -14,11 +14,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-public class SaveState {
+class SaveState {
 
     private final String TAG = Constants.TAG;
-
-    private ObjectOutput mObjectOutput;
 
     private File mFolder;
     private Context mContext;

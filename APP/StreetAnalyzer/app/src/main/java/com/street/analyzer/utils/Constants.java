@@ -11,7 +11,7 @@ public class Constants {
     public static final int ACCELEROMETER_REGISTER_TIME = SensorManager.SENSOR_DELAY_GAME;
     public static final int GRAVITY_REGISTER_TIME = SensorManager.SENSOR_DELAY_NORMAL;
 
-    //TODO: Define default value for Location Update and Limit Position Change 
+    //TODO: Define default value for Location Update and Limit Position Change
     public static final long LOCATION_UPDATE_INTERVAL = 1000;//30000;
     public static final long LOCATION_UPDATE_FASTEST_INTERVAL = 1000;//20000;
     public static final int LOCATION_LIMIT_POSITION_CHANGE = 5;
@@ -24,5 +24,5 @@ public class Constants {
 
     public static final String DATA_FILE_NAME = "recordData.data";
 
-
+    public static final String SERVER_URL = "https://reqres.in/api/users?page=2";
 }

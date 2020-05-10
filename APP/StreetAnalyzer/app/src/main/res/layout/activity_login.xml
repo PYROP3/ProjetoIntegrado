@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/cloud"
-        android:text="Street Analyzer"
+        android:text="@string/app_title"
         android:textColor="@color/white"
         android:textSize="@dimen/textSizeTitle"
         app:layout_constraintBottom_toTopOf="@+id/textEmail"
@@ -89,7 +89,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button"
-        app:layout_constraintVertical_bias="0.517" />
+        app:layout_constraintVertical_bias="0.517"
+        android:onClick="onClickSignUp"/>
 
 
 
