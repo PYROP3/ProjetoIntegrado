@@ -29,7 +29,6 @@ class SaveState {
     }
 
     void saveData(ArrayList<Values> data) {
-        Log.d(TAG, "Trying to load data");
         ObjectOutput out;
         try {
             File outFile = new File(mFolder, Constants.DATA_FILE_NAME);
@@ -44,7 +43,6 @@ class SaveState {
     }
 
     ArrayList<Values> loadData(){
-        Log.d(TAG, "Trying to save data");
         if(mFolder == null){
             mFolder = mContext.getExternalFilesDir(null);
         }
@@ -59,6 +57,7 @@ class SaveState {
             e.printStackTrace();
         }
         if (savedData != null) {
+            Log.d(TAG, "Data loaded successfully");
             return savedData;
         } else {
            Log.d(TAG, "Error when trying to read data");

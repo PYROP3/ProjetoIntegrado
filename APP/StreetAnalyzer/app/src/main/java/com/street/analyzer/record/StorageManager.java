@@ -1,11 +1,14 @@
 package com.street.analyzer.record;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import com.street.analyzer.utils.Constants;
 
 import java.util.ArrayList;
+
+import static java.lang.System.gc;
 
 class StorageManager {
 
@@ -22,7 +25,7 @@ class StorageManager {
     private SaveState mSaveState;
 
     StorageManager(Context context){
-        resetVariables();
+        instanceVariables();
 
         mLocationCounter = 0;
         mSaveState = new SaveState(context);
@@ -47,7 +50,7 @@ class StorageManager {
         if(mLocationCounter == Constants.LOCATION_LIMIT_POSITION_CHANGE){
             Log.d(TAG, "Limit reached, saving new values into storage");
             final Values value = new Values(mXValue, mYValue, mZValue, mLatitude, mLongitude);
-            resetVariables();
+            instanceVariables();
             mLocationCounter = 0;
 
             Runnable r = new Runnable() {
@@ -70,12 +73,13 @@ class StorageManager {
         }
     }
 
-    private void resetVariables(){
-        mXValue.clear();
-        mYValue.clear();
-        mZValue.clear();
-        mLatitude.clear();
-        mLongitude.clear();
+    private void instanceVariables(){
+        mXValue = new ArrayList<>();
+        mYValue = new ArrayList<>();
+        mZValue = new ArrayList<>();
+        mLatitude = new ArrayList<>();
+        mLongitude = new ArrayList<>();
+        gc();
     }
 
 }
