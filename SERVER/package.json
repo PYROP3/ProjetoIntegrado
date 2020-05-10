@@ -13,7 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "python -m pylint --rcfile=.\\script\\.pylintrc_build --exit-zero script && echo \"OK!\"",
+    "test": "python -m pylint --rcfile=./script/.pylintrc_build --exit-zero script && echo \"OK!\"",
     "start": "node Server.js"
   },
   "repository": {
