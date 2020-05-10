@@ -51,7 +51,7 @@ def __quad(x, y):
     return ("NE" if y > 0 else "SE") if x > 0 else ("NW" if y > 0 else "SW")
 
 def __sign(x):
-    return 1 if x >= 0 else -1 
+    return 1 if x >= 0 else -1
 
 # def roundUp(x):
 #     return math.ceil(x) if x > 0 else math.floor(x)
@@ -89,19 +89,19 @@ def load_segments(min_x, min_y, max_x, max_y, resolution=resolution, alias_appen
             try: # Get segment if it exists
                 with Image.open(overlay_path+"graphics/"+overlay_alias+".png").convert("RGB") as temp_overlay:
                     aux = np.asarray(temp_overlay)
-                    if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb,(_y+1)*dpb,_x*dpb,(_x+1)*dpb))
-                    overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
+                    if DEBUG: print("Ranges: {}:{}, {}:{}".format(_y*dpb, (_y+1)*dpb, _x*dpb, (_x+1)*dpb))
+                    overlay_canvas[_y*dpb:(_y+1)*dpb, _x*dpb:(_x+1)*dpb, :] = aux[:, :, :]
             except: # Create new segment if not found on disk
                 if DEBUG: print("[PYTHON] creating new segment (source_mode = {})".format(str(source_mode)))
                 if source_mode: # Source mode (for testing cropping)
-                    img = Image.new("RGB", (dpb,dpb), ((x+y)%2*255,0,(x+y)%2*255))
+                    img = Image.new("RGB", (dpb, dpb), ((x+y)%2*255, 0, (x+y)%2*255))
                     d = ImageDraw.Draw(img)
-                    d.text((20,20), overlay_alias, font=fnt, fill=(127,127,127,255))
+                    d.text((20, 20), overlay_alias, font=fnt, fill=(127, 127, 127, 255))
                 else: # Sigma-mu mode (for testing maths)
-                    img = Image.new("RGB", (dpb,dpb), (127,255,0))
+                    img = Image.new("RGB", (dpb, dpb), (127, 255, 0))
                 aux = np.asarray(img)
-                overlay_canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:] = aux[:,:,:]
-    
+                overlay_canvas[_y*dpb:(_y+1)*dpb, _x*dpb:(_x+1)*dpb, :] = aux[:, :, :]
+
     return overlay_canvas
 
 def bounding_box(min_x, min_y, max_x, max_y, resolution=resolution, dpb=dpb):
@@ -131,5 +131,5 @@ def save_overlay(min_x, min_y, max_x, max_y, canvas, resolution=resolution, dpb=
             y = _y + __y - __sign(min_y)
             overlay_alias = "{}_{}_{}{}".format(__quad(x, y), abs(y), abs(x), "_sigma_mu")
             if DEBUG: print("Saving as {}".format(overlay_alias))
-            overlay_segment = Image.fromarray(canvas[_y*dpb:(_y+1)*dpb,_x*dpb:(_x+1)*dpb,:])
+            overlay_segment = Image.fromarray(canvas[_y*dpb:(_y+1)*dpb, _x*dpb:(_x+1)*dpb, :])
             overlay_segment.save(overlay_path+"graphics/"+overlay_alias+".png", format="PNG")

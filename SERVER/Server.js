@@ -37,18 +37,18 @@ const logger = winston.createLogger({
     defaultMeta: { service: 'user-service' },
     transports: [
       //
-      // - Write to all logs with level `info` and below to `combined.log` 
+      // - Write to all logs with level `info` and below to `combined.log`
       // - Write all logs error (and below) to `error.log`.
       //
       new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'error.log'), level: 'error' }),
       new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'combined.log') })
     ]
   });
-   
+
   //
   // If we're not in production then log to the `console` with the format:
   // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-  // 
+  //
   if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
       format: winston.format.simple()
@@ -75,9 +75,9 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
 
     const python = spawn(
-        Constants.PYTHON_BIN, 
+        Constants.PYTHON_BIN,
         [
-            fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
+            fetchFile(Constants.SCRIPT_SLICE_OVERLAY),
             parseFloat(query.minLongitude), // x_min
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
@@ -151,7 +151,7 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
 
     logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
-        Constants.PYTHON_BIN, 
+        Constants.PYTHON_BIN,
         py_args
     );
 
@@ -176,13 +176,13 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
             sendErrorMessage(code, req, res);
             return;
         }
-        
+
         res.send("Obrigado pela contribuição, " + data["usuario"] + "!")
     });
 
 });
 
-// =================================== End page require =================================== 
+// =================================== End page require ===================================
 
 // Listen on port
 let port = process.env.PORT;

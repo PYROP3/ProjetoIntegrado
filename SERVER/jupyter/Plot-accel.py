@@ -52,7 +52,7 @@ print(str(ts))
 
 
 plt.clf()
-fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(40,30))
+fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(40, 30))
 ax1.plot(ts, xs, color='red')
 ax2.plot(ts, ys, color='green')
 ax3.plot(ts, zs, color='blue')
