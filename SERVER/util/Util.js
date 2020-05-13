@@ -1,3 +1,5 @@
+const path = require('path');
+
 /**
  * Create a random hex string with a given size
  *
@@ -15,3 +17,12 @@ module.exports.generateToken = function(len) {
     }
     return r;
 };
+
+/**
+ * Return absolute location of file pointed by filename
+ *
+ * @param filename {String} File to be located
+ */
+module.exports.fetchFile = function fetchFile(filename) { 
+    return path.join(__dirname + "/" + filename);
+}

@@ -24,20 +24,7 @@ const client = new MongoClient(mongoUrl, { useUnifiedTopology: true });
 const load = async () => {
     let cclient = await client.connect()//function(err) {
     module.exports.db = cclient.db(dbName);
+    
 }
 
 load()
-    //     assert.equal(null, err);
-    //     console.log("Connected successfully to server");
-      
-    //     const db = client.db(dbName);
-
-    //     const col = db.collection(collection);
-      
-    //     console.log("accessed collection " + collection);
-
-    //     callback(col, function() {
-    //         client.close();
-    //     });
-    // });
-    // }
