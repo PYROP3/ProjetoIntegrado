@@ -1,16 +1,24 @@
 const express = require('express');
-const app = express();
+const server = express();
 const Constants = require("./util/Constants");
 const {spawn} = require('child_process');
 const fs = require('fs');
 const winston = require('winston');
-
 const path = require('path');
+const mongo = require("./mongodb/MongoHelper.js");
+//const oauth2 = require("./oauth2/Oauth2Helper.js").oauth2;
+const assert = require('assert');
+const userModel = require("./mongodb/model/User.js");
+const serverUtils = require("./util/Util.js");
+const mailer = require("./util/MailerHelper.js");
 
 // JSON via post
 const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: false }));
+
+// Environment variables
+require('dotenv').config({path: __dirname + '/util/.env'});
 
 // Cookies
 function parseCookies (request) {
@@ -26,11 +34,29 @@ function parseCookies (request) {
 }
 
 // Static pages
-//app.use(express.static('htmls'));
+//server.use(express.static('htmls'));
 
 function fetchFile(filename) { return path.join(__dirname + "/" + filename); }
 
-// Winston config
+// Oauth2 setup
+// server.use(oauth2.inject());
+// server.post('/token', oauth2.controller.token);
+// server.get('/authorization', isAuthorized, oauth2.controller.authorization, function(req, res) {
+//     // Render our decision page
+//     // Look into ./test/server for further information
+//     res.render('authorization', {layout: false});
+// });
+// server.post('/authorization', isAuthorized, oauth2.controller.authorization);
+// function isAuthorized(req, res, next) {
+//     if (req.session.authorized) next();
+//     else {
+//         var params = req.query;
+//         params.backUrl = req.path;
+//         res.redirect('/login?' + query.stringify(params));
+//     }
+// };
+
+// Winston setup
 const logger = winston.createLogger({
     level: 'debug',
     format: winston.format.json(),
@@ -64,12 +90,59 @@ function sendErrorMessage(code, request, response) {
         "Error": errorData["PrettyName"],
         "Description": errorData["Description"],
     }
-    response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
+    response.status(error["HttpReturn"]).header("Content-Type", "serverlication/json").send(JSON.stringify(thisErr));
 }
 
 // =================================== Requests ===================================
 
-app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
+server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
+    let data = req.body;
+    let authToken = req.token;
+
+    let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
+    if (findResult) { 
+        logger.info("Account requested for email " + data['email'] + " already in use");
+        sendErrorMessage(3, req, res); //TODO find a better way to reply
+        return 
+    }
+    var newUser = new userModel.User(data['email'], data['name'], data['password']).toJSON();
+    newUser['authToken'] = serverUtils.generateToken(32);
+    logger.info("Creating user : ", newUser);
+    let result = await mongo.db.collection('pendingUsers').insertOne(newUser);
+    if (result == null) {
+        sendErrorMessage(1, req, res); 
+    } else {
+        sendErrorMessage(0, req, res); //TODO find a better way to reply
+        //TODO des-gambiarrar esse processo de enviar email
+        mailer.sendMail({
+            from: Constants.SOURCE_EMAIL_ADDRESS,
+            to: newUser['email'],
+            subject: 'Street analyzer account validation',
+            text: 'That was easy!\n' + 
+                'Now just click on this link to validate your account: ' +
+                Constants.SERVER_URL + 
+                Constants.VERIFY_ACCOUNT_REQUEST + 
+                '?token='+newUser['authToken']
+        });
+    }
+});
+
+server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
+    let query = req.query;
+    let authToken = query.token;
+
+    let auth = await mongo.db.collection('pendingUsers').findOneAndDelete({'authToken':authToken});
+    if (auth == null) {
+        sendErrorMessage(7, req, res); 
+    } else {
+        logger.info("Validating user : ", auth);
+        delete(auth['authToken']);
+        await mongo.db.collection('users').insertOne(new userModel.User(auth).toJSON());
+        sendErrorMessage(0, req, res); //TODO find a better way to reply
+    }
+});
+
+server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     var query = req.query;
 
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
@@ -131,7 +204,7 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
 });
 
 
-app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
+server.post(Constants.LOG_TRIP_REQUEST, function(req, res){
     var data = req.body;
 
     logger.info("[Server][logTrip] Trip log requested")
@@ -147,7 +220,7 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
         //"--DEBUG"
     ]
 
-    py_args = py_args.concat([].concat.apply([], data["dados"].map(line => ["--accel_data", line.map(data => data.join(",")).join(" ")])))
+    py_args = py_args.concat([].concat.serverly([], data["dados"].map(line => ["--accel_data", line.map(data => data.join(",")).join(" ")])))
 
     logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
@@ -186,9 +259,9 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
 
 // Listen on port
 let port = process.env.PORT;
-if (port == undefined) port = 8080;
+if (port == undefined) port = Constants.SERVER_PORT;
 
-app.listen(port);
+server.listen(port);
 logger.info("[Server] Listening on port " + port);
 
 // var rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));

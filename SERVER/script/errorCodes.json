@@ -103,5 +103,20 @@
                 "Description": "Máximo e mínimo estão invertidos"
             }
         }
+    },
+    {
+        "id":7,
+        "Name": "ValidationFailed",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Account validation failed",
+                "Description": "Check the URL and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Validacao de conta falhou",
+                "Description": "Verifique a URL e tente novamente"
+            }
+        }
     }
 ]
