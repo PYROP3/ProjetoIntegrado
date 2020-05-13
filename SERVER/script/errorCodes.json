@@ -103,5 +103,20 @@
                 "Description": "Máximo e mínimo estão invertidos"
             }
         }
+    },
+    {
+        "id":7,
+        "Name": "MismatchedData",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Mismatched Data",
+                "Description": "Did not find data as it was expected"
+            },
+            "Portugues":{
+                "PrettyName": "Dados não pareados",
+                "Description": "Dados não foram encontrados como esperado"
+            }
+        }
     }
 ]

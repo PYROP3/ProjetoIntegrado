@@ -39,7 +39,7 @@ def quad(x, y):
     return ("NE" if y > 0 else "SE") if x > 0 else ("NW" if y > 0 else "SW")
 
 def sign(x):
-    return 1 if x >= 0 else -1 
+    return 1 if x >= 0 else -1
 
 def roundUp(x):
     return math.ceil(x) if x > 0 else math.floor(x)
@@ -50,12 +50,12 @@ def roundDown(x):
 coord_dtype = float
 
 parser = argparse.ArgumentParser(description='Retrieve required segment from overlay.')
-parser.add_argument('x_min',            type=coord_dtype, nargs=1, help='Minimum X coordinate of bounding box')
-parser.add_argument('y_min',            type=coord_dtype, nargs=1, help='Minimum Y coordinate of bounding box')
-parser.add_argument('x_max',            type=coord_dtype, nargs=1, help='Maximum X coordinate of bounding box')
-parser.add_argument('y_max',            type=coord_dtype, nargs=1, help='Maximum Y coordinate of bounding box')
-parser.add_argument('--overlay_folder', type=str,         nargs=1, help='Path to overlay folder')
-parser.add_argument('--errors_file',    type=str,         nargs=1, help='Path to errors JSON file')
+parser.add_argument('x_min', type=coord_dtype, nargs=1, help='Minimum X coordinate of bounding box')
+parser.add_argument('y_min', type=coord_dtype, nargs=1, help='Minimum Y coordinate of bounding box')
+parser.add_argument('x_max', type=coord_dtype, nargs=1, help='Maximum X coordinate of bounding box')
+parser.add_argument('y_max', type=coord_dtype, nargs=1, help='Maximum Y coordinate of bounding box')
+parser.add_argument('--overlay_folder', type=str, nargs=1, help='Path to overlay folder')
+parser.add_argument('--errors_file', type=str, nargs=1, help='Path to errors JSON file')
 parser.add_argument('--DEBUG', dest='DEBUG', action='store_const', const=True, default=False)
 
 if DEBUG: print("Args: " + str(sys.argv))
@@ -77,11 +77,11 @@ req_y_max = args.y_max[0]
 
 try:
     overlay_canvas = segments.load_segments (
-        req_x_min, 
-        req_y_min, 
-        req_x_max, 
-        req_y_max, 
-        alias_append="_"+run_mode, 
+        req_x_min,
+        req_y_min,
+        req_x_max,
+        req_y_max,
+        alias_append="_"+run_mode,
         overlay_path=args.overlay_folder[0],
         DEBUG=DEBUG,
         source_mode=source_mode
@@ -97,19 +97,19 @@ if req_x_min > req_x_max  or req_y_max < req_y_min:
 
 if DEBUG: print("Done!")
 
-aux_canvas = overlay_canvas[:,:,:]
+aux_canvas = overlay_canvas[:, :, :]
 
 # Convert sigma-mu to gradient
 if run_mode == "sigma_mu":
     if DEBUG:
-        if (np.max(overlay_canvas[:,:,util_channel]) == 0):
+        if (np.max(overlay_canvas[:, :, util_channel]) == 0):
             print("None active!")
         else:
             print("Found active!")
-        print("Mu range: {} <> {}".format(np.min(overlay_canvas[:,:,mu_channel]), np.max(overlay_canvas[:,:,mu_channel])))
+        print("Mu range: {} <> {}".format(np.min(overlay_canvas[:, :, mu_channel]), np.max(overlay_canvas[:, :, mu_channel])))
 
     try:
-        _mu = overlay_canvas[:,:,mu_channel] / 255.
+        _mu = overlay_canvas[:, :, mu_channel] / 255.
     except MemoryError:
         err.exitOnError("MemoryError")
 
@@ -118,7 +118,7 @@ if run_mode == "sigma_mu":
     fig.tight_layout(pad=0)
     fig.canvas.draw()
     data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-    aux_canvas = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    aux_canvas = data.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
 
     assert aux_canvas.shape == overlay_canvas.shape, "Expected {}, got {}".format(str(overlay_canvas.shape), str(aux_canvas.shape))
 
@@ -135,8 +135,8 @@ if DEBUG:
 
     ellipse_rad = 10
 
-    d.ellipse([left-ellipse_rad, upper-ellipse_rad, left+ellipse_rad, upper+ellipse_rad],   fill=(255,0,0))
-    d.ellipse([right-ellipse_rad, lower-ellipse_rad, right+ellipse_rad, lower+ellipse_rad], fill=(0,0,255))
+    d.ellipse([left-ellipse_rad, upper-ellipse_rad, left+ellipse_rad, upper+ellipse_rad], fill=(255, 0, 0))
+    d.ellipse([right-ellipse_rad, lower-ellipse_rad, right+ellipse_rad, lower+ellipse_rad], fill=(0, 0, 255))
 
     overlay_canvas_img.show()
 
@@ -157,13 +157,13 @@ print(nonce, end="")
 
 # Testing
 # segments.save_overlay(
-#     req_x_min, 
-#     req_y_min, 
-#     req_x_max, 
-#     req_y_max, 
-#     overlay_canvas, 
-#     resolution=resolution, 
-#     dpb=dpb, 
+#     req_x_min,
+#     req_y_min,
+#     req_x_max,
+#     req_y_max,
+#     overlay_canvas,
+#     resolution=resolution,
+#     dpb=dpb,
 #     overlay_path=args.overlay_folder[0],
 #     DEBUG=DEBUG
 # )
