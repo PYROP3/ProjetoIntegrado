@@ -101,4 +101,3 @@ SERVER/jupyter/*.txt
 
 # Confidential data
 *.env
-SERVER/mongodb/data/

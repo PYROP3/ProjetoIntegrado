@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
  * Generic send email
  * Uses environment variables to get authentication tokens to communicate with email provider
  *
- * @param emailData {Object} File to be locate
+ * @param emailData {Object} File to be located
  */
 module.exports.sendMail = function(emailData) {
     transporter.sendMail(emailData, function(error, info){

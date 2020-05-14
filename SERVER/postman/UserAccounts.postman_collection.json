@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "f29ed5ca-0b91-4e76-9369-ae039963bc32",
+		"name": "Create and verify account",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Account",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 0123456789ABCDEF",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\":\"gabriela_m18@outlook.com\",\n\t\"name\":\"Seu cu\",\n\t\"password\":\"buceta\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/createAccount",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/verifyAccount?token=6f25cf4a592bef07eb7627e6d64ce30e",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"verifyAccount"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "6f25cf4a592bef07eb7627e6d64ce30e"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"user\":\"caiotsan@gmail.com\",\n\t\"pass\":\"HelloWorld\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/auth",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request with auth",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer c561a14638121d883a3d888e56db9269f28482976474a6e9b2059293396ad7fa",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"usuario\":\"teste-01\",\n  \"pontos\":[\n    [ -22.1542655728, -47.1149176376 ],\n    [ -22.1743303693, -47.1005861652 ],\n    [ -22.1764570632, -47.1261083091 ]\n  ],\n  \"dados\":[\n    [\n      [0.7486795668, 0.7486795668, 0.7486795668],\n      [0.1058922260, 0.1058922260, 0.1058922260],\n      [0.7486795668, 0.7486795668, 0.7486795668]\n    ],\n    [\n      [0.1058922260, 0.1058922260, 0.1058922260],\n      [0.7486795668, 0.7486795668, 0.7486795668],\n      [0.1058922260, 0.1058922260, 0.1058922260],\n      [0.7486795668, 0.7486795668, 0.7486795668]\n    ]\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "localhost:8080/logTrip",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"logTrip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Log out",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer c561a14638121d883a3d888e56db9269f28482976474a6e9b2059293396ad7fd"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/deauth",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"deauth"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

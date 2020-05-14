@@ -1,5 +1,5 @@
 const path = require('path');
-
+const Constants = require("./Constants.js");
 /**
  * Create a random hex string with a given size
  *
@@ -23,6 +23,25 @@ module.exports.generateToken = function(len) {
  *
  * @param filename {String} File to be located
  */
-module.exports.fetchFile = function fetchFile(filename) { 
-    return path.join(__dirname + "/" + filename);
+module.exports.fetchFile = function(filename) { 
+    return path.join(__dirname + "/../" + filename);
+}
+
+/**
+ * Preprocess the bearer token in the request header
+ *
+ * @param authToken {String} Token to be parsed
+ */
+module.exports.parseAuthToken = function(authToken) {
+    if (authToken == undefined) {
+        return null;
+    }
+    if (authToken.substr(0, Constants.AUTH_TOKEN_NAME.length) !== Constants.AUTH_TOKEN_NAME) {
+        return null;
+    }
+    if (authToken.substr(Constants.AUTH_TOKEN_NAME.length).length != Constants.AUTH_TOKEN_LENGTH) {
+        return null;
+    }
+
+    return authToken.substr(Constants.AUTH_TOKEN_NAME.length);
 }

@@ -3,13 +3,17 @@ module.exports.SERVER_PORT = 8080
 module.exports.SERVER_URL = "http://localhost:8080"
 
 // Requests
+// -- API
 module.exports.QUALITY_OVERLAY_REQUEST = "/qualityOverlay";
 module.exports.LOG_TRIP_REQUEST = "/logTrip";
-module.exports.CREATE_ACCOUNT_REQUEST = "/createAccount"
+// -- Account
+module.exports.CREATE_ACCOUNT_REQUEST = "/createAccount";
 module.exports.VERIFY_ACCOUNT_REQUEST = "/verifyAccount";
+module.exports.AUTH_REQUEST           = "/auth";
+module.exports.DEAUTH_REQUEST         = "/deauth";
 
 // Executables
-module.exports.PYTHON_BIN = "python"
+module.exports.PYTHON_BIN = "python3"
 
 // Scripts
 module.exports.SCRIPT_PATH = "script/"
@@ -29,6 +33,17 @@ module.exports.DEFAULT_LOCALE = "English"
 module.exports.SOURCE_EMAIL_ADDRESS = "streetAnalyzer@gmail.com"
 module.exports.SOURCE_EMAIL_SERVICE = "gmail"
 module.exports.SOURCE_EMAIL_HOST    = "smtp.gmail.com"
+
+// Mongo keys
+module.exports.USER_PRIMARY_KEY  = "email"
+module.exports.USER_PASSWORD_KEY = "password"
+module.exports.AUTH_TOKEN_KEY    = "authToken"
+module.exports.TIMESTAMP_KEY     = "timestamp"
+
+// Authentication info
+module.exports.AUTH_TOKEN_LENGTH = 64
+module.exports.AUTH_TOKEN_TYPE = "Bearer"
+module.exports.AUTH_TOKEN_NAME = module.exports.AUTH_TOKEN_TYPE + " "
 
 // module.exports = {
 //     QUALITY_OVERLAY_REQUEST: QUALITY_OVERLAY_REQUEST,

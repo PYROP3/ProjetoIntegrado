@@ -56,13 +56,24 @@ function parseCookies (request) {
 // Error handling
 function sendErrorMessage(code, request, response) {
     let rawdata = fs.readFileSync(serverUtils.fetchFile(Constants.SCRIPT_ERRORS_PATH));
-    let error = JSON.parse(rawdata)[code];
+    let parsedData = JSON.parse(rawdata);
+    if (typeof(code)==='string') {
+        var name = code
+        code = parsedData.length - 1
+        while (1) {
+            if (parsedData[code]["Name"] == name) break;
+            code -= 1;
+            if (code < 0) { code = 1; break; }
+        }
+    }
+    let error = parsedData[code];
     let errorData = error["Data"][request.header("Locale") != null ? request.header("Locale") : Constants.DEFAULT_LOCALE];
     let thisErr = {
         "Error": errorData["PrettyName"],
         "Description": errorData["Description"],
+        "Code": error["id"]
     }
-    response.status(error["HttpReturn"]).header("Content-Type", "serverlication/json").send(JSON.stringify(thisErr));
+    response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
 }
 
 // =================================== Requests ===================================
@@ -112,6 +123,37 @@ server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
         await mongo.db.collection('users').insertOne(new userModel.User(auth).toJSON());
         sendErrorMessage(0, req, res); //TODO find a better way to reply
     }
+});
+
+server.post(Constants.AUTH_REQUEST, async function(req, res) {
+    let data = req.body;
+    // TODO use SHA256 of password
+    let authResult = await mongo.createSession(data.user, data.pass);
+    logger.debug("Authentication result for " + JSON.stringify(data) + " is " + String(authResult))
+    if (authResult) {
+        res.status(200).header("Content-Type", "application/json").send(JSON.stringify({[Constants.AUTH_TOKEN_KEY]:authResult}));
+    } else {
+        sendErrorMessage("InvalidCredentials", req, res);
+    }
+});
+
+server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
+    let authToken = serverUtils.parseAuthToken(req.get("Authorization"));
+    logger.debug("Got authorization = " + req.get("Authorization"));
+
+    if (authToken == null) {
+        sendErrorMessage("MalformedToken", req, res);
+        return;
+    }
+    
+    let result = await mongo.destroySession(authToken);
+    
+    if (result == null) {
+        sendErrorMessage("SessionNotFound", req, res);
+        return;
+    }
+
+    sendErrorMessage(0, req, res);
 });
 
 server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
@@ -175,13 +217,28 @@ server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     });
 });
 
-server.post(Constants.LOG_TRIP_REQUEST, function(req, res){
+server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
     var data = req.body;
+    let authToken = serverUtils.parseAuthToken(req.get("Authorization"));
+    logger.debug("Got authorization = " + req.get("Authorization"));
+
+    if (authToken == null) {
+        sendErrorMessage("MalformedToken", req, res);
+        return;
+    }
+
+    let authResult = await mongo.validateSession(authToken);
+
+    if (authResult == null) {
+        sendErrorMessage("AuthorizationNotRecognized", req, res);
+        return;
+    }
 
     logger.info("[Server][logTrip] Trip log requested")
 
-    logger.debug("[Server][logTrip] Coordinates : " + JSON.stringify(data["pontos"]))
-    logger.debug("[Server][logTrip] Accel data  : " + JSON.stringify(data["dados"]))
+    logger.debug("[Server][logTrip] Authentication : " + JSON.stringify(authResult))
+    logger.debug("[Server][logTrip] Coordinates    : " + JSON.stringify(data["pontos"]))
+    logger.debug("[Server][logTrip] Accel data     : " + JSON.stringify(data["dados"]))
 
     let py_args = [
         serverUtils.fetchFile(Constants.SCRIPT_LOG_TRIP),
@@ -191,7 +248,7 @@ server.post(Constants.LOG_TRIP_REQUEST, function(req, res){
         //"--DEBUG"
     ]
 
-    py_args = py_args.concat([].concat.serverly([], data["dados"].map(line => ["--accel_data", line.map(data => data.join(",")).join(" ")])))
+    py_args = py_args.concat([].concat.apply([], data["dados"].map(line => ["--accel_data", line.map(data => data.join(",")).join(" ")])))
 
     logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
