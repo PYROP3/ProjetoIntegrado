@@ -162,7 +162,7 @@ server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
 
     const python = spawn(
-        Constants.PYTHON_BIN, 
+        Constants.PYTHON_BIN,
         [
             serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
             parseFloat(query.minLongitude), // x_min
@@ -252,7 +252,7 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
 
     logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
-        Constants.PYTHON_BIN, 
+        Constants.PYTHON_BIN,
         py_args
     );
 
@@ -277,13 +277,13 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
             sendErrorMessage(code, req, res);
             return;
         }
-        
+
         res.send("Obrigado pela contribuição, " + data["usuario"] + "!")
     });
 
 });
 
-// =================================== End page require =================================== 
+// =================================== End page require ===================================
 
 // Listen on port
 let port = process.env.PORT;
