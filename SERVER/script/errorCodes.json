@@ -106,6 +106,96 @@
     },
     {
         "id":7,
+        "Name": "ValidationFailed",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Account validation failed",
+                "Description": "Check the URL and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Validacao de conta falhou",
+                "Description": "Verifique a URL e tente novamente"
+            }
+        }
+    },
+    {
+        "id":8,
+        "Name": "InvalidCredentials",
+        "HttpReturn": 401,
+        "Data": {
+            "English":{
+                "PrettyName": "Invalid credentials",
+                "Description": "Check the username and password and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Credenciais invalidas",
+                "Description": "Verifique os dados e tente novamente"
+            }
+        }
+    },
+    {
+        "id":9,
+        "Name": "NoAuthorizationToken",
+        "HttpReturn": 401,
+        "Data": {
+            "English":{
+                "PrettyName": "Not logged in",
+                "Description": "Log in and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Nao esta logado",
+                "Description": "Faca login e entre novamente"
+            }
+        }
+    },
+    {
+        "id":10,
+        "Name": "AuthorizationNotRecognized",
+        "HttpReturn": 401,
+        "Data": {
+            "English":{
+                "PrettyName": "Not logged in",
+                "Description": "Log in and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Nao esta logado",
+                "Description": "Faca login e entre novamente"
+            }
+        }
+    },
+    {
+        "id":11,
+        "Name": "MalformedToken",
+        "HttpReturn": 401,
+        "Data": {
+            "English":{
+                "PrettyName": "Malformed token",
+                "Description": "Check the token and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Token mal-formado",
+                "Description": "Verifique o token e tente noovamente"
+            }
+        }
+    },
+    {
+        "id":12,
+        "Name": "SessionNotFound",
+        "HttpReturn": 401,
+        "Data": {
+            "English":{
+                "PrettyName": "Session not found",
+                "Description": "Check the token and try again"
+            },
+            "Portugues":{
+                "PrettyName": "Sessao nao encontrada",
+                "Description": "Verifique o token e tente noovamente"
+            }
+        }
+    },
+    {
+        "id":13,
         "Name": "MismatchedData",
         "HttpReturn": 400,
         "Data": {
@@ -116,6 +206,7 @@
             "Portugues":{
                 "PrettyName": "Dados não pareados",
                 "Description": "Dados não foram encontrados como esperado"
+
             }
         }
     }

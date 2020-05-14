@@ -1,16 +1,23 @@
 const express = require('express');
-const app = express();
+const server = express();
 const Constants = require("./util/Constants");
 const {spawn} = require('child_process');
 const fs = require('fs');
-const winston = require('winston');
-
-const path = require('path');
+const mongo = require("./mongodb/MongoHelper.js");
+//const oauth2 = require("./oauth2/Oauth2Helper.js").oauth2;
+const assert = require('assert');
+const userModel = require("./mongodb/model/User.js");
+const serverUtils = require("./util/Util.js");
+const logger = require("./util/Logger.js").logger;
+const mailer = require("./util/MailerHelper.js");
 
 // JSON via post
 const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: false }));
+
+// Environment variables
+require('dotenv').config({path: __dirname + '/util/.env'});
 
 // Cookies
 function parseCookies (request) {
@@ -26,50 +33,130 @@ function parseCookies (request) {
 }
 
 // Static pages
-//app.use(express.static('htmls'));
+//server.use(express.static('htmls'));
 
-function fetchFile(filename) { return path.join(__dirname + "/" + filename); }
-
-// Winston config
-const logger = winston.createLogger({
-    level: 'debug',
-    format: winston.format.json(),
-    defaultMeta: { service: 'user-service' },
-    transports: [
-      //
-      // - Write to all logs with level `info` and below to `combined.log`
-      // - Write all logs error (and below) to `error.log`.
-      //
-      new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'error.log'), level: 'error' }),
-      new winston.transports.File({ filename: fetchFile(Constants.LOG_STORAGE_PATH + 'combined.log') })
-    ]
-  });
-
-  //
-  // If we're not in production then log to the `console` with the format:
-  // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-  //
-  if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-      format: winston.format.simple()
-    }));
-  }
+// Oauth2 setup
+// server.use(oauth2.inject());
+// server.post('/token', oauth2.controller.token);
+// server.get('/authorization', isAuthorized, oauth2.controller.authorization, function(req, res) {
+//     // Render our decision page
+//     // Look into ./test/server for further information
+//     res.render('authorization', {layout: false});
+// });
+// server.post('/authorization', isAuthorized, oauth2.controller.authorization);
+// function isAuthorized(req, res, next) {
+//     if (req.session.authorized) next();
+//     else {
+//         var params = req.query;
+//         params.backUrl = req.path;
+//         res.redirect('/login?' + query.stringify(params));
+//     }
+// };
 
 // Error handling
 function sendErrorMessage(code, request, response) {
-    let rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
-    let error = JSON.parse(rawdata)[code];
+    let rawdata = fs.readFileSync(serverUtils.fetchFile(Constants.SCRIPT_ERRORS_PATH));
+    let parsedData = JSON.parse(rawdata);
+    if (typeof(code)==='string') {
+        var name = code
+        code = parsedData.length - 1
+        while (1) {
+            if (parsedData[code]["Name"] == name) break;
+            code -= 1;
+            if (code < 0) { code = 1; break; }
+        }
+    }
+    let error = parsedData[code];
     let errorData = error["Data"][request.header("Locale") != null ? request.header("Locale") : Constants.DEFAULT_LOCALE];
     let thisErr = {
         "Error": errorData["PrettyName"],
         "Description": errorData["Description"],
+        "Code": error["id"]
     }
     response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
 }
 
 // =================================== Requests ===================================
 
-app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
+server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
+    let data = req.body;
+    let authToken = req.token;
+
+    let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
+    if (findResult) { 
+        logger.info("Account requested for email " + data['email'] + " already in use");
+        sendErrorMessage(3, req, res); //TODO find a better way to reply
+        return 
+    }
+    var newUser = new userModel.User(data['email'], data['name'], data['password']).toJSON();
+    newUser['authToken'] = serverUtils.generateToken(32);
+    logger.info("Creating user : ", newUser);
+    let result = await mongo.db.collection('pendingUsers').insertOne(newUser);
+    if (result == null) {
+        sendErrorMessage(1, req, res); 
+    } else {
+        sendErrorMessage(0, req, res); //TODO find a better way to reply
+        //TODO des-gambiarrar esse processo de enviar email
+        mailer.sendMail({
+            from: Constants.SOURCE_EMAIL_ADDRESS,
+            to: newUser['email'],
+            subject: 'Street analyzer account validation',
+            text: 'That was easy!\n' + 
+                'Now just click on this link to validate your account: ' +
+                Constants.SERVER_URL + 
+                Constants.VERIFY_ACCOUNT_REQUEST + 
+                '?token='+newUser['authToken']
+        });
+    }
+});
+
+server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
+    let query = req.query;
+    let authToken = query.token;
+
+    let auth = await mongo.db.collection('pendingUsers').findOneAndDelete({'authToken':authToken});
+    if (auth == null) {
+        sendErrorMessage(7, req, res); 
+    } else {
+        logger.info("Validating user : ", auth);
+        delete(auth['authToken']);
+        await mongo.db.collection('users').insertOne(new userModel.User(auth).toJSON());
+        sendErrorMessage(0, req, res); //TODO find a better way to reply
+    }
+});
+
+server.post(Constants.AUTH_REQUEST, async function(req, res) {
+    let data = req.body;
+    // TODO use SHA256 of password
+    let authResult = await mongo.createSession(data.user, data.pass);
+    logger.debug("Authentication result for " + JSON.stringify(data) + " is " + String(authResult))
+    if (authResult) {
+        res.status(200).header("Content-Type", "application/json").send(JSON.stringify({[Constants.AUTH_TOKEN_KEY]:authResult}));
+    } else {
+        sendErrorMessage("InvalidCredentials", req, res);
+    }
+});
+
+server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
+    let authToken = serverUtils.parseAuthToken(req.get("Authorization"));
+    logger.debug("Got authorization = " + req.get("Authorization"));
+
+    if (authToken == null) {
+        sendErrorMessage("MalformedToken", req, res);
+        return;
+    }
+    
+    let result = await mongo.destroySession(authToken);
+    
+    if (result == null) {
+        sendErrorMessage("SessionNotFound", req, res);
+        return;
+    }
+
+    sendErrorMessage(0, req, res);
+});
+
+server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     var query = req.query;
 
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
@@ -77,15 +164,15 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     const python = spawn(
         Constants.PYTHON_BIN,
         [
-            fetchFile(Constants.SCRIPT_SLICE_OVERLAY),
+            serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
             parseFloat(query.minLongitude), // x_min
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
             parseFloat(query.maxLatitude),  // y_max
             "--overlay_folder",
-            fetchFile("/overlay/"),         // overlay_folder
+            serverUtils.fetchFile("/overlay/"),         // overlay_folder
             "--errors_file",
-            fetchFile(Constants.SCRIPT_ERRORS_PATH),
+            serverUtils.fetchFile(Constants.SCRIPT_ERRORS_PATH),
             //"--DEBUG"
         ]
     );
@@ -115,7 +202,7 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
         res.set('Content-Type', 'image/jpeg');
 
         // Get file using nonce from script
-        const path = fetchFile("/tmp/"+overlayNonce+".jpg");
+        const path = serverUtils.fetchFile("/tmp/"+overlayNonce+".jpg");
 
         // Send customized overlay
         res.sendFile(path, (err) => {
@@ -130,20 +217,34 @@ app.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     });
 });
 
-
-app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
+server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
     var data = req.body;
+    let authToken = serverUtils.parseAuthToken(req.get("Authorization"));
+    logger.debug("Got authorization = " + req.get("Authorization"));
+
+    if (authToken == null) {
+        sendErrorMessage("MalformedToken", req, res);
+        return;
+    }
+
+    let authResult = await mongo.validateSession(authToken);
+
+    if (authResult == null) {
+        sendErrorMessage("AuthorizationNotRecognized", req, res);
+        return;
+    }
 
     logger.info("[Server][logTrip] Trip log requested")
 
-    logger.debug("[Server][logTrip] Coordinates : " + JSON.stringify(data["pontos"]))
-    logger.debug("[Server][logTrip] Accel data  : " + JSON.stringify(data["dados"]))
+    logger.debug("[Server][logTrip] Authentication : " + JSON.stringify(authResult))
+    logger.debug("[Server][logTrip] Coordinates    : " + JSON.stringify(data["pontos"]))
+    logger.debug("[Server][logTrip] Accel data     : " + JSON.stringify(data["dados"]))
 
     let py_args = [
-        fetchFile(Constants.SCRIPT_LOG_TRIP),
+        serverUtils.fetchFile(Constants.SCRIPT_LOG_TRIP),
         "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
-        "--overlay_folder" , fetchFile("/overlay/"),
-        "--errors_file"    , fetchFile(Constants.SCRIPT_ERRORS_PATH),
+        "--overlay_folder" , serverUtils.fetchFile("/overlay/"),
+        "--errors_file"    , serverUtils.fetchFile(Constants.SCRIPT_ERRORS_PATH),
         //"--DEBUG"
     ]
 
@@ -186,14 +287,7 @@ app.post(Constants.LOG_TRIP_REQUEST, function(req, res){
 
 // Listen on port
 let port = process.env.PORT;
-if (port == undefined) port = 8080;
+if (port == undefined) port = Constants.SERVER_PORT;
 
-app.listen(port);
+server.listen(port);
 logger.info("[Server] Listening on port " + port);
-
-// var rawdata = fs.readFileSync(fetchFile(Constants.SCRIPT_ERRORS_PATH));
-// var error = JSON.parse(rawdata)[code];
-// var thisErr = {
-//     "Error": error["PrettyName"],
-//     "Description": error["Description"],
-// }
