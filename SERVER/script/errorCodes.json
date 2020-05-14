@@ -193,5 +193,21 @@
                 "Description": "Verifique o token e tente noovamente"
             }
         }
+    },
+    {
+        "id":13,
+        "Name": "MismatchedData",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Mismatched Data",
+                "Description": "Did not find data as it was expected"
+            },
+            "Portugues":{
+                "PrettyName": "Dados não pareados",
+                "Description": "Dados não foram encontrados como esperado"
+
+            }
+        }
     }
 ]

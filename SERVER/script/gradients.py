@@ -5,9 +5,9 @@ class GradientError(RuntimeError):
 class interpolationGradient:
     def __init__(self, colors=[], points=[]):
         assert len(colors) == len(points), "Lengths differ: {} x {}".format(len(colors), len(points))
-        self._colors = [(points[i], colors[i]) for i in range(len(colors))]
+        self._colors = [(points[i], colors[i]) for i, c in enumerate(colors)]
         self._sorted = False
-    
+
     def _interpolate(self, min1, max1, val1, min2, max2):
         return min2 + (val1 - min1) * (max2 - min2)/(max1 - min1)
 
@@ -37,7 +37,7 @@ class interpolationGradient:
         minP = self._colors[auxInd - 1]
         maxP = self._colors[auxInd]
         assert len(minP[1]) == len(maxP[1]), "Found different color channels: {} vs {}".format(len(minP[1]), len(maxP[1]))
-        return [self._interpolate(minP[0], maxP[0], point, minP[1][i], maxP[1][i]) for i in range(len(minP[1]))]
+        return [self._interpolate(minP[0], maxP[0], point, minP[1][i], maxP[1][i]) for i, p in enumerate(minP[1])]
 
     def colorizeChannel(self, point, channel=0):
         return self.colorize(point)[channel]
