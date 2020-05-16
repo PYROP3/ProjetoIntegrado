@@ -24,5 +24,12 @@ public class Constants {
 
     public static final String DATA_FILE_NAME = "recordData.data";
 
-    public static final String SERVER_URL = "https://reqres.in/api/users?page=2";
+    //Only for test
+    public static final String MY_ADDRESS = "http//10.0.0.144:8080";
+    public static final String SEND_SCHEME_HTTPS = "https";
+    public static final String SEND_HOST = "reqres.in";
+    public static final String SEND_API_PATH = "api";
+    public static final String SEND_USERS_PATH = "users";
+    public static final String SEND_REGISTER_PATH = "register";
+
 }

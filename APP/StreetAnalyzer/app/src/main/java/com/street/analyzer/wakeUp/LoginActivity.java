@@ -72,8 +72,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     @Override
     public void onFailure(Request request, IOException e) {
-        Toast.makeText(mContext, "Sorry, we can't loggin!" +
-                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
+//        Toast.makeText(mContext, "Sorry, we can't loggin!" +
+//                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
         Log.d(TAG, "Login - onFailure");
     }
 
@@ -81,6 +81,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     public void onResponse(Response response) throws IOException {
         if(response.isSuccessful()){
             Log.d(TAG, "Successfully response");
+            Log.d(TAG, "Response: " + response.body().string());
             startActivity(new Intent(mContext, MapsActivity.class));
         }else {
             //TODO: Handle the response and check what is the error
@@ -88,8 +89,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         }
     }
 
-    //TODO: Start create account activity
     public void onClickSignUp(View v){
-        startActivity(new Intent(mContext, MapsActivity.class));
+        startActivity(new Intent(mContext, CreateAccountActivity.class));
     }
 }
