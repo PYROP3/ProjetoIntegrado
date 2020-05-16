@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "895bc4b5-483d-45d9-8689-95b78485c863",
+		"name": "logTrip",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "main",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"usuario\": \"teste-01\",\r\n  \"pontos\": [\r\n  \t[-22.1542655728, -47.1149176376], \r\n  \t[-22.1743303693, -47.1005861652], \r\n  \t[-22.1764570632, -47.1261083091]\r\n  ],\r\n  \"scores\": [0.33190, 0.71654]\r\n}"
+				},
+				"url": {
+					"raw": "http://{{server_addr}}:{{server_port}}/logTrip",
+					"protocol": "http",
+					"host": [
+						"{{server_addr}}"
+					],
+					"port": "{{server_port}}",
+					"path": [
+						"logTrip"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

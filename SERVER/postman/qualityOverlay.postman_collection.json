@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "6f5de329-1bbb-4ae4-8082-e17ca6411072",
+		"name": "qualityOverlay",
+		"description": "requests testing the GET /qualityOverlay API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "main",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b2ae679-28c8-4afd-9e77-a1ff2d4ea709",
+						"exec": [
+							"pm.test(\"Status is 200/OK\", function() {",
+							"   // pm.globals.set(\"minLatitude\", 18);",
+							"   ",
+							"   mult = Math.random()*0.1;",
+							"   mult2 = Math.random()*0.1;",
+							"   max1 = Math.random()*10;",
+							"   max2 = Math.random()*10;",
+							"   if(Math.random()<0.5)",
+							"   sin1 = 1;",
+							"   else",
+							"   sin1 = -1;",
+							"   ",
+							"   if(Math.random()<0.5)",
+							"   sin2 = 1;",
+							"   else",
+							"   sin2 = -1;",
+							"   val1 = (pm.variables.get(\"minLatitude\") + max1 * sin1) * sin1;",
+							"   val2 = (pm.variables.get(\"minLongitude\") + max2 * sin2) * sin2;",
+							"   val3 = (pm.variables.get(\"minLatitude\") + max1 * sin1 + mult) * sin1;",
+							"   val4 = (pm.variables.get(\"minLongitude\") + max2 * sin2 + mult2) * sin2;",
+							"   pm.globals.set(\"minLatitude\", val1);",
+							"   pm.globals.set(\"minLongitude\", val2);",
+							"   pm.globals.set(\"maxLatitude\", val3);",
+							"   pm.globals.set(\"maxLongitude\", val4);",
+							"   pm.response.to.have.status(200); ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_addr}}:{{server_port}}/qualityOverlay?minLatitude={{minLatitude}}&minLongitude={{minLongitude}}&maxLatitude={{maxLatitude}}&maxLongitude={{maxLongitude}}",
+					"protocol": "http",
+					"host": [
+						"{{server_addr}}"
+					],
+					"port": "{{server_port}}",
+					"path": [
+						"qualityOverlay"
+					],
+					"query": [
+						{
+							"key": "minLatitude",
+							"value": "{{minLatitude}}"
+						},
+						{
+							"key": "minLongitude",
+							"value": "{{minLongitude}}"
+						},
+						{
+							"key": "maxLatitude",
+							"value": "{{maxLatitude}}"
+						},
+						{
+							"key": "maxLongitude",
+							"value": "{{maxLongitude}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
