@@ -89,7 +89,7 @@ try:
 except MemoryError:
     err.exitOnError("MemoryError")
 
-if req_x_min < -90 or req_x_max > 90 or req_y_max > 180 or req_y_min < -180:
+if req_x_min < -180 or req_x_max > 180 or req_y_max > 90 or req_y_min < -90:
     raise err.exitOnError("LimitsError")
 
 if req_x_min > req_x_max  or req_y_max < req_y_min:
