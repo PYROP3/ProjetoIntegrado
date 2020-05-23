@@ -3,9 +3,13 @@ const assert = require('assert');
 const Constants = require("../util/Constants.js");
 const logger = require("../util/Logger.js").logger;
 const serverUtils = require("../util/Util.js");
+const {spawn} = require('child_process');
+
+// Environment variables
+require('dotenv').config({path: __dirname + '/.env'});
 
 // Connection URL
-const mongoUrl = 'mongodb://localhost:27017';
+//const mongoUrl = 'mongodb://localhost:27017';
 
 // Database Name
 const dbName = 'ProjetoIntegrado';
@@ -15,14 +19,53 @@ const usersCollectionStr        = 'users'
 const pendingUsersCollectionStr = 'pendingUsers'
 const sessionsCollectionStr     = 'sessions'
 
-// Default collection
-const defaultCollection = 'users'
-
 // Mongo db client
-const client = new MongoClient(mongoUrl, { useUnifiedTopology: true });
+const client = new MongoClient(process.env.MONGOD_URL, { useUnifiedTopology: true });
+
+const spawnMongod = () => {
+    let mongodb_path = process.env.MONGO_DBPATH;
+    if (mongodb_path[0] == '.') { // Relative path
+        mongodb_path = __dirname + mongodb_path.substr(1);
+    }
+    logger.debug("Mongodb path set as [" + mongodb_path + "]");
+    module.exports._mongodProcess = spawn(
+        process.env.MONGOD_BIN,
+        [
+            "--dbpath="+mongodb_path
+        ]
+    );
+
+    // Collect data from script
+    module.exports._mongodProcess.stdout.on('data', function (data) {
+        for (line of String(data).split('\n').slice(0, -1))
+            logger.debug('[mongod/stdout] ' + line);
+    });
+
+    // Collect error data from script (for debugging)
+    module.exports._mongodProcess.stderr.on('data', function (data) {
+        for (line of String(data).split('\n').slice(0, -1))
+            logger.error('[mongod/stderr] ' + line);
+    });
+
+    // Handle mongod process exit
+    module.exports._mongodProcess.on('close', function (code) {
+        logger.warn('[mongod/close] ' + code);
+        if (code == 100) { // Instance already running, terminate it
+            logger.warn('[mongod/close] Trying to restart mongod');
+            let x = spawn("kill -9 $(ps -ax | grep \"mongod\" | grep -o -E \"^[^0-9]*[0-9]+\")");
+            x.on('close', () => {
+                spawnMongod();
+            });
+        }
+    });
+
+    logger.debug("Created mongod process");
+}
 
 const load = async () => {
-    let cclient = await client.connect()//function(err) {
+    spawnMongod()
+
+    let cclient = await client.connect()
     module.exports.db = cclient.db(dbName);
     logger.info("Mongo db loaded");
 
@@ -52,7 +95,7 @@ const load = async () => {
             [Constants.USER_PRIMARY_KEY]:user, 
             [Constants.USER_PASSWORD_KEY]:password 
         });
-        logger.debug(result);
+        logger.debug(JSON.stringify(result));
         if (result == null) { return null; }
 
         //TODO check if a session already exists
@@ -62,7 +105,7 @@ const load = async () => {
             [Constants.AUTH_TOKEN_KEY]:token,
             [Constants.TIMESTAMP_KEY]:Date.now()
         });
-        logger.debug(result);
+        logger.debug(JSON.stringify(result));
         if (result == null) { return null; }
         return token;
     }

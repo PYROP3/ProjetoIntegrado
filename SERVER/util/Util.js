@@ -1,5 +1,7 @@
 const path = require('path');
 const Constants = require("./Constants.js");
+require('dotenv').config({path: __dirname + '/.env'});
+
 /**
  * Create a random hex string with a given size
  *

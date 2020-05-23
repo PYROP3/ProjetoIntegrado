@@ -12,9 +12,6 @@ module.exports.VERIFY_ACCOUNT_REQUEST = "/verifyAccount";
 module.exports.AUTH_REQUEST           = "/auth";
 module.exports.DEAUTH_REQUEST         = "/deauth";
 
-// Executables
-module.exports.PYTHON_BIN = "python3"
-
 // Scripts
 module.exports.SCRIPT_PATH = "script/"
 module.exports.SCRIPT_SLICE_OVERLAY = module.exports.SCRIPT_PATH + "sliceOverlay.py"
