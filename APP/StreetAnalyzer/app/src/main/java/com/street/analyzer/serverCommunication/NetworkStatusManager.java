@@ -1,9 +1,21 @@
 package com.street.analyzer.serverCommunication;
 
+import android.app.job.JobInfo;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import com.street.analyzer.record.SaveState;
+import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
-class NetworkStatusManager /*extends ConnectivityManager.NetworkCallback*/ {
+import java.util.Calendar;
+
+public class NetworkStatusManager {
+
+    private static final String TAG = "NetworkStatusManager";
+
+    private static final String PREFERENCES_NAME = "dataTransmittedValue";
+    private static final String TOTAL_DATA_TRANSMITTED = "totalDataTransmitted";
 
     static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager =
@@ -16,4 +28,54 @@ class NetworkStatusManager /*extends ConnectivityManager.NetworkCallback*/ {
                     && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 
+    public static int networkAllowedToSend(Context context){
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (connectivityManager == null) {
+            SLog.d(TAG, "Null connectivity manager");
+            return JobInfo.NETWORK_TYPE_ANY;
+        }
+
+        long totalData = getCurrentDataToTransmit(context) + getTotalDataTransmitted(context);
+
+        if(connectivityManager.isActiveNetworkMetered()){
+            if(Constants.TOTAL_DATA_TO_TRANSMIT < totalData){
+                SLog.d(TAG, "Is allowed to send only in unmetered connection");
+                return JobInfo.NETWORK_TYPE_UNMETERED;
+            }
+        }
+        SLog.d(TAG, "Is allowed to send in any connection");
+        return JobInfo.NETWORK_TYPE_ANY;
+    }
+
+    private static long getCurrentDataToTransmit(Context context){
+        SaveState saveState = new SaveState(context);
+        long currentDataSize = saveState.getCurrentDataSize();
+        SLog.d(TAG, "Current data to transmit: " + currentDataSize);
+        return currentDataSize;
+    }
+
+    private static int getTotalDataTransmitted(Context context){
+        needToResetCounter(context);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        int totalData = sharedPreferences.getInt(TOTAL_DATA_TRANSMITTED, 0);
+        SLog.d(TAG, "Total data transmitted: " + totalData);
+        return totalData;
+    }
+
+    private static void needToResetCounter(Context context){
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        SLog.d(TAG, "Reset calendar: " + day);
+        if(day == 1)
+            resetTotalDataTransmitted(context);
+    }
+
+    private static void resetTotalDataTransmitted(Context context){
+        SharedPreferences.Editor editor =
+                (SharedPreferences.Editor) context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        editor.putInt(TOTAL_DATA_TRANSMITTED, 0);
+        editor.apply();
+    }
 }

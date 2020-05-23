@@ -3,6 +3,9 @@ package com.street.analyzer.location;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
@@ -18,10 +21,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.street.analyzer.R;
 import com.street.analyzer.record.RecordService;
-import com.street.analyzer.serverCommunication.CustomOkHttpClient;
+import com.street.analyzer.serverCommunication.DataUploadScheduler;
+import com.street.analyzer.serverCommunication.NetworkStatusManager;
+import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
+
+    private final String TAG = getClass().getSimpleName();
 
     private GoogleMap mMap;
 
@@ -82,7 +90,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }else{
             stopService(new Intent(this, RecordService.class));
+            enableScheduler();
         }
+
         mServiceStats = !mServiceStats;
+    }
+
+    private void enableScheduler(){
+        SLog.d(TAG, "Trying to active job scheduler");
+        ComponentName componentName = new ComponentName(this, DataUploadScheduler.class);
+        int requiredNetwork = NetworkStatusManager.networkAllowedToSend(this);
+        JobInfo jobInfo = null;
+            jobInfo = new JobInfo.Builder(Constants.JOB_UPLOAD_ID, componentName)
+                    .setRequiredNetworkType(requiredNetwork)
+                    .setPersisted(true)
+                    .setPeriodic(Constants.JOB_SCHEDULER_PERIOD)
+                    .build();
+        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        int result = scheduler.schedule(jobInfo);
+        SLog.d(TAG, "Scheduler result : " + (result == JobScheduler.RESULT_SUCCESS ? "SUCCESS" : "FAILURE"));
     }
 }

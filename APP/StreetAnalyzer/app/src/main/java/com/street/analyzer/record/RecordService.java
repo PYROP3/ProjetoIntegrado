@@ -15,7 +15,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -29,13 +28,11 @@ import com.google.android.gms.location.LocationServices;
 import com.street.analyzer.R;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.location.MapsActivity;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.street.analyzer.utils.SLog;
 
 public class RecordService extends Service implements SensorEventListener {
 
-    private final String TAG = Constants.TAG;
+    private final String TAG = getClass().getSimpleName();
 
     private float mAlpha = (float)0.8;
     private float mGravity[] = new float[]{(float)9.81, (float)9.81, (float)9.81};
@@ -57,7 +54,7 @@ public class RecordService extends Service implements SensorEventListener {
         super.onCreate();
         mStorageManager = new StorageManager(this);
 
-        Log.d(TAG, "Registering listeners and starting service");
+        SLog.d(TAG, "Registering listeners and starting service");
 
        registerSensorListener();
        registerLocaleListener();
@@ -110,7 +107,7 @@ public class RecordService extends Service implements SensorEventListener {
                 if(locationResult == null) return;
                 Location location = locationResult.getLastLocation();
                 mStorageManager.registerPositionChange(location.getLatitude(), location.getLongitude());
-                Log.d(TAG, "New location registered");
+                SLog.d(TAG, "New location registered");
             }
         };
         mFusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
@@ -159,7 +156,7 @@ public class RecordService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy(){
-        Log.d(TAG, "onDestroy: Unregistering listeners");
+        SLog.d(TAG, "onDestroy: Unregistering listeners");
         mSensorManager.unregisterListener(this);
         mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
     }

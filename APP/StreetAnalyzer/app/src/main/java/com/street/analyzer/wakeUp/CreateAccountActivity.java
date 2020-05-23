@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,13 +15,14 @@ import com.street.analyzer.R;
 import com.street.analyzer.location.MapsActivity;
 import com.street.analyzer.serverCommunication.CustomOkHttpClient;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
 import java.io.IOException;
 
 public class CreateAccountActivity extends AppCompatActivity implements Callback {
 
     private Context mContext;
-    private String TAG = Constants.TAG;
+    private String TAG = getClass().getSimpleName();
 
     //TODO: Get email, password and name from user and let he choose profile picture
     @Override
@@ -31,7 +31,7 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         setContentView(R.layout.activity_create_account);
 
         mContext = getApplicationContext();
-        Log.d(TAG, "Create account activity created");
+        SLog.d(TAG, "Create account activity created");
     }
 
     public void onClickRegisterAccount(View v){
@@ -41,21 +41,21 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
             Toast.makeText(mContext, "Network not detected"
                     + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
 
-            Log.d(TAG, "Can't login, network error");
+            SLog.d(TAG, "Can't login, network error");
         }else{
-            Log.d(TAG, "Start request to server");
+            SLog.d(TAG, "Start request to server");
         }
     }
 
     @Override
     public void onResponse(Response response) throws IOException {
         if(response.isSuccessful()){
-            Log.d(TAG, "Successfully response");
-            Log.d(TAG, "Response: " + response.body().string());
+            SLog.d(TAG, "Successfully response");
+            SLog.d(TAG, "Response: " + response.body().string());
             startActivity(new Intent(mContext, MapsActivity.class));
         }else {
             //TODO: Handle the response and check what is the error
-            Log.d(TAG, "Response fail not successful response");
+            SLog.d(TAG, "Response fail not successful response");
         }
     }
 

@@ -24,6 +24,12 @@ public class Constants {
 
     public static final String DATA_FILE_NAME = "recordData.data";
 
+    public static final int JOB_UPLOAD_ID = 17037607;
+
+    public static final long TOTAL_DATA_TO_TRANSMIT = 1024 * 1024;
+
+    public static final int JOB_SCHEDULER_PERIOD = 15 * 60 * 1000; //60 * 60 * 1000 //One hour
+
     //Only for test
     public static final String MY_ADDRESS = "http//10.0.0.144:8080";
     public static final String SEND_SCHEME_HTTPS = "https";

@@ -2,9 +2,9 @@ package com.street.analyzer.record;
 
 import android.content.Context;
 import android.location.Location;
-import android.util.Log;
 
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ import static java.lang.System.gc;
 
 class StorageManager {
 
-    private final String TAG = Constants.TAG;
+    private final String TAG = getClass().getSimpleName();
 
     private ArrayList<Float> mXValue;
     private ArrayList<Float> mYValue;
@@ -43,12 +43,11 @@ class StorageManager {
         mLocationCounter++;
 
         checkLimitPositionChange();
-        Log.d(TAG, "Position change registered");
     }
 
     private void checkLimitPositionChange(){
         if(mLocationCounter == Constants.LOCATION_LIMIT_POSITION_CHANGE){
-            Log.d(TAG, "Limit reached, saving new values into storage");
+            SLog.d(TAG, "Limit reached, saving new values into storage");
             final Values value = new Values(mXValue, mYValue, mZValue, mLatitude, mLongitude);
             instanceVariables();
             mLocationCounter = 0;
@@ -62,7 +61,7 @@ class StorageManager {
                     ArrayList<Values> oldData = mSaveState.loadData();
                     if(oldData != null){
                         newData.addAll(oldData);
-                        Log.d(TAG, "Device has old data");
+                        SLog.d(TAG, "Device has old data");
                     }
                     mSaveState.saveData(newData);
                 }

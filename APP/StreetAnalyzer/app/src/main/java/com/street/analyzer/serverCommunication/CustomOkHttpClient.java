@@ -1,7 +1,6 @@
 package com.street.analyzer.serverCommunication;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.HttpUrl;
@@ -10,6 +9,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class CustomOkHttpClient {
 
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private final String TAG = Constants.TAG;
+    private final String TAG = getClass().getSimpleName();
 
     public boolean sendCreateAccountRequest(Context context, Callback callback){
         if(!isNetworkAvailable(context))
@@ -32,7 +32,7 @@ public class CustomOkHttpClient {
                 .addPathSegment(Constants.SEND_REGISTER_PATH)
                 .build();
 
-        Log.d(TAG, "Sending request to: " + url.toString());
+        SLog.d(TAG, "Sending request to: " + url.toString());
 
         JSONObject jsonObject = JsonParser.createAccountJson("eve.holt@reqres.in", "pistol");
         RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
@@ -42,7 +42,7 @@ public class CustomOkHttpClient {
                 .post(requestBody)
                 .build();
 
-        Log.d(TAG, "Enqueuing new retrofit callback");
+        SLog.d(TAG, "Enqueuing new retrofit callback");
 
         okHttpClient.newCall(request).enqueue(callback);
 
@@ -65,7 +65,7 @@ public class CustomOkHttpClient {
                 .addPathSegment("users")
                 .build();
 
-        Log.d(TAG, "Sending request to: " + url.toString());
+        SLog.d(TAG, "Sending request to: " + url.toString());
 
         JSONObject jsonObject = new JSONObject();
 
@@ -76,7 +76,7 @@ public class CustomOkHttpClient {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "JSON: " + jsonObject.toString());
+        SLog.d(TAG, "JSON: " + jsonObject.toString());
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -87,7 +87,7 @@ public class CustomOkHttpClient {
                 .post(requestBody)
                 .build();
 
-        Log.d(TAG, "Enqueuing new retrofit callback");
+        SLog.d(TAG, "Enqueuing new retrofit callback");
 
         okHttpClient.newCall(request).enqueue(callback);
         return true;
@@ -97,7 +97,7 @@ public class CustomOkHttpClient {
         if (NetworkStatusManager.isNetworkAvailable(context)){
             return true;
         }
-        Log.d(TAG, "Network not available");
+        SLog.d(TAG, "Network not available");
         return false;
     }
 }

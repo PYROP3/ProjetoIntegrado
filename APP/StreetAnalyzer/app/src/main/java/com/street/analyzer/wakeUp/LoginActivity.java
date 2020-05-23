@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,12 +17,13 @@ import com.street.analyzer.location.MapsActivity;
 import com.street.analyzer.R;
 import com.street.analyzer.serverCommunication.CustomOkHttpClient;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.SLog;
 
 import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity implements Callback {
 
-    private final String TAG = Constants.TAG;
+    private final String TAG = getClass().getSimpleName();
     private Context mContext;
     private RequestPermissions mRequestPermissions;
 
@@ -44,9 +44,9 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             Toast.makeText(mContext, "Network not detected"
             + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
 
-            Log.d(TAG, "Can't login, network error");
+            SLog.d(TAG, "Can't login, network error");
         }else{
-            Log.d(TAG, "Start request to server");
+            SLog.d(TAG, "Start request to server");
         }
     }
 
@@ -74,18 +74,18 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     public void onFailure(Request request, IOException e) {
 //        Toast.makeText(mContext, "Sorry, we can't loggin!" +
 //                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
-        Log.d(TAG, "Login - onFailure");
+        SLog.d(TAG, "Login - onFailure");
     }
 
     @Override
     public void onResponse(Response response) throws IOException {
         if(response.isSuccessful()){
-            Log.d(TAG, "Successfully response");
-            Log.d(TAG, "Response: " + response.body().string());
+            SLog.d(TAG, "Successfully response");
+            SLog.d(TAG, "Response: " + response.body().string());
             startActivity(new Intent(mContext, MapsActivity.class));
         }else {
             //TODO: Handle the response and check what is the error
-            Log.d(TAG, "Response fail not successful response");
+            SLog.d(TAG, "Response fail not successful response");
         }
     }
 
