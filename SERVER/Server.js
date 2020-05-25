@@ -18,6 +18,8 @@ server.use(bodyParser.urlencoded({ extended: false }));
 
 // Environment variables
 require('dotenv').config({path: __dirname + '/util/.env'});
+require('dotenv').config({path: __dirname + '/script/.env'});
+require('dotenv').config({path: __dirname + '/mongodb/.env'});
 
 // Cookies
 function parseCookies (request) {
@@ -171,7 +173,7 @@ server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     }
 
     const python = spawn(
-        Constants.PYTHON_BIN,
+        process.env.PYTHON_BIN,
         [
             serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
             parseFloat(query.minLongitude), // x_min
@@ -266,7 +268,7 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
 
     logger.debug("[Server][logTrip][debug] py_args = " + py_args)
     const python = spawn(
-        Constants.PYTHON_BIN,
+        process.env.PYTHON_BIN,
         py_args
     );
 

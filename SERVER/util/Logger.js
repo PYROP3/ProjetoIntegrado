@@ -26,3 +26,5 @@ if (process.env.NODE_ENV !== 'production') {
         format: winston.format.simple()
     }));
 }
+
+module.exports.logger.debug("Process environment type is " + process.env.NODE_ENV);
