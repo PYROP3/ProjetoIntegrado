@@ -21,6 +21,8 @@ class StorageManager {
     private ArrayList<Double> mLatitude;
     private ArrayList<Double> mLongitude;
 
+    private ArrayList<Integer> mCounter;
+
     private int mLocationCounter;
     private SaveState mSaveState;
 
@@ -28,7 +30,8 @@ class StorageManager {
         instanceVariables();
 
         mLocationCounter = 0;
-        mSaveState = new SaveState(context);
+        mSaveState = SaveState.getInstance();
+        mSaveState.setContext(context);
     }
 
     void registerAccelerometerData(float[] data){
@@ -42,13 +45,15 @@ class StorageManager {
         mLongitude.add(longitude);
         mLocationCounter++;
 
+        mCounter.add(mXValue.size());
+
         checkLimitPositionChange();
     }
 
     private void checkLimitPositionChange(){
         if(mLocationCounter == Constants.LOCATION_LIMIT_POSITION_CHANGE){
             SLog.d(TAG, "Limit reached, saving new values into storage");
-            final Values value = new Values(mXValue, mYValue, mZValue, mLatitude, mLongitude);
+            final Values value = new Values(mXValue, mYValue, mZValue, mLatitude, mLongitude, mCounter);
             instanceVariables();
             mLocationCounter = 0;
 
@@ -78,6 +83,7 @@ class StorageManager {
         mZValue = new ArrayList<>();
         mLatitude = new ArrayList<>();
         mLongitude = new ArrayList<>();
+        mCounter = new ArrayList<>();
         gc();
     }
 

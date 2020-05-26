@@ -34,7 +34,8 @@ public class CustomOkHttpClient {
 
         SLog.d(TAG, "Sending request to: " + url.toString());
 
-        JSONObject jsonObject = JsonParser.createAccountJson("eve.holt@reqres.in", "pistol");
+        JsonParser jsonParser = new JsonParser();
+        JSONObject jsonObject = jsonParser.createAccountJson("eve.holt@reqres.in", "pistol");
         RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
         Request request = new Request.Builder()

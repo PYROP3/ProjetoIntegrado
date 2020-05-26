@@ -3,7 +3,11 @@ package com.street.analyzer.serverCommunication;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 
+import com.street.analyzer.record.SaveState;
+import com.street.analyzer.record.Values;
 import com.street.analyzer.utils.SLog;
+
+import org.json.JSONObject;
 
 public class DataUploadScheduler extends JobService {
 
@@ -23,17 +27,17 @@ public class DataUploadScheduler extends JobService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for(int i = 0; i < 10; i++){
-                    if(jobStatus)
-                        return;
-                    SLog.d(TAG, "Run: " + i);
-                    try{
-                        Thread.sleep(1000);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
-                }
+                SLog.d(TAG, "Starting new scheduled thread");
+
+                SaveState saveState = SaveState.getInstance();
+                Values recordedValues = saveState.loadDataMerged();
+                JsonParser jsonParser = new JsonParser();
+
+                JSONObject jsonObject = jsonParser.createLogToSend(recordedValues);
+
                 SLog.d(TAG, "Job finished");
+                saveState.deleteFile();
+                //TODO: Set job to not reschedule if the data was uploaded successfully
                 jobFinished(params, false);
             }
         }).start();

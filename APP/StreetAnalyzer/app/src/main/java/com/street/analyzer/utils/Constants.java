@@ -14,7 +14,7 @@ public class Constants {
     //TODO: Define default value for Location Update and Limit Position Change
     public static final long LOCATION_UPDATE_INTERVAL = 1000;//30000;
     public static final long LOCATION_UPDATE_FASTEST_INTERVAL = 1000;//20000;
-    public static final int LOCATION_LIMIT_POSITION_CHANGE = 5;
+    public static final int LOCATION_LIMIT_POSITION_CHANGE = 3;
     public static final int LOCATION_PRIORITY_HIGH = LocationRequest.PRIORITY_HIGH_ACCURACY;
 
     public static final String NOTIFICATION_CHANNEL_MSG = "Notification_channel";

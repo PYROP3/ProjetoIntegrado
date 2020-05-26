@@ -50,7 +50,7 @@ public class NetworkStatusManager {
     }
 
     private static long getCurrentDataToTransmit(Context context){
-        SaveState saveState = new SaveState(context);
+        SaveState saveState = SaveState.getInstance();
         long currentDataSize = saveState.getCurrentDataSize();
         SLog.d(TAG, "Current data to transmit: " + currentDataSize);
         return currentDataSize;
