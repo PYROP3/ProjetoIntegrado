@@ -92,4 +92,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     public void onClickSignUp(View v){
         startActivity(new Intent(mContext, CreateAccountActivity.class));
     }
+
+    public void onClickReturn(View v){
+        finish();
+    }
 }
