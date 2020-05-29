@@ -61,7 +61,7 @@
         android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
-        android:hint="Senha"
+        android:hint="Password"
         android:inputType="textPassword"
         android:textColor="@color/darkGray"
         android:textColorHint="@color/darkGray"
