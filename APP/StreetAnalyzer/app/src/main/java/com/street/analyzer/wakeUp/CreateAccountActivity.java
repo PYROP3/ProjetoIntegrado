@@ -1,10 +1,14 @@
 package com.street.analyzer.wakeUp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -66,5 +70,21 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
 
     public void onClickReturn(View v){
         finish();
+    }
+
+    public void onClickAddPicture(View v){
+        //TODO: Get a picture from the user gallery and save it
+
+        // PLACE HOLDER (IT SHOULD BE REMOVED ANYTIME SOON)
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        dlgAlert.setMessage("This option is not available yet. Please, try again later.");
+        dlgAlert.setTitle("Warning");
+        dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 }
