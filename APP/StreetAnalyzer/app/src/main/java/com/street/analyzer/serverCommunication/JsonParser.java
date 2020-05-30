@@ -50,9 +50,8 @@ class JsonParser {
             jsonArray = new JSONArray();
             aux = new JSONArray();
 
-            int indice = 0, x;
-            for(int j = 0; j < values.getCounters().size() - 1; j++){//Integer x : values.getCounters()
-                x = values.getCounters().get(j);
+            int indice = 0;
+            for(Integer x : values.getCounters()){
                 for(int i = 0; i < x; i++){
                     aux.put(values.getXValue().get(indice));
                     aux.put(values.getYValue().get(indice));
@@ -65,7 +64,7 @@ class JsonParser {
             }
 
             jsonObject.put("dados", jsonArray);
-            
+
         }catch (JSONException e){
             SLog.d(TAG, "Error trying to create JSON");
             e.printStackTrace();
