@@ -14,24 +14,28 @@ class StorageManager {
 
     private final String TAG = getClass().getSimpleName();
 
-    private ArrayList<Float> mXValue;
-    private ArrayList<Float> mYValue;
-    private ArrayList<Float> mZValue;
+    volatile private ArrayList<Float> mXValue;
+    volatile private ArrayList<Float> mYValue;
+    volatile private ArrayList<Float> mZValue;
 
-    private ArrayList<Double> mLatitude;
-    private ArrayList<Double> mLongitude;
+    volatile private ArrayList<Double> mLatitude;
+    volatile private ArrayList<Double> mLongitude;
 
-    private ArrayList<Integer> mCounter;
+    volatile private ArrayList<Integer> mCounter;
 
-    private int mLocationCounter;
-    private SaveState mSaveState;
+    volatile private int mLocationCounter;
+    volatile private SaveState mSaveState;
+    volatile private boolean isFistTime;
+    volatile private int lastValueSize;
 
     StorageManager(Context context){
         instanceVariables();
 
         mLocationCounter = 0;
+        lastValueSize = 0;
         mSaveState = SaveState.getInstance();
         mSaveState.setContext(context);
+        isFistTime = true;
     }
 
     void registerAccelerometerData(float[] data){
@@ -40,17 +44,26 @@ class StorageManager {
         mZValue.add(data[2]);
     }
 
-    void registerPositionChange(double latitude, double longitude){
+    synchronized void registerPositionChange(double latitude, double longitude){
         mLatitude.add(latitude);
         mLongitude.add(longitude);
         mLocationCounter++;
 
-        mCounter.add(mXValue.size());
+        if(isFistTime) {
+            isFistTime = false;
+            mXValue.clear();
+            mYValue.clear();
+            mZValue.clear();
+        }else {
+            int val = mXValue.size() - lastValueSize;
+            lastValueSize = mXValue.size();
+            mCounter.add(val);
+        }
 
         checkLimitPositionChange();
     }
 
-    private void checkLimitPositionChange(){
+    private synchronized void checkLimitPositionChange(){
         if(mLocationCounter == Constants.LOCATION_LIMIT_POSITION_CHANGE){
             SLog.d(TAG, "Limit reached, saving new values into storage");
             final Values value = new Values(mXValue, mYValue, mZValue, mLatitude, mLongitude, mCounter);
@@ -62,7 +75,6 @@ class StorageManager {
                 public void run() {
                     ArrayList<Values> newData = new ArrayList<>();
                     newData.add(value);
-
                     ArrayList<Values> oldData = mSaveState.loadData();
                     if(oldData != null){
                         newData.addAll(oldData);
@@ -77,7 +89,7 @@ class StorageManager {
         }
     }
 
-    private void instanceVariables(){
+    private synchronized void instanceVariables(){
         mXValue = new ArrayList<>();
         mYValue = new ArrayList<>();
         mZValue = new ArrayList<>();

@@ -53,7 +53,7 @@ public class SaveState {
         }
     }
 
-    public ArrayList<Values> loadData(){
+    synchronized ArrayList<Values> loadData(){
         if(mFolder == null){
             mFolder = mContext.getExternalFilesDir(null);
         }
@@ -76,7 +76,7 @@ public class SaveState {
         }
     }
     //TODO: Bug can be caused when user record less than necessary to save data into database
-    public Values loadDataMerged(){
+    public synchronized Values loadDataMerged(){
         if(mFolder == null){
             mFolder = mContext.getExternalFilesDir(null);
         }
@@ -142,7 +142,7 @@ public class SaveState {
             merged.addAllZValues(val.getZValue());
             merged.addAllLatitudes(val.getLatitude());
             merged.addAllLongitudes(val.getLongitude());
-            merged.addAllCoutners(val.getCounters());
+            merged.addAllCounters(val.getCounters());
         }
         SLog.d(TAG, "Data successfully merged");
         return merged;
