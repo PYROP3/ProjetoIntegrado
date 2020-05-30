@@ -22,7 +22,8 @@ public class Values implements Serializable {
         mCounter = new ArrayList<>();
     }
 
-    Values(ArrayList x, ArrayList y, ArrayList z, ArrayList latitude, ArrayList longitude, ArrayList number){
+    Values(ArrayList<Float> x, ArrayList<Float> y, ArrayList<Float> z, ArrayList<Double> latitude,
+           ArrayList<Double> longitude, ArrayList<Integer> number){
         mXValue = x;
         mYValue = y;
         mZValue = z;
@@ -69,5 +70,5 @@ public class Values implements Serializable {
         mLongitude.addAll(longitudes);
     }
 
-    public void addAllCoutners(ArrayList<Integer> counters) {mCounter.addAll(counters);}
+    public void addAllCounters(ArrayList<Integer> counters) {mCounter.addAll(counters);}
 }

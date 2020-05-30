@@ -49,18 +49,23 @@ class JsonParser {
 
             jsonArray = new JSONArray();
             aux = new JSONArray();
-            for(int i = 0; i < values.getXValue().size(); i++){
-                aux.put(values.getXValue().get(i));
-                aux.put(values.getYValue().get(i));
-                aux.put(values.getZValue().get(i));
-                jsonArray.put(aux);
-                aux = new JSONArray();
+
+            int indice = 0, x;
+            for(int j = 0; j < values.getCounters().size() - 1; j++){//Integer x : values.getCounters()
+                x = values.getCounters().get(j);
+                for(int i = 0; i < x; i++){
+                    aux.put(values.getXValue().get(indice));
+                    aux.put(values.getYValue().get(indice));
+                    aux.put(values.getZValue().get(indice));
+
+                    jsonArray.put(aux);
+                    aux = new JSONArray();
+                    indice++;
+                }
             }
 
-            jsonObject.put("pontos", jsonArray);
-
-
-
+            jsonObject.put("dados", jsonArray);
+            
         }catch (JSONException e){
             SLog.d(TAG, "Error trying to create JSON");
             e.printStackTrace();
