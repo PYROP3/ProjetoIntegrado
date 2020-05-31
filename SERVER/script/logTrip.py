@@ -32,20 +32,20 @@ brush_radius = 5
 
 def coord_list_dtype(s):
     try:
-        x = list(map(lambda p: list(map(float, p.split(', ')))[::-1], s.split(' ')))
+        x = list(map(lambda p: list(map(float, p.split(',')))[::-1], s.split(' ')))
         return x
     except:
         raise argparse.ArgumentTypeError(
-            "Coordinates must be (x0, y0 x1, y1 ... xn, yn) :[{}]".format(s)
+            "Coordinates must be (x0,y0 x1,y1 ... xn,yn) :[{}]".format(s)
             )
 
 def accel_dtype(s):
     try:
-        x = list(map(lambda p: list(map(float, p.split(', ')))[::-1], s.split(' ')))
+        x = list(map(lambda p: list(map(float, p.split(',')))[::-1], s.split(' ')))
         return x
     except:
         raise argparse.ArgumentTypeError(
-            "Qualities must be (x0, y0, z0 x1, y1, z1 ... xn, yn, zn) :[{}]".format(s)
+            "Qualities must be (x0,y0,z0 x1,y1,z1 ... xn,yn,zn) :[{}]".format(s)
             )
 
 def pseudoSigmoid(value, k=10):
