@@ -120,6 +120,7 @@ server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
     if (auth == null) {
         sendErrorMessage(7, req, res); 
     } else {
+        auth = auth['value'];
         logger.info("Validating user : ", auth);
         delete(auth['authToken']);
         await mongo.db.collection('users').insertOne(new userModel.User(auth).toJSON());
