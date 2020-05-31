@@ -176,10 +176,12 @@ server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
         sendErrorMessage(5, req, res);
         return;
     }
+
     if(query.minLatitude == query.maxLatitude || query.minLongitude == query.maxLatitude){
         sendErrorMessage(14, req, res);
         return;
     }
+
 
     const python = spawn(
         process.env.PYTHON_BIN,
@@ -260,12 +262,14 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
     logger.debug("[Server][logTrip] Coordinates    : " + JSON.stringify(data["pontos"]))
     logger.debug("[Server][logTrip] Accel data     : " + JSON.stringify(data["dados"]))
 
+
     for(let i = 0; i < (data["pontos"]).length; i++){
         if(data["pontos"][i][0] > 180 || data["pontos"][i][0] < -180 || data["pontos"][i][1] > 90 || data["pontos"][i][1] < -90){
             sendErrorMessage(5, req, res);
             return;
         }
     }
+
 
 
     if((data["pontos"]).length != (data["dados"]).length + 1){
