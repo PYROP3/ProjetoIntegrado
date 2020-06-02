@@ -40,7 +40,7 @@ function parseCookies (request) {
 }
 
 // Static pages
-//server.use(express.static('htmls'));
+server.use('/static', express.static('public'));
 
 // Oauth2 setup
 // server.use(oauth2.inject());
@@ -105,11 +105,10 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     let data = req.body;
     let authToken = req.token;
     
-
     let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
     if (findResult) { 
         logger.info("Account requested for email " + data['email'] + " already in use");
-        sendErrorMessage(3, req, res); //TODO find a better way to reply
+        sendErrorMessage("PrimaryKeyInUse", req, res); //TODO find a better way to reply
         return 
     }
     var newUser = new userModel.User(data['email'], data['name'], data['password']).toJSON();

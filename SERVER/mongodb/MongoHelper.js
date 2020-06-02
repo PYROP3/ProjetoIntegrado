@@ -50,12 +50,8 @@ const spawnMongod = () => {
     // Handle mongod process exit
     module.exports._mongodProcess.on('close', function (code) {
         logger.warn('[mongod/close] ' + code);
-        if (code == 100) { // Instance already running, terminate it
-            logger.warn('[mongod/close] Trying to restart mongod');
-            let x = spawn("kill -9 $(ps -ax | grep \"mongod\" | grep -o -E \"^[^0-9]*[0-9]+\")");
-            x.on('close', () => {
-                spawnMongod();
-            });
+        if (code == 100) { // Instance already running
+            logger.warn('[mongod/close] Mongod instance already running, logger is unavailable');
         }
     });
 
