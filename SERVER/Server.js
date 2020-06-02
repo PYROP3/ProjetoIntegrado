@@ -21,6 +21,11 @@ require('dotenv').config({path: __dirname + '/util/.env'});
 require('dotenv').config({path: __dirname + '/script/.env'});
 require('dotenv').config({path: __dirname + '/mongodb/.env'});
 
+//Email
+EmailTemplate = require('email-templates').EmailTemplate,
+path = require('path'),
+Promise = require('bluebird');
+
 // Cookies
 function parseCookies (request) {
     var list = {},
@@ -78,11 +83,28 @@ function sendErrorMessage(code, request, response) {
     response.status(error["HttpReturn"]).header("Content-Type", "application/json").send(JSON.stringify(thisErr));
 }
 
+//Email template
+function loadTemplate(templateName, contexts){
+    let template = new EmailTemplate(path.join(__dirname, '/templates', templateName));
+    return Promise.all([contexts].map((context) => {
+        return new Promise((resolve, reject) => {
+            template.render(context, (err, result) => {
+                if (err) reject(err);
+                else resolve({
+                    email: result,
+                    context,
+                });
+            });
+        });
+    }));
+}
+
 // =================================== Requests ===================================
 
 server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     let data = req.body;
     let authToken = req.token;
+    
 
     let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
     if (findResult) { 
@@ -99,15 +121,20 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     } else {
         sendErrorMessage(0, req, res); //TODO find a better way to reply
         //TODO des-gambiarrar esse processo de enviar email
-        mailer.sendMail({
-            from: Constants.SOURCE_EMAIL_ADDRESS,
-            to: newUser['email'],
-            subject: 'Street analyzer account validation',
-            text: 'That was easy!\n' + 
-                'Now just click on this link to validate your account: ' +
-                Constants.SERVER_URL + 
-                Constants.VERIFY_ACCOUNT_REQUEST + 
-                '?token='+newUser['authToken']
+        loadTemplate('validation', newUser).then((results) => {
+            return Promise.all(results.map((result) =>{         
+                mailer.sendMail({
+                    from: Constants.SOURCE_EMAIL_ADDRESS,
+                    to: newUser['email'],
+                    subject: 'Street analyzer account validation',
+                    text: 'That was easy!\n' + 
+                        'Now just click on this link to validate your account: ' +
+                        Constants.SERVER_URL + 
+                        Constants.VERIFY_ACCOUNT_REQUEST + 
+                        '?token='+newUser['authToken'],
+                    html: result.email.html,
+                });
+            }));
         });
     }
 });
