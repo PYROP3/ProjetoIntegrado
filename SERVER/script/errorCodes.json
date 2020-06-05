@@ -209,5 +209,20 @@
 
             }
         }
+    },
+    {
+        "id":14,
+        "Name": "InvalidCoordinates",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Invalid Coordinates",
+            "Description": "Maximum and minimum coordinates have no difference"
+            },
+            "Portugues":{
+                "PrettyName": "Coordenadas Inválidas",
+                "Description": "Coordenadas minimas e máximas são iguais"
+            }
+        }
     }
 ]

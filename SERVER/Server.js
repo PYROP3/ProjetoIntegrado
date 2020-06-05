@@ -161,17 +161,36 @@ server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
 
 server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     var query = req.query;
+    query.minLatitude   = parseFloat(query.minLatitude);
+    query.minLongitude  = parseFloat(query.minLongitude);
+    query.maxLatitude   = parseFloat(query.maxLatitude);
+    query.maxLongitude  = parseFloat(query.maxLongitude);
 
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
+
+    if(query.minLatitude > query.maxLatitude || query.minLongitude > query.maxLongitude){
+        sendErrorMessage(6, req, res);
+        return;
+    }
+    if(query.minLatitude < -90 || query.maxLatitude > 90 || query.maxLongitude > 180 || query.minLongitude < -180){
+        sendErrorMessage(5, req, res);
+        return;
+    }
+
+    if(query.minLatitude == query.maxLatitude || query.minLongitude == query.maxLatitude){
+        sendErrorMessage(14, req, res);
+        return;
+    }
+
 
     const python = spawn(
         process.env.PYTHON_BIN,
         [
-            serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY),
-            parseFloat(query.minLongitude), // x_min
-            parseFloat(query.minLatitude),  // y_min
-            parseFloat(query.maxLongitude), // x_max
-            parseFloat(query.maxLatitude),  // y_max
+            serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
+            query.minLongitude, // x_min
+            query.minLatitude,  // y_min
+            query.maxLongitude, // x_max
+            query.maxLatitude,  // y_max
             "--overlay_folder",
             serverUtils.fetchFile("/overlay/"),         // overlay_folder
             "--errors_file",
@@ -242,6 +261,21 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
     logger.debug("[Server][logTrip] Authentication : " + JSON.stringify(authResult))
     logger.debug("[Server][logTrip] Coordinates    : " + JSON.stringify(data["pontos"]))
     logger.debug("[Server][logTrip] Accel data     : " + JSON.stringify(data["dados"]))
+
+
+    for(let i = 0; i < (data["pontos"]).length; i++){
+        if(data["pontos"][i][0] > 180 || data["pontos"][i][0] < -180 || data["pontos"][i][1] > 90 || data["pontos"][i][1] < -90){
+            sendErrorMessage(5, req, res);
+            return;
+        }
+    }
+
+
+
+    if((data["pontos"]).length != (data["dados"]).length + 1){
+        sendErrorMessage(13, req, res);
+        return;
+    }
 
     let py_args = [
         serverUtils.fetchFile(Constants.SCRIPT_LOG_TRIP),
