@@ -9,7 +9,7 @@ module.exports.logger = winston.createLogger({
     defaultMeta: { service: 'user-service' },
     transports: [
       //
-      // - Write to all logs with level `info` and below to `combined.log` 
+      // - Write to all logs with level `info` and below to `combined.log`
       // - Write all logs error (and below) to `error.log`.
       //
         new winston.transports.File({ filename: serverUtils.fetchFile(Constants.LOG_STORAGE_PATH + 'error.log'), level: 'error' }),
@@ -20,11 +20,11 @@ module.exports.logger = winston.createLogger({
   //
   // If we're not in production then log to the `console` with the format:
   // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-  // 
-if (process.env.NODE_ENV !== 'production') {
+  //
+//if (serverUtils.isLocalEnvironment) {
     module.exports.logger.add(new winston.transports.Console({
         format: winston.format.simple()
     }));
-}
+//}
 
 module.exports.logger.debug("Process environment type is " + process.env.NODE_ENV);

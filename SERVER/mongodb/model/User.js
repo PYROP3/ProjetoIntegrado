@@ -10,7 +10,7 @@ module.exports.User = class {
             this._password = password;
         }
     }
-    
+
     toJSON() {
         return {
             'email':this._email,
