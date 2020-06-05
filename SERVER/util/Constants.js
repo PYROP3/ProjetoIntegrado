@@ -1,7 +1,3 @@
-// Server data
-module.exports.SERVER_PORT = 8080
-module.exports.SERVER_URL = "http://localhost:8080"
-
 // Requests
 // -- API
 module.exports.QUALITY_OVERLAY_REQUEST = "/qualityOverlay";
@@ -42,13 +38,5 @@ module.exports.AUTH_TOKEN_LENGTH = 64
 module.exports.AUTH_TOKEN_TYPE = "Bearer"
 module.exports.AUTH_TOKEN_NAME = module.exports.AUTH_TOKEN_TYPE + " "
 
-// module.exports = {
-//     QUALITY_OVERLAY_REQUEST: QUALITY_OVERLAY_REQUEST,
-//     LOG_TRIP_REQUEST:        LOG_TRIP_REQUEST,
-//     PYTHON_BIN:              PYTHON_BIN,
-//     SCRIPT_ERRORS_PATH:      SCRIPT_ERRORS_PATH,
-//     SCRIPT_SLICE_OVERLAY:    SCRIPT_SLICE_OVERLAY,
-//     SCRIPT_LOG_TRIP:         SCRIPT_LOG_TRIP,
-//     LOG_STORAGE_PATH:        LOG_STORAGE_PATH,
-//     DEFAULT_LOCALE:          DEFAULT_LOCALE
-// }
+module.exports.SERVER_PORT_DEFAULT = 8080
+module.exports.SERVER_URL_DEFAULT = "http://localhost:"+module.exports.SERVER_PORT_DEFAULT

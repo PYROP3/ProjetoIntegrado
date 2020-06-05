@@ -85,17 +85,17 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     let authToken = req.token;
 
     let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
-    if (findResult) { 
+    if (findResult) {
         logger.info("Account requested for email " + data['email'] + " already in use");
         sendErrorMessage(3, req, res); //TODO find a better way to reply
-        return 
+        return
     }
     var newUser = new userModel.User(data['email'], data['name'], data['password']).toJSON();
     newUser['authToken'] = serverUtils.generateToken(32);
     logger.info("Creating user : ", newUser);
     let result = await mongo.db.collection('pendingUsers').insertOne(newUser);
     if (result == null) {
-        sendErrorMessage(1, req, res); 
+        sendErrorMessage(1, req, res);
     } else {
         sendErrorMessage(0, req, res); //TODO find a better way to reply
         //TODO des-gambiarrar esse processo de enviar email
@@ -103,10 +103,10 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
             from: Constants.SOURCE_EMAIL_ADDRESS,
             to: newUser['email'],
             subject: 'Street analyzer account validation',
-            text: 'That was easy!\n' + 
+            text: 'That was easy!\n' +
                 'Now just click on this link to validate your account: ' +
-                Constants.SERVER_URL + 
-                Constants.VERIFY_ACCOUNT_REQUEST + 
+                serverUtils.serverUrl +
+                Constants.VERIFY_ACCOUNT_REQUEST +
                 '?token='+newUser['authToken']
         });
     }
@@ -118,7 +118,7 @@ server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
 
     let auth = await mongo.db.collection('pendingUsers').findOneAndDelete({'authToken':authToken});
     if (auth == null) {
-        sendErrorMessage(7, req, res); 
+        sendErrorMessage(7, req, res);
     } else {
         auth = auth['value'];
         logger.info("Validating user : ", auth);
@@ -148,9 +148,9 @@ server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
         sendErrorMessage("MalformedToken", req, res);
         return;
     }
-    
+
     let result = await mongo.destroySession(authToken);
-    
+
     if (result == null) {
         sendErrorMessage("SessionNotFound", req, res);
         return;
@@ -167,7 +167,7 @@ server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     const python = spawn(
         process.env.PYTHON_BIN,
         [
-            serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
+            serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY),
             parseFloat(query.minLongitude), // x_min
             parseFloat(query.minLatitude),  // y_min
             parseFloat(query.maxLongitude), // x_max
@@ -290,7 +290,8 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
 
 // Listen on port
 let port = process.env.PORT;
-if (port == undefined) port = Constants.SERVER_PORT;
+if (port == undefined) port = Constants.SERVER_PORT_DEFAULT;
 
+logger.info("Starting server...");
 server.listen(port);
 logger.info("[Server] Listening on port " + port);

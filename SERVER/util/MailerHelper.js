@@ -28,5 +28,5 @@ module.exports.sendMail = function(emailData) {
         } else {
             console.log('Email sent: ' + info.response);
         }
-    }); 
+    });
 }
