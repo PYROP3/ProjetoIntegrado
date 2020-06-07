@@ -8,19 +8,24 @@ const {spawn} = require('child_process');
 // Environment variables
 require('dotenv').config({path: __dirname + '/.env'});
 
-// Connection URL
-//const mongoUrl = 'mongodb://localhost:27017';
-
-// Database Name
-const dbName = 'ProjetoIntegrado';
-
 // Collections
 const usersCollectionStr        = 'users'
 const pendingUsersCollectionStr = 'pendingUsers'
 const sessionsCollectionStr     = 'sessions'
 
+logger.info("Starting mongo helper...");
+
+let _dbUrl;
+if (serverUtils.isLocalEnvironment) {
+    _dbUrl = "mongodb://"+process.env.MONGO_URL;
+} else {
+    _dbUrl = "mongodb+srv://"+process.env.MONGO_USER+":"+process.env.MONGO_PASS+"@"+process.env.MONGO_URL+"/"+process.env.MONGO_DB_NAME+"?retryWrites=true&w=majority";
+}
+const dbUrl = _dbUrl;
+logger.debug("Mongo url=" + dbUrl);
+
 // Mongo db client
-const client = new MongoClient(process.env.MONGOD_URL, { useUnifiedTopology: true });
+const client = new MongoClient(dbUrl, { useUnifiedTopology: true });
 
 const spawnMongod = () => {
     let mongodb_path = process.env.MONGO_DBPATH;
@@ -29,7 +34,7 @@ const spawnMongod = () => {
     }
     logger.debug("Mongodb path set as [" + mongodb_path + "]");
     module.exports._mongodProcess = spawn(
-        process.env.MONGOD_BIN,
+        process.env.MONGO_BIN,
         [
             "--dbpath="+mongodb_path
         ]
@@ -59,10 +64,19 @@ const spawnMongod = () => {
 }
 
 const load = async () => {
-    spawnMongod()
+    if (serverUtils.isLocalEnvironment) {
+        logger.debug("Spawning mongo process...");
+        spawnMongod();
+    } else {
+        logger.debug("Env is " + process.env.NODE_ENV + "; skipping mongo spawn");
+    }
 
-    let cclient = await client.connect()
-    module.exports.db = cclient.db(dbName);
+    let cclient = await client.connect().catch(err => {
+        logger.error('Mongo load error: ', err.message);
+        logger.debug('Mongo load error: ', err);
+        process.exit(1); // FIXME: find appropriate exit code (maybe client.connect error code?)
+    });
+    module.exports.db = cclient.db(process.env.MONGO_DB_NAME);
     logger.info("Mongo db loaded");
 
     /**
@@ -88,8 +102,8 @@ const load = async () => {
     module.exports.createSession = async function(user, password) {
         // Check for correct credentials
         let result = await module.exports.db.collection(usersCollectionStr).findOne({
-            [Constants.USER_PRIMARY_KEY]:user, 
-            [Constants.USER_PASSWORD_KEY]:password 
+            [Constants.USER_PRIMARY_KEY]:user,
+            [Constants.USER_PASSWORD_KEY]:password
         });
         logger.debug(JSON.stringify(result));
         if (result == null) { return null; }
@@ -97,7 +111,7 @@ const load = async () => {
         //TODO check if a session already exists
         let token = serverUtils.generateToken(Constants.AUTH_TOKEN_LENGTH);
         result = await module.exports.db.collection(sessionsCollectionStr).insertOne({
-            [Constants.USER_PRIMARY_KEY]:user, 
+            [Constants.USER_PRIMARY_KEY]:user,
             [Constants.AUTH_TOKEN_KEY]:token,
             [Constants.TIMESTAMP_KEY]:Date.now()
         });

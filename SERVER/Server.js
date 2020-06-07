@@ -106,7 +106,7 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     let authToken = req.token;
     
     let findResult = await mongo.db.collection('users').findOne({'email':data['email']});
-    if (findResult) { 
+    if (findResult) {
         logger.info("Account requested for email " + data['email'] + " already in use");
         sendErrorMessage("PrimaryKeyInUse", req, res); //TODO find a better way to reply
         return 
@@ -116,7 +116,7 @@ server.post(Constants.CREATE_ACCOUNT_REQUEST, async function(req, res) {
     logger.info("Creating user : ", newUser);
     let result = await mongo.db.collection('pendingUsers').insertOne(newUser);
     if (result == null) {
-        sendErrorMessage(1, req, res); 
+        sendErrorMessage(1, req, res);
     } else {
         sendErrorMessage(0, req, res); //TODO find a better way to reply
         //TODO des-gambiarrar esse processo de enviar email
@@ -144,7 +144,7 @@ server.get(Constants.VERIFY_ACCOUNT_REQUEST, async function(req, res) {
 
     let auth = await mongo.db.collection('pendingUsers').findOneAndDelete({'authToken':authToken});
     if (auth == null) {
-        sendErrorMessage(7, req, res); 
+        sendErrorMessage(7, req, res);
     } else {
         auth = auth['value'];
         logger.info("Validating user : ", auth);
@@ -174,9 +174,9 @@ server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
         sendErrorMessage("MalformedToken", req, res);
         return;
     }
-    
+
     let result = await mongo.destroySession(authToken);
-    
+
     if (result == null) {
         sendErrorMessage("SessionNotFound", req, res);
         return;
@@ -187,17 +187,36 @@ server.get(Constants.DEAUTH_REQUEST, async function(req, res) {
 
 server.get(Constants.QUALITY_OVERLAY_REQUEST, function(req, res) {
     var query = req.query;
+    query.minLatitude   = parseFloat(query.minLatitude);
+    query.minLongitude  = parseFloat(query.minLongitude);
+    query.maxLatitude   = parseFloat(query.maxLatitude);
+    query.maxLongitude  = parseFloat(query.maxLongitude);
 
     logger.info("[Server][qualityOverlay] Overlay requested from ("+query.minLatitude+","+query.minLongitude+") to ("+query.maxLatitude+","+query.maxLongitude+")");
+
+    if(query.minLatitude > query.maxLatitude || query.minLongitude > query.maxLongitude){
+        sendErrorMessage(6, req, res);
+        return;
+    }
+    if(query.minLatitude < -90 || query.maxLatitude > 90 || query.maxLongitude > 180 || query.minLongitude < -180){
+        sendErrorMessage(5, req, res);
+        return;
+    }
+
+    if(query.minLatitude == query.maxLatitude || query.minLongitude == query.maxLatitude){
+        sendErrorMessage(14, req, res);
+        return;
+    }
+
 
     const python = spawn(
         process.env.PYTHON_BIN,
         [
             serverUtils.fetchFile(Constants.SCRIPT_SLICE_OVERLAY), 
-            parseFloat(query.minLongitude), // x_min
-            parseFloat(query.minLatitude),  // y_min
-            parseFloat(query.maxLongitude), // x_max
-            parseFloat(query.maxLatitude),  // y_max
+            query.minLongitude, // x_min
+            query.minLatitude,  // y_min
+            query.maxLongitude, // x_max
+            query.maxLatitude,  // y_max
             "--overlay_folder",
             serverUtils.fetchFile("/overlay/"),         // overlay_folder
             "--errors_file",
@@ -269,6 +288,21 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
     logger.debug("[Server][logTrip] Coordinates    : " + JSON.stringify(data["pontos"]))
     logger.debug("[Server][logTrip] Accel data     : " + JSON.stringify(data["dados"]))
 
+
+    for(let i = 0; i < (data["pontos"]).length; i++){
+        if(data["pontos"][i][0] > 180 || data["pontos"][i][0] < -180 || data["pontos"][i][1] > 90 || data["pontos"][i][1] < -90){
+            sendErrorMessage(5, req, res);
+            return;
+        }
+    }
+
+
+
+    if((data["pontos"]).length != (data["dados"]).length + 1){
+        sendErrorMessage(13, req, res);
+        return;
+    }
+
     let py_args = [
         serverUtils.fetchFile(Constants.SCRIPT_LOG_TRIP),
         "--coordinates"    , data["pontos"].map(coord => coord.join(",")).join(" "),
@@ -316,7 +350,8 @@ server.post(Constants.LOG_TRIP_REQUEST, async function(req, res){
 
 // Listen on port
 let port = process.env.PORT;
-if (port == undefined) port = Constants.SERVER_PORT;
+if (port == undefined) port = Constants.SERVER_PORT_DEFAULT;
 
+logger.info("Starting server...");
 server.listen(port);
 logger.info("[Server] Listening on port " + port);
