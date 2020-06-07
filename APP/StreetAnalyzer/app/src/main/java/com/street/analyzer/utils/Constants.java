@@ -30,12 +30,14 @@ public class Constants {
 
     public static final int JOB_SCHEDULER_PERIOD = 15 * 60 * 1000; //60 * 60 * 1000 //One hour
 
-    //Only for test
-    public static final String MY_ADDRESS = "http//10.0.0.144:8080";
-    public static final String SEND_SCHEME_HTTPS = "https";
-    public static final String SEND_HOST = "reqres.in";
-    public static final String SEND_API_PATH = "api";
-    public static final String SEND_USERS_PATH = "users";
-    public static final String SEND_REGISTER_PATH = "register";
+    public static final String SERVER_HOST = "street-analyzer.herokuapp.com";
+    public static final String SERVER_SCHEME_HTTPS = "https";
+    public static final String SERVER_CREATE_ACCOUNT = "createAccount";
 
+    public static final int SERVER_RESPONSE_OK = 0;
+
+    public static final int MIN_NAME_LENGTH = 4;
+    public static final int MIN_PASSWORD_LENGTH = 4;
+
+    public static final String EXTRA_CREATE_ACCOUNT = "CreateAccount";
 }

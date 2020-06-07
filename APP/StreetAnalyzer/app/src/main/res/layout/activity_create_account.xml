@@ -148,6 +148,7 @@
         android:layout_marginTop="47dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
+        android:onClick="onClickRegisterAccount"
         android:text="@string/confirm"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"

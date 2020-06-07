@@ -9,6 +9,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.JsonParser;
 import com.street.analyzer.utils.SLog;
 
 import org.json.JSONException;
@@ -19,23 +20,24 @@ public class CustomOkHttpClient {
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final String TAG = getClass().getSimpleName();
 
-    public boolean sendCreateAccountRequest(Context context, Callback callback){
+    public boolean sendCreateAccountRequest(Context context, Callback callback,
+                        String email, String name, String password){
+
         if(!isNetworkAvailable(context))
             return false;
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
         HttpUrl url = new HttpUrl.Builder()
-                .scheme(Constants.SEND_SCHEME_HTTPS)
-                .host(Constants.SEND_HOST)
-                .addPathSegment(Constants.SEND_API_PATH)
-                .addPathSegment(Constants.SEND_REGISTER_PATH)
+                .scheme(Constants.SERVER_SCHEME_HTTPS)
+                .host(Constants.SERVER_HOST)
+                .addPathSegment(Constants.SERVER_CREATE_ACCOUNT)
                 .build();
 
         SLog.d(TAG, "Sending request to: " + url.toString());
 
         JsonParser jsonParser = new JsonParser();
-        JSONObject jsonObject = jsonParser.createAccountJson("eve.holt@reqres.in", "pistol");
+        JSONObject jsonObject = jsonParser.createAccountJson(name, email, password);
         RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
         Request request = new Request.Builder()
@@ -49,9 +51,6 @@ public class CustomOkHttpClient {
 
         return true;
     }
-
-
-
 
     public boolean requestJsonTest(Context context, Callback callback){
         if(!isNetworkAvailable(context))

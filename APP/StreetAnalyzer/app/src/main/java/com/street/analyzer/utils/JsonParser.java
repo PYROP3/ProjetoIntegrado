@@ -1,4 +1,4 @@
-package com.street.analyzer.serverCommunication;
+package com.street.analyzer.utils;
 
 import com.street.analyzer.record.Values;
 import com.street.analyzer.utils.SLog;
@@ -11,16 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class JsonParser {
+public class JsonParser {
 
     private static final String TAG = "JsonParser";
 
-    JSONObject createAccountJson(String name, String email){
+    public JSONObject createAccountJson(String name, String email, String password){
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("email",name);
-            jsonObject.put("password", email);
+            jsonObject.put("email", email);
+            jsonObject.put("name", name);
+            jsonObject.put("password", password);
             SLog.d(TAG, "JSON: " + jsonObject.toString());
         } catch (JSONException e) {
             SLog.d(TAG, "Error trying to create JSON");
@@ -30,7 +31,7 @@ class JsonParser {
         return jsonObject;
     }
 
-    JSONObject createLogToSend(Values values){
+    public JSONObject createLogToSend(Values values){
         JSONObject jsonObject = new JSONObject();
 
         try {
@@ -76,5 +77,16 @@ class JsonParser {
         return null;
     }
 
-
+    public static boolean isResponseSuccessful(String jsonResponse){
+       try {
+           SLog.d(TAG, jsonResponse);
+           JSONObject jsonObject = new JSONObject(jsonResponse);
+           if(jsonObject.getInt("Code") == Constants.SERVER_RESPONSE_OK){
+               return true;
+           }
+       } catch (JSONException e) {
+           e.printStackTrace();
+       }
+        return false;
+    }
 }

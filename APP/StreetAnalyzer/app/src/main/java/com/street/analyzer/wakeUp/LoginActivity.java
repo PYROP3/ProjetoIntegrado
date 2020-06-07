@@ -1,12 +1,15 @@
 package com.street.analyzer.wakeUp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,7 +27,6 @@ import java.io.IOException;
 public class LoginActivity extends AppCompatActivity implements Callback {
 
     private final String TAG = getClass().getSimpleName();
-    private Context mContext;
     private RequestPermissions mRequestPermissions;
 
     @Override
@@ -32,16 +34,18 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-         mContext = getApplicationContext();
-        mRequestPermissions = new RequestPermissions(mContext);
+        if(getIntent().hasExtra(Constants.EXTRA_CREATE_ACCOUNT))
+            showExplainMessage();
+
+        mRequestPermissions = new RequestPermissions(this);
         checkUserPermissions();
     }
 
-    public void onClickStartMap(View v){
+    public void onClickLogin(View v){
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
 
-        if(!customOkHttpClient.requestJsonTest(mContext, this)){
-            Toast.makeText(mContext, "Network not detected"
+        if(!customOkHttpClient.requestJsonTest(this, this)){
+            Toast.makeText(this, "Network not detected"
             + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
 
             SLog.d(TAG, "Can't login, network error");
@@ -53,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private void checkUserPermissions(){
         if(mRequestPermissions.checkPermission()){
             if(!isLocationEnabled()){
-                Toast.makeText(mContext, "Please, turn on device location", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please, turn on device location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
@@ -65,15 +69,18 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     //Check if location is enable in device
     private boolean isLocationEnabled(){
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-        );
+        if (locationManager != null) {
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                    LocationManager.NETWORK_PROVIDER
+            );
+        }
+        return false;
     }
 
     @Override
     public void onFailure(Request request, IOException e) {
-//        Toast.makeText(mContext, "Sorry, we can't loggin!" +
-//                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Sorry, we can't login!" +
+                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
         SLog.d(TAG, "Login - onFailure");
     }
 
@@ -82,18 +89,31 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         if(response.isSuccessful()){
             SLog.d(TAG, "Successfully response");
             SLog.d(TAG, "Response: " + response.body().string());
-            startActivity(new Intent(mContext, MapsActivity.class));
+            startActivity(new Intent(this, MapsActivity.class));
         }else {
             //TODO: Handle the response and check what is the error
             SLog.d(TAG, "Response fail not successful response");
         }
     }
 
-    public void onClickSignUp(View v){
-        startActivity(new Intent(mContext, CreateAccountActivity.class));
+    public void onClickForgotPassword(View v){
+        startActivity(new Intent(this, CreateAccountActivity.class));
     }
 
     public void onClickReturn(View v){
         finish();
+    }
+
+    private void showExplainMessage(){
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setTitle("Success!");
+        dlgAlert.setMessage("Only one more step!\n" +
+                "Please check your mail box to verify your email address!");
+        dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 }

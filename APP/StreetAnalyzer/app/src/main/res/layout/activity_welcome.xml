@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/cloud_bold"
-        android:text="MEET UP"
+        android:text="@string/meet_up_title"
         android:textColor="@color/white"
         android:textSize="42sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +40,7 @@
         android:layout_marginTop="16dp"
         android:width="228dp"
         android:fontFamily="@font/cloud_light"
-        android:text="Join our community and be aware of the street condition. You’ll be also helping us to analyze it better!"
+        android:text="@string/meet_up_text"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -56,14 +56,14 @@
         android:layout_marginTop="28dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
-        android:text="LOGIN"
+        android:onClick="onClickLogin"
+        android:text="@string/login"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        android:onClick="onClickLogin"/>
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
         android:id="@+id/btn_register"
@@ -72,7 +72,8 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/ic_btn_not_filled"
         android:fontFamily="@font/cloud_light"
-        android:text="REGISTER"
+        android:onClick="onClickRegister"
+        android:text="@string/register"
         android:textColor="@color/lightGreen"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -80,8 +81,7 @@
         app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_login"
-        app:layout_constraintVertical_bias="0.011"
-        android:onClick="onClickRegister"/>
+        app:layout_constraintVertical_bias="0.011" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,12 @@
     <string name="side_default_name">Roberto Justos</string>
     <string name="side_default_email">roberj@bol.com.br</string>
 
+    <!-- Welcome Activity -->
+    <string name="meet_up_title">MEET UP</string>
+    <string name="meet_up_text">Join our community and be aware of the street condition. You’ll be also helping us to analyze it better!</string>
+    <string name="login">LOGIN</string>
+    <string name="register">REGISTER</string>
+
     <!-- Login Activity -->
     <string name="sign_in">Sign In</string>
     <string name="create_account">Don\'t have an account yet? Sign Up</string>
