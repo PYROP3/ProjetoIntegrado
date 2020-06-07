@@ -1,6 +1,7 @@
 <resources>
     <!-- App -->
     <string name="app_name">StreetAnalyzer</string>
+    <string name="app_title">Street Analyzer</string>
 
     <!-- Google Maps API -->
     <string name="title_activity_maps">Map</string>
@@ -17,9 +18,17 @@
     <string name="side_default_email">roberj@bol.com.br</string>
 
     <!-- Login Activity -->
-    <string name="app_title">Street Analyzer</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Don\'t have an account yet? Sign Up</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
+
+    <!-- Create Account Activity -->
+    <string name="create_account_title">Create \nYour account</string>
+    <string name="email">E-mail</string>
+    <string name="name">Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm">CONFIRM</string>
+
+
 </resources>

@@ -28,7 +28,7 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
     private Context mContext;
     private String TAG = getClass().getSimpleName();
 
-    //TODO: Get email, password and name from user and let he choose profile picture
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +40,8 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
 
     public void onClickRegisterAccount(View v){
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
+
+
 
         if(!customOkHttpClient.sendCreateAccountRequest(mContext, this)){
             Toast.makeText(mContext, "Network not detected"

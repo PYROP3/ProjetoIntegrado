@@ -8,7 +8,7 @@
     tools:context=".wakeUp.CreateAccountActivity">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/btnGoBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -20,12 +20,12 @@
         android:onClick="onClickReturn"/>
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/lblTitleStreetAnalyzer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/cloud_bold"
-        android:text="Street Analyzer"
+        android:text="@string/app_title"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,11 +38,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
+        android:onClick="onClickAddPicture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:srcCompat="@drawable/profile_picture"
-        android:onClick="onClickAddPicture"/>
+        app:layout_constraintTop_toBottomOf="@+id/lblTitleStreetAnalyzer"
+        app:srcCompat="@drawable/profile_picture" />
 
     <ImageView
         android:id="@+id/imageView4"
@@ -57,12 +57,12 @@
         app:srcCompat="@drawable/ic_btn_add_picture" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/lblTitleCreateYourAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="42dp"
         android:fontFamily="@font/cloud_light"
-        android:text="Create \nyour account"
+        android:text="@string/create_account_title"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,49 +71,49 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/txtEmail"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="12dp"
+        android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
-        android:hint="E-mail"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/darkGray"
+        android:textColorHint="@color/darkGray"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lblTitleCreateYourAccount" />
+
+    <EditText
+        android:id="@+id/txtName"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/input_field"
+        android:ems="14"
+        android:fontFamily="@font/cloud_light"
+        android:hint="@string/name"
         android:inputType="textPersonName"
         android:textColor="@color/darkGray"
+
         android:textColorHint="@color/darkGray"
         android:textSize="16sp"
-        android:background="@drawable/input_field"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/txtPassword"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="14dp"
         android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
-        android:hint="Name"
-        android:inputType="textPassword"
-        android:textColor="@color/darkGray"
-        android:textColorHint="@color/darkGray"
-
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
-
-    <EditText
-        android:id="@+id/editText6"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/input_field"
-        android:ems="14"
-        android:fontFamily="@font/cloud_light"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="textPassword"
         android:textColor="@color/darkGray"
 
@@ -121,17 +121,17 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+        app:layout_constraintTop_toBottomOf="@+id/txtName" />
 
     <EditText
-        android:id="@+id/editText7"
+        android:id="@+id/txtConfirmPassword"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="14dp"
         android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
-        android:hint="Confirm Password"
+        android:hint="@string/confirm_password"
         android:inputType="textPassword"
         android:textColor="@color/darkGray"
 
@@ -139,7 +139,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText6" />
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword" />
 
     <Button
         android:id="@+id/btn_login"
@@ -148,14 +148,14 @@
         android:layout_marginTop="47dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
-        android:text="CONFIRM"
+        android:text="@string/confirm"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText7"
+        app:layout_constraintTop_toBottomOf="@+id/txtConfirmPassword"
         app:layout_constraintVertical_bias="0.047" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
