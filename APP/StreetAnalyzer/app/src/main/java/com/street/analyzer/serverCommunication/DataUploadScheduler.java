@@ -1,10 +1,13 @@
 package com.street.analyzer.serverCommunication;
 
 import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
 import android.app.job.JobService;
+import android.content.Context;
 
 import com.street.analyzer.record.SaveState;
 import com.street.analyzer.record.Values;
+import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.SLog;
 
 import org.json.JSONObject;
@@ -37,8 +40,8 @@ public class DataUploadScheduler extends JobService {
 
                 SLog.d(TAG, "Job finished");
                 saveState.deleteFile();
-                //TODO: Set job to not reschedule if the data was uploaded successfully
-                jobFinished(params, false);
+
+                cancelScheduler(params);
             }
         }).start();
     }
@@ -48,5 +51,11 @@ public class DataUploadScheduler extends JobService {
         SLog.d(TAG, "Job cancelled before completion");
         jobStatus = true;
         return true;
+    }
+
+    private void cancelScheduler(JobParameters params){
+        jobFinished(params, false);
+        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        scheduler.cancel(Constants.JOB_UPLOAD_ID);
     }
 }

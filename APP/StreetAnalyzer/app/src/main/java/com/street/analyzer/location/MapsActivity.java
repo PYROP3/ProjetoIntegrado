@@ -21,6 +21,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.street.analyzer.R;
 import com.street.analyzer.record.RecordService;
+import com.street.analyzer.record.SaveState;
 import com.street.analyzer.serverCommunication.DataUploadScheduler;
 import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
@@ -98,16 +99,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void enableScheduler(){
         SLog.d(TAG, "Trying to active job scheduler");
-        ComponentName componentName = new ComponentName(this, DataUploadScheduler.class);
-        int requiredNetwork = NetworkStatusManager.networkAllowedToSend(this);
-        JobInfo jobInfo = null;
+        if(SaveState.getInstance().getSavedCounter() > 0) {
+            ComponentName componentName = new ComponentName(this, DataUploadScheduler.class);
+            int requiredNetwork = NetworkStatusManager.networkAllowedToSend(this);
+            JobInfo jobInfo = null;
             jobInfo = new JobInfo.Builder(Constants.JOB_UPLOAD_ID, componentName)
                     .setRequiredNetworkType(requiredNetwork)
                     .setPersisted(true)
                     .setPeriodic(Constants.JOB_SCHEDULER_PERIOD)
                     .build();
-        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-        int result = scheduler.schedule(jobInfo);
-        SLog.d(TAG, "Scheduler result : " + (result == JobScheduler.RESULT_SUCCESS ? "SUCCESS" : "FAILURE"));
+            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            int result = scheduler.schedule(jobInfo);
+            SLog.d(TAG, "Scheduler result : " + (result == JobScheduler.RESULT_SUCCESS ? "SUCCESS" : "FAILURE"));
+        }
     }
 }

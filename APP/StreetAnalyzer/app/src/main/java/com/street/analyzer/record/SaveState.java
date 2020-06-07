@@ -1,6 +1,7 @@
 package com.street.analyzer.record;
 
 import android.content.Context;
+import android.system.ErrnoException;
 
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.SLog;
@@ -21,6 +22,7 @@ public class SaveState {
     private final String TAG = getClass().getSimpleName();
 
     private static SaveState instance = null;
+    private static int mSavedCounter = 0;
 
     private File mFolder;
     private Context mContext;
@@ -47,6 +49,7 @@ public class SaveState {
             out.writeObject(data);
             out.close();
             SLog.d(TAG, "Data saved successfully new size: " + data.size());
+            mSavedCounter++;
         } catch (Exception e) {
             SLog.d(TAG, "Error when trying to save data");
             e.printStackTrace();
@@ -128,9 +131,14 @@ public class SaveState {
             File fileIn = new File(mFolder.getPath() + File.separator + Constants.DATA_FILE_NAME);
             boolean ret = fileIn.delete();
             SLog.d(TAG, "File deleted status: " + (ret ? "SUCCESS" : "ERROR"));
+            mSavedCounter = 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public int getSavedCounter(){
+        return mSavedCounter;
     }
 
     private Values mergeValues(ArrayList<Values> values){
