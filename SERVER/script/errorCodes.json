@@ -206,7 +206,21 @@
             "Portugues":{
                 "PrettyName": "Dados não pareados",
                 "Description": "Dados não foram encontrados como esperado"
-
+            }
+        }
+    },
+    {
+        "id":14,
+        "Name": "PrimaryKeyInUse",
+        "HttpReturn": 400,
+        "Data": {
+            "English":{
+                "PrettyName": "Email in use",
+                "Description": "There is already an account with that email"
+            },
+            "Portugues":{
+                "PrettyName": "Email em uso",
+                "Description": "Já existe uma conta com este email"
             }
         }
     },

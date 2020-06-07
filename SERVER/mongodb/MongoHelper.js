@@ -55,8 +55,8 @@ const spawnMongod = () => {
     // Handle mongod process exit
     module.exports._mongodProcess.on('close', function (code) {
         logger.warn('[mongod/close] ' + code);
-        if (code == 100) { // Instance already running, terminate it
-            logger.warn('[mongod/close] Mongo was already executing');
+        if (code == 100) { // Instance already running
+            logger.warn('[mongod/close] Mongod instance already running, logger is unavailable');
         }
     });
 
