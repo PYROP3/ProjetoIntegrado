@@ -33,28 +33,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profilePicture"
+        android:layout_width="167dp"
+        android:layout_height="167dp"
         android:layout_marginTop="34dp"
         android:onClick="onClickAddPicture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lblTitleStreetAnalyzer"
-        app:srcCompat="@drawable/profile_picture" />
+        android:src="@drawable/profile_picture" />
 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.639"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="@+id/profilePicture"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_btn_add_picture" />
+        app:srcCompat="@drawable/ic_btn_add_picture"
+        android:onClick="onClickAddPicture"/>
 
     <TextView
         android:id="@+id/lblTitleCreateYourAccount"
@@ -68,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.163"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 
     <EditText
         android:id="@+id/txtEmail"

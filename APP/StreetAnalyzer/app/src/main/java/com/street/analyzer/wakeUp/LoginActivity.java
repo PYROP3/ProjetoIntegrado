@@ -36,12 +36,13 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
         if(getIntent().hasExtra(Constants.EXTRA_CREATE_ACCOUNT))
             showExplainMessage();
-
-        mRequestPermissions = new RequestPermissions(this);
-        checkUserPermissions();
     }
 
     public void onClickLogin(View v){
+
+        mRequestPermissions = new RequestPermissions(this);
+        checkUserPermissions();
+
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
 
         if(!customOkHttpClient.requestJsonTest(this, this)){

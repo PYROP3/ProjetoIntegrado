@@ -6,12 +6,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Callback;
@@ -23,9 +28,13 @@ import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.JsonParser;
 import com.street.analyzer.utils.SLog;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class CreateAccountActivity extends AppCompatActivity implements Callback {
+    public static final int IMAGE_GALLERY_REQUEST = 20;
 
     private Context mContext;
     private String TAG = getClass().getSimpleName();
@@ -34,6 +43,8 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
     private TextView mTvName;
     private TextView mTvPassword;
     private TextView mTvConfirmPassword;
+
+    private ImageView mImgPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +55,8 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         mTvName = findViewById(R.id.txtName);
         mTvPassword = findViewById(R.id.txtPassword);
         mTvConfirmPassword = findViewById(R.id.txtConfirmPassword);
+
+        mImgPicture = (ImageView)findViewById(R.id.profilePicture);
 
         mContext = getApplicationContext();
         SLog.d(TAG, "Create account activity created");
@@ -98,20 +111,49 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         finish();
     }
 
-    public void onClickAddPicture(View v){
-        //TODO: Get a picture from the user gallery and save it
+    public void onClickAddPicture(View v) {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 
-        // PLACE HOLDER (IT SHOULD BE REMOVED ANYTIME SOON)
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-        dlgAlert.setMessage("This option is not available yet. Please, try again later.");
-        dlgAlert.setTitle("Warning");
-        dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int arg1) {
+        // Find the data location
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String pictureDirectoryPath = pictureDirectory.getPath();
+        // Uri representation
+        Uri data = Uri.parse(pictureDirectoryPath);
+
+        // Get all image types
+        photoPickerIntent.setDataAndType(data, "image/*");
+
+        // Invoke activyResult and getting the photo back
+        startActivityForResult(photoPickerIntent, IMAGE_GALLERY_REQUEST);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == IMAGE_GALLERY_REQUEST) {
+                // The images's address on the SD Card.
+                Uri imageUri = data.getData();
+
+                // Stream to read the image data from the SD Card.
+                InputStream inputStream;
+
+                // Input stream, based on the URI of the image
+                try {
+                    inputStream = getContentResolver().openInputStream(imageUri);
+
+                    // Get a bitmap from the stream
+                    Bitmap image = BitmapFactory.decodeStream(inputStream);
+
+                    // Show the image to the user
+                    mImgPicture.setImageBitmap(image);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
+                }
 
             }
-        });
-        dlgAlert.setCancelable(true);
-        dlgAlert.create().show();
+        }
     }
 
     private boolean isInputValid(String email, String name, String password, String confirmPassword){
