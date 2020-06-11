@@ -15,7 +15,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -223,21 +222,12 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(status) {
-                    findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                    mTvName.setEnabled(false);
-                    mTvEmail.setEnabled(false);
-                    mImgPicture.setEnabled(false);
-                    mTvPassword.setEnabled(false);
-                    mTvConfirmPassword.setEnabled(false);
-                }else {
-                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    mTvName.setEnabled(true);
-                    mTvEmail.setEnabled(true);
-                    mImgPicture.setEnabled(true);
-                    mTvPassword.setEnabled(true);
-                    mTvConfirmPassword.setEnabled(true);
-                }
+                findViewById(R.id.loadingPanel).setVisibility((status)?View.VISIBLE:View.GONE);
+                mTvName.setEnabled(!status);
+                mTvEmail.setEnabled(!status);
+                mImgPicture.setEnabled(!status);
+                mTvPassword.setEnabled(!status);
+                mTvConfirmPassword.setEnabled(!status);
             }
         });
     }

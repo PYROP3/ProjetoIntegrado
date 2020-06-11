@@ -6,11 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Callback;
@@ -29,6 +34,12 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private final String TAG = getClass().getSimpleName();
     private RequestPermissions mRequestPermissions;
 
+    private TextView mTvEmail;
+    private Switch mSwRememberMe;
+    private TextView mTvPassword;
+
+    private boolean needToRemember;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,18 +47,38 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
         if(getIntent().hasExtra(Constants.EXTRA_CREATE_ACCOUNT))
             showExplainMessage();
+
+        mTvEmail = findViewById(R.id.txtEmail);
+        mTvPassword = findViewById(R.id.txtPassword);
+        mSwRememberMe = findViewById(R.id.switchRememberMe);
+
+        getRememberAccount();
+        needToRemember = false;
+
+        mSwRememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+               needToRemember = isChecked;
+            }
+        });
+        loadingBarStatus(false);
     }
 
     public void onClickLogin(View v){
+        login();
+    }
 
+    private void login(){
+        loadingBarStatus(true);
         mRequestPermissions = new RequestPermissions(this);
         checkUserPermissions();
 
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
 
         if(!customOkHttpClient.requestJsonTest(this, this)){
+            loadingBarStatus(false);
             Toast.makeText(this, "Network not detected"
-            + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
+                    + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
 
             SLog.d(TAG, "Can't login, network error");
         }else{
@@ -80,6 +111,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     @Override
     public void onFailure(Request request, IOException e) {
+        loadingBarStatus(false);
         Toast.makeText(this, "Sorry, we can't login!" +
                 "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
         SLog.d(TAG, "Login - onFailure");
@@ -87,9 +119,13 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     @Override
     public void onResponse(Response response) throws IOException {
+        loadingBarStatus(false);
         if(response.isSuccessful()){
             SLog.d(TAG, "Successfully response");
             SLog.d(TAG, "Response: " + response.body().string());
+
+            setRememberAccount(needToRemember);
+
             startActivity(new Intent(this, MapsActivity.class));
         }else {
             //TODO: Handle the response and check what is the error
@@ -116,5 +152,33 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         });
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
+    }
+
+    private void getRememberAccount(){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+            mSwRememberMe.setChecked(true);
+            mTvEmail.setText(sharedPref.getString(Constants.REMEMBER_ME_EMAIL_KEY, ""));
+            mTvPassword.setText(sharedPref.getString(Constants.REMEMBER_ME_PASSWORD_KEY, ""));
+            login();
+        }
+    }
+    private void setRememberAccount(boolean status){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(Constants.REMEMBER_ME_STATUS_KEY, status);
+        editor.apply();
+    }
+
+    private void loadingBarStatus(final Boolean status){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            findViewById(R.id.loadingPanel).setVisibility((status)?View.VISIBLE:View.GONE);
+            mTvEmail.setEnabled(!status);
+            mTvPassword.setEnabled(!status);
+            mSwRememberMe.setEnabled(!status);
+            }
+        });
     }
 }

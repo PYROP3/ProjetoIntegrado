@@ -43,4 +43,7 @@ public class Constants {
 
     public static final int IMAGE_GALLERY_REQUEST = 20;
 
+    public static final String REMEMBER_ME_STATUS_KEY = "RememberMeStatusKey";
+    public static final String REMEMBER_ME_EMAIL_KEY = "RememberMeEmailKey";
+    public static final String REMEMBER_ME_PASSWORD_KEY = "RememberMePasswordKey";
 }

@@ -41,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="12dp"
+        android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
         android:hint="E-mail"
@@ -48,13 +49,12 @@
         android:textColor="@color/darkGray"
         android:textColorHint="@color/darkGray"
         android:textSize="16sp"
-        android:background="@drawable/input_field"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lblTitleCreateYourAccount" />
 
     <EditText
-        android:id="@+id/txtName"
+        android:id="@+id/txtPassword"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="14dp"
@@ -81,19 +81,19 @@
         android:text="Remember me"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/simpleSwitch"
+        app:layout_constraintEnd_toStartOf="@+id/switchRememberMe"
         app:layout_constraintHorizontal_bias="0.753"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtName" />
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword" />
 
     <Switch
-        android:id="@+id/simpleSwitch"
+        android:id="@+id/switchRememberMe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="36dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtName" />
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword" />
 
     <Button
         android:id="@+id/btn_login"
@@ -108,7 +108,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtName"
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword"
         android:onClick="onClickLogin"/>
 
     <TextView
@@ -138,6 +138,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_return_arrow"
         android:onClick="onClickReturn"/>
+
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
