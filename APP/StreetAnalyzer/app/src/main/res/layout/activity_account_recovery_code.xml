@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_bg"
-    tools:context=".wakeUp.CreateAccountActivity">
+    tools:context=".wakeUp.AccountRecoveryCode">
 
     <ImageView
         android:id="@+id/btnGoBack"
@@ -33,44 +33,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profilePicture"
-        android:layout_width="167dp"
-        android:layout_height="167dp"
-        android:layout_marginTop="34dp"
-        android:onClick="onClickAddPicture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblTitleStreetAnalyzer"
-        android:src="@drawable/profile_picture" />
-
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/emailIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
+        android:layout_marginTop="100dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.639"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_btn_add_picture"
-        android:onClick="onClickAddPicture"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_email" />
 
     <TextView
-        android:id="@+id/lblTitleCreateYourAccount"
+        android:id="@+id/lblForgotYouPassword1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="42dp"
-        android:fontFamily="@font/cloud_light"
-        android:text="@string/create_account_title"
+        android:layout_marginTop="76dp"
+        android:fontFamily="@font/cloud_bold"
+        android:text="Forgot your password?"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.163"
+        app:layout_constraintHorizontal_bias="0.241"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
+        app:layout_constraintTop_toBottomOf="@+id/emailIcon" />
+
+    <TextView
+        android:id="@+id/lblForgotYouPassword2"
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/cloud_light"
+        android:text="Don’t worry. Reseting your password is easy,
+just tell us the email address you registered."
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lblForgotYouPassword1" />
 
     <EditText
         android:id="@+id/txtEmail"
@@ -87,17 +86,17 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblTitleCreateYourAccount" />
+        app:layout_constraintTop_toBottomOf="@+id/lblForgotYouPassword2" />
 
     <EditText
-        android:id="@+id/txtName"
+        android:id="@+id/txtSecurityCode"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginTop="14dp"
         android:background="@drawable/input_field"
         android:ems="14"
         android:fontFamily="@font/cloud_light"
-        android:hint="@string/name"
+        android:hint="Security Code"
         android:inputType="textPersonName"
         android:textColor="@color/darkGray"
 
@@ -107,50 +106,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
 
-    <EditText
-        android:id="@+id/txtPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/input_field"
-        android:ems="14"
-        android:fontFamily="@font/cloud_light"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:textColor="@color/darkGray"
-
-        android:textColorHint="@color/darkGray"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtName" />
-
-    <EditText
-        android:id="@+id/txtConfirmPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/input_field"
-        android:ems="14"
-        android:fontFamily="@font/cloud_light"
-        android:hint="@string/confirm_password"
-        android:inputType="textPassword"
-        android:textColor="@color/darkGray"
-
-        android:textColorHint="@color/darkGray"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtPassword" />
-
     <Button
         android:id="@+id/btn_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="47dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
-        android:onClick="onClickRegisterAccount"
         android:text="@string/confirm"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"
@@ -158,21 +119,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtConfirmPassword"
-        app:layout_constraintVertical_bias="0.047" />
-
-    <RelativeLayout
-        android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="-104dp">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
+        app:layout_constraintTop_toBottomOf="@+id/txtSecurityCode"
+        app:layout_constraintVertical_bias="0.799" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
