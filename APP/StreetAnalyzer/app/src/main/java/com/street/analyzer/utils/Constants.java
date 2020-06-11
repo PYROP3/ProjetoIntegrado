@@ -40,4 +40,7 @@ public class Constants {
     public static final int MIN_PASSWORD_LENGTH = 4;
 
     public static final String EXTRA_CREATE_ACCOUNT = "CreateAccount";
+
+    public static final int IMAGE_GALLERY_REQUEST = 20;
+
 }
