@@ -45,41 +45,30 @@ public class CustomOkHttpClient {
                 .post(requestBody)
                 .build();
 
-        SLog.d(TAG, "Enqueuing new retrofit callback");
+        SLog.d(TAG, "Enqueuing new retrofit callback [CreateAccount]");
 
         okHttpClient.newCall(request).enqueue(callback);
 
         return true;
     }
 
-    public boolean requestJsonTest(Context context, Callback callback){
+    public boolean sendLoginRequest(Context context, Callback callback, String email, String password){
         if(!isNetworkAvailable(context))
             return false;
 
         OkHttpClient okHttpClient = new OkHttpClient();
 
         HttpUrl url = new HttpUrl.Builder()
-                .scheme("https")
-                .host("reqres.in")
-                .addPathSegment("api")
-                .addPathSegment("users")
+                .scheme(Constants.SERVER_SCHEME_HTTPS)
+                .host(Constants.SERVER_HOST)
+                .addPathSegment(Constants.SERVER_LOGIN)
                 .build();
+
 
         SLog.d(TAG, "Sending request to: " + url.toString());
 
-        JSONObject jsonObject = new JSONObject();
-
-        try {
-            jsonObject.put("name","morpheus");
-            jsonObject.put("job", "leader");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        SLog.d(TAG, "JSON: " + jsonObject.toString());
-
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
+        JsonParser jsonParser = new JsonParser();
+        JSONObject jsonObject = jsonParser.loginJson(email, password);
         RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
         Request request = new Request.Builder()
@@ -87,9 +76,10 @@ public class CustomOkHttpClient {
                 .post(requestBody)
                 .build();
 
-        SLog.d(TAG, "Enqueuing new retrofit callback");
+        SLog.d(TAG, "Enqueuing new retrofit callback [CreateAccount]");
 
         okHttpClient.newCall(request).enqueue(callback);
+
         return true;
     }
 

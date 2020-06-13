@@ -30,11 +30,12 @@ public class Constants {
 
     public static final int JOB_SCHEDULER_PERIOD = 15 * 60 * 1000; //60 * 60 * 1000 //One hour
 
-    public static final String SERVER_HOST = "street-analyzer.herokuapp.com";
+    public static final int SERVER_RESPONSE_OK = 0;
+    public static final String SERVER_LOGIN = "auth";
     public static final String SERVER_SCHEME_HTTPS = "https";
     public static final String SERVER_CREATE_ACCOUNT = "createAccount";
+    public static final String SERVER_HOST = "street-analyzer.herokuapp.com";
 
-    public static final int SERVER_RESPONSE_OK = 0;
 
     public static final int MIN_NAME_LENGTH = 4;
     public static final int MIN_PASSWORD_LENGTH = 4;

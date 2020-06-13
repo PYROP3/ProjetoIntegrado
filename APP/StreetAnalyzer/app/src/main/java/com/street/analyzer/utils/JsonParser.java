@@ -31,6 +31,20 @@ public class JsonParser {
         return jsonObject;
     }
 
+    public JSONObject loginJson(String email, String password){
+        JSONObject jsonObject = new JSONObject();
+
+        try{
+            jsonObject.put("user", email);
+            jsonObject.put("pass", password);
+        }catch (JSONException e){
+            SLog.d(TAG, "Error trying to create JSON");
+            e.printStackTrace();
+        }
+        SLog.d(TAG, "JSON created");
+        return jsonObject;
+    }
+
     public JSONObject createLogToSend(Values values){
         JSONObject jsonObject = new JSONObject();
 

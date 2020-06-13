@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -52,6 +51,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         mTvPassword = findViewById(R.id.txtPassword);
         mSwRememberMe = findViewById(R.id.switchRememberMe);
 
+        mRequestPermissions = new RequestPermissions(this);
+
         getRememberAccount();
         needToRemember = false;
 
@@ -70,12 +71,11 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     private void login(){
         loadingBarStatus(true);
-        mRequestPermissions = new RequestPermissions(this);
         checkUserPermissions();
 
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
 
-        if(!customOkHttpClient.requestJsonTest(this, this)){
+        if(!customOkHttpClient.sendLoginRequest(this, this, mTvEmail.getText().toString(), mTvPassword.getText().toString())){
             loadingBarStatus(false);
             Toast.makeText(this, "Network not detected"
                     + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
