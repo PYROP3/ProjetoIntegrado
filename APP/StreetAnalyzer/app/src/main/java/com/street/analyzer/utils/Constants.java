@@ -35,7 +35,7 @@ public class Constants {
     public static final String SERVER_SCHEME_HTTPS = "https";
     public static final String SERVER_CREATE_ACCOUNT = "createAccount";
     public static final String SERVER_HOST = "street-analyzer.herokuapp.com";
-
+    public static final String SERVER_VERIFY_ACCOUNT = "verifyAccount";
 
     public static final int MIN_NAME_LENGTH = 4;
     public static final int MIN_PASSWORD_LENGTH = 4;

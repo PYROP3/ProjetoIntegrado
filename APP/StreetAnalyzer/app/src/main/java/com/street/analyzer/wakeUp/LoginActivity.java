@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
@@ -37,6 +38,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private Switch mSwRememberMe;
     private TextView mTvPassword;
 
+    private CustomOkHttpClient mCustomOkHttpClient;
+
     private boolean needToRemember;
 
     @Override
@@ -44,8 +47,28 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if(getIntent().hasExtra(Constants.EXTRA_CREATE_ACCOUNT))
-            showExplainMessage();
+         mCustomOkHttpClient = new CustomOkHttpClient();
+
+        Intent intent = getIntent();
+
+        if(intent != null) {
+            SLog.d(TAG, "Intent not null");
+            if (intent.hasExtra(Constants.EXTRA_CREATE_ACCOUNT)) {
+                SLog.d(TAG, "opened by create account");
+                showExplainMessage();
+            } else {
+                if(intent.getData() != null) {
+                    Uri data = intent.getData();
+                    if(data.getQueryParameter("token") != null) {
+                        String token = data.getQueryParameter("token");
+                        if (token != null && !token.isEmpty()) {
+                            SLog.d(TAG, "App opened by link");
+                            validateAccount(token);
+                        }
+                    }
+                }
+            }
+        }
 
         mTvEmail = findViewById(R.id.txtEmail);
         mTvPassword = findViewById(R.id.txtPassword);
@@ -63,19 +86,30 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             }
         });
         loadingBarStatus(false);
+
+        checkUserPermissions();
+    }
+
+    //TODO: Do something to retry the authentication if it fails
+    //TODO: Receive the email in another activity and instantiate this after confirm the email
+    private void validateAccount(String token){
+        if(!mCustomOkHttpClient.authenticateAccount(LoginActivity.this, null, token)){
+            SLog.d(TAG, "Start validate account request");
+        }else{
+            //TODO: Do something
+            SLog.d(TAG, "Can't start validate account request");
+        }
     }
 
     public void onClickLogin(View v){
+        SLog.d(TAG, "onClickLogin");
         login();
     }
 
     private void login(){
         loadingBarStatus(true);
-        checkUserPermissions();
 
-        CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
-
-        if(!customOkHttpClient.sendLoginRequest(this, this, mTvEmail.getText().toString(), mTvPassword.getText().toString())){
+        if(!mCustomOkHttpClient.sendLoginRequest(this, this, mTvEmail.getText().toString(), mTvPassword.getText().toString())){
             loadingBarStatus(false);
             Toast.makeText(this, "Network not detected"
                     + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
@@ -85,8 +119,9 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             SLog.d(TAG, "Start request to server");
         }
     }
-
+    //TODO: Check when user don't consent the permission
     private void checkUserPermissions(){
+        SLog.d(TAG, "checkUserPermissions");
         if(mRequestPermissions.checkPermission()){
             if(!isLocationEnabled()){
                 Toast.makeText(this, "Please, turn on device location", Toast.LENGTH_LONG).show();
@@ -120,15 +155,18 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     @Override
     public void onResponse(Response response) throws IOException {
         loadingBarStatus(false);
+        SLog.d(TAG, "Login - onResponse");
         if(response.isSuccessful()){
             SLog.d(TAG, "Successfully response");
             SLog.d(TAG, "Response: " + response.body().string());
 
             setRememberAccount(needToRemember);
 
+            SLog.d(TAG, "Remember password set");
+
             startActivity(new Intent(this, MapsActivity.class));
+
         }else {
-            //TODO: Handle the response and check what is the error
             SLog.d(TAG, "Response fail not successful response");
         }
     }
@@ -137,7 +175,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         startActivity(new Intent(this, CreateAccountActivity.class));
     }
 
-    public void onClickReturn(View v){
+    public void onClickLoginReturn(View v){
         finish();
     }
 
@@ -155,15 +193,19 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     }
 
     private void getRememberAccount(){
+        SLog.d(TAG, "getRememberAccount");
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
             mSwRememberMe.setChecked(true);
             mTvEmail.setText(sharedPref.getString(Constants.REMEMBER_ME_EMAIL_KEY, ""));
             mTvPassword.setText(sharedPref.getString(Constants.REMEMBER_ME_PASSWORD_KEY, ""));
             login();
+        }else{
+            SLog.d(TAG, "Remember account false");
         }
     }
     private void setRememberAccount(boolean status){
+        SLog.d(TAG, "setRememberAccount");
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(Constants.REMEMBER_ME_STATUS_KEY, status);

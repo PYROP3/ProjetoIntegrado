@@ -20,11 +20,13 @@ public class WelcomeActivity extends AppCompatActivity {
 
         mContext = getApplicationContext();
     }
-    public void onClickLogin(View v){
+    public void onClickStartUserActivity(View v){
         startActivity(new Intent(mContext, LoginActivity.class));
+        finish();
     }
 
     public void onClickRegister(View v){
         startActivity(new Intent(mContext, CreateAccountActivity.class));
+        finish();
     }
 }

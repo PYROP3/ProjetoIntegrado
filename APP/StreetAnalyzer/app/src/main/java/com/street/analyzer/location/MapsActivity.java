@@ -1,15 +1,21 @@
 package com.street.analyzer.location;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.Dialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,6 +32,7 @@ import com.street.analyzer.serverCommunication.DataUploadScheduler;
 import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.SLog;
+import com.street.analyzer.wakeUp.LoginActivity;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
@@ -35,6 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     private Boolean mServiceStats;
+    private Context mContext;
 
     private Location mLastLocation;
     private LocationRequest mLocationRequest;

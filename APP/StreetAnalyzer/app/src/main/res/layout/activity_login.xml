@@ -102,14 +102,14 @@
         android:layout_marginTop="90dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
+        android:onClick="onClickLogin"
         android:text="LOGIN"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtPassword"
-        android:onClick="onClickLogin"/>
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword" />
 
     <TextView
         android:id="@+id/textView6"
@@ -137,13 +137,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_return_arrow"
-        android:onClick="onClickReturn"/>
+        android:onClick="onClickLoginReturn"/>
 
     <RelativeLayout
         android:id="@+id/loadingPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center" >
+        android:gravity="center">
 
         <ProgressBar
             android:layout_width="wrap_content"

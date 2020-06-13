@@ -56,7 +56,7 @@
         android:layout_marginTop="28dp"
         android:background="@drawable/ic_btn_filled"
         android:fontFamily="@font/cloud_light"
-        android:onClick="onClickLogin"
+        android:onClick="onClickStartUserActivity"
         android:text="@string/login"
         android:textColor="@color/darkBlue"
         android:textSize="20sp"

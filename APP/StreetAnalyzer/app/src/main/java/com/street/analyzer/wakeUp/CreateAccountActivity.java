@@ -78,8 +78,10 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         String password = mTvPassword.getText().toString();
         String confirmPassword = mTvConfirmPassword.getText().toString();
 
-        if(!isInputValid(email, name, password, confirmPassword))
+        if(!isInputValid(email, name, password, confirmPassword)) {
+            loadingBarStatus(false);
             return;
+        }
 
         if(!customOkHttpClient.sendCreateAccountRequest(mContext, this, email, name, password)){
             loadingBarStatus(false);
@@ -183,13 +185,13 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         //Name validation
         if(TextUtils.isEmpty(name) || name.length() < Constants.MIN_NAME_LENGTH){
             valid = false;
-            msg.append("Invalid name, your name must have more than " + Constants.MIN_NAME_LENGTH + " characters!\n");
+            msg.append("Invalid name, your name must have at least " + Constants.MIN_NAME_LENGTH + " characters!\n");
         }
 
         //Password validation
         if(TextUtils.isEmpty(password) || password.length() < Constants.MIN_PASSWORD_LENGTH){
             valid = false;
-            msg.append("Invalid password, your password must have more than " + Constants.MIN_PASSWORD_LENGTH + " characters!\n");
+            msg.append("Invalid password, your password must have at least " + Constants.MIN_PASSWORD_LENGTH + " characters!\n");
         }else{
             if(!password.equals(confirmPassword)){
                 valid = false;
@@ -216,6 +218,7 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         Intent intent = new Intent(mContext, LoginActivity.class);
         intent.putExtra(Constants.EXTRA_CREATE_ACCOUNT, 0);
         startActivity(intent);
+        finish();
     }
 
     private void loadingBarStatus(final Boolean status){
