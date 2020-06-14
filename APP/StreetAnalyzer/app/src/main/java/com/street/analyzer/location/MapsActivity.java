@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private NavigationView mNavigationView;
+    private boolean pressedOnce;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +62,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mNavigationView = findViewById(R.id.nvMenu);
         mServiceStats = false;
+        pressedOnce = false;
         mContext = getApplicationContext();
+
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(pressedOnce){
+                    startActivity(new Intent(mContext, LoginActivity.class));
+                    finish();
+                }
+                pressedOnce = true;
+                Toast.makeText(mContext, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        pressedOnce = false;
+                    }
+                }, 2000);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
     /**

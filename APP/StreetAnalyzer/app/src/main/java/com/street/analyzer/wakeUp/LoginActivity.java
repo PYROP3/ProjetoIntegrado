@@ -78,8 +78,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         mRequestPermissions = new RequestPermissions(this);
         mContext = getApplicationContext();
 
-        getRememberAccount();
         needToRemember = false;
+        getRememberAccount();
 
         mSwRememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -199,14 +199,15 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         dlgAlert.create().show();
     }
 
+    //TODO: Save only the email and the auth token
     private void getRememberAccount(){
         SLog.d(TAG, "getRememberAccount");
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
             mSwRememberMe.setChecked(true);
+            needToRemember = true;
             mTvEmail.setText(sharedPref.getString(Constants.REMEMBER_ME_EMAIL_KEY, ""));
             mTvPassword.setText(sharedPref.getString(Constants.REMEMBER_ME_PASSWORD_KEY, ""));
-            login();
         }else{
             SLog.d(TAG, "Remember account false");
         }
@@ -216,6 +217,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(Constants.REMEMBER_ME_STATUS_KEY, status);
+        editor.putString(Constants.REMEMBER_ME_EMAIL_KEY, mTvEmail.getText().toString());
+        editor.putString(Constants.REMEMBER_ME_PASSWORD_KEY, mTvPassword.getText().toString());
         editor.apply();
     }
 
