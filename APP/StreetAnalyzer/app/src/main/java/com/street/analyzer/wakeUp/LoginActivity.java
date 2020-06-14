@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private Switch mSwRememberMe;
     private TextView mTvPassword;
 
+    private Context mContext;
     private CustomOkHttpClient mCustomOkHttpClient;
 
     private boolean needToRemember;
@@ -75,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         mSwRememberMe = findViewById(R.id.switchRememberMe);
 
         mRequestPermissions = new RequestPermissions(this);
+        mContext = getApplicationContext();
 
         getRememberAccount();
         needToRemember = false;
@@ -147,8 +149,13 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     @Override
     public void onFailure(Request request, IOException e) {
         loadingBarStatus(false);
-        Toast.makeText(this, "Sorry, we can't login!" +
-                "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mContext, "Sorry, we can't login!" +
+                        "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
+            }
+        });
         SLog.d(TAG, "Login - onFailure");
     }
 
@@ -165,7 +172,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             SLog.d(TAG, "Remember password set");
 
             startActivity(new Intent(this, MapsActivity.class));
-
+            finish();
         }else {
             SLog.d(TAG, "Response fail not successful response");
         }

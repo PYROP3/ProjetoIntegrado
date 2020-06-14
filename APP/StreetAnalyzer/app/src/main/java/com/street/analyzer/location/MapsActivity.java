@@ -60,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mNavigationView = findViewById(R.id.nvMenu);
         mServiceStats = false;
+        mContext = getApplicationContext();
     }
 
     /**

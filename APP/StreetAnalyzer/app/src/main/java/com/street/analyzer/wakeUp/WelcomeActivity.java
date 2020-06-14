@@ -22,11 +22,9 @@ public class WelcomeActivity extends AppCompatActivity {
     }
     public void onClickStartUserActivity(View v){
         startActivity(new Intent(mContext, LoginActivity.class));
-        finish();
     }
 
     public void onClickRegister(View v){
         startActivity(new Intent(mContext, CreateAccountActivity.class));
-        finish();
     }
 }
