@@ -50,25 +50,21 @@ public class Values implements Serializable {
 
     public ArrayList<Integer> getCounters(){ return mCounter;}
 
-    public void addAllXValues(ArrayList<Float> xValues){
+    void addAllXValues(ArrayList<Float> xValues){
         mXValue.addAll(xValues);
     }
 
-    public void addAllYValues(ArrayList<Float> yValues){
-        mYValue.addAll(yValues);
-    }
+    void addAllYValues(ArrayList<Float> yValues){mYValue.addAll(yValues);}
 
-    public void addAllZValues(ArrayList<Float> zValues){
-        mZValue.addAll(zValues);
-    }
+    void addAllZValues(ArrayList<Float> zValues){mZValue.addAll(zValues);}
 
-    public void addAllLatitudes(ArrayList<Double> latitudes){
+    void addAllLatitudes(ArrayList<Double> latitudes){
         mLatitude.addAll(latitudes);
     }
 
-    public void addAllLongitudes(ArrayList<Double> longitudes){
+    void addAllLongitudes(ArrayList<Double> longitudes){
         mLongitude.addAll(longitudes);
     }
 
-    public void addAllCounters(ArrayList<Integer> counters) {mCounter.addAll(counters);}
+    void addAllCounters(ArrayList<Integer> counters) {mCounter.addAll(counters);}
 }

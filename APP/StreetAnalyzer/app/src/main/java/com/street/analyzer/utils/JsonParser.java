@@ -1,15 +1,10 @@
 package com.street.analyzer.utils;
 
 import com.street.analyzer.record.Values;
-import com.street.analyzer.utils.SLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class JsonParser {
 
