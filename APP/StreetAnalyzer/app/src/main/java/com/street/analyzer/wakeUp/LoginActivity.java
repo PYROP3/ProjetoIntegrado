@@ -85,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                needToRemember = isChecked;
+               SLog.d(TAG, "Is need to remember: " + isChecked);
             }
         });
         loadingBarStatus(false);
@@ -106,6 +107,13 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     public void onClickLogin(View v){
         SLog.d(TAG, "onClickLogin");
         login();
+    }
+
+    //TODO: Remove this button
+    //In case of server communication failed use this button
+    public void onClickSkipLogin(View v){
+        SLog.d(TAG, "SkippingLogin");
+        startActivity(new Intent(this, MapsActivity.class));
     }
 
     private void login(){
