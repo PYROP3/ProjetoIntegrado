@@ -48,7 +48,7 @@ public class JsonParser {
     public JSONObject createLogToSend(Values values){
         JSONObject jsonObject = new JSONObject();
 
-        try {
+        try {//TODO: get user name
             jsonObject.put("usuario", "casalbé");
 
             JSONArray jsonArray = new JSONArray();
@@ -88,7 +88,7 @@ public class JsonParser {
         SLog.d(TAG, "Log JSON created");
         SLog.d(TAG, jsonObject.toString());
 
-        return null;
+        return jsonObject;
     }
 
     public static boolean isResponseSuccessful(String jsonResponse){

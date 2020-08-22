@@ -10,6 +10,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.street.analyzer.record.Values;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.JsonParser;
 import com.street.analyzer.utils.SLog;
@@ -80,6 +81,39 @@ public class CustomOkHttpClient implements Callback{
                 .build();
 
         SLog.d(TAG, "Enqueuing new retrofit callback [CreateAccount]");
+
+        okHttpClient.newCall(request).enqueue(callback);
+
+        return true;
+    }
+
+    public boolean sendRegisteredData(Context context, Callback callback,
+                                      Values recordedValues){
+
+        if(!isNetworkAvailable(context))
+            return false;
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(Constants.SERVER_SCHEME_HTTPS)
+                .host(Constants.SERVER_HOST)
+                .addPathSegment(Constants.SERVER_UPLOAD_LOG)
+                .build();
+
+        SLog.d(TAG, "Sending request to: " + url.toString());
+
+        JsonParser jsonParser = new JsonParser();
+        JSONObject jsonObject = jsonParser.createLogToSend(recordedValues);
+
+        RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+
+        SLog.d(TAG, "Enqueuing new retrofit callback [LogTrip]");
 
         okHttpClient.newCall(request).enqueue(callback);
 

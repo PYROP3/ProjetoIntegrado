@@ -5,46 +5,51 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.Context;
 
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.street.analyzer.record.SaveState;
 import com.street.analyzer.record.Values;
 import com.street.analyzer.utils.Constants;
-import com.street.analyzer.utils.JsonParser;
 import com.street.analyzer.utils.SLog;
 
-import org.json.JSONObject;
+import java.io.IOException;
 
-public class DataUploadScheduler extends JobService {
+
+public class DataUploadScheduler extends JobService implements Callback {
 
     private final String TAG = getClass().getSimpleName();
     private boolean jobStatus = false;
+    private SaveState mSaveState;
+    JobParameters mJobParameters;
 
     @Override
     public boolean onStartJob(JobParameters params) {
         SLog.d(TAG, "Job started");
 
-        doBackgroundWork(params);
+        mJobParameters = params;
+        doBackgroundWork();
 
         return true;
     }
 
-    private void doBackgroundWork(final JobParameters params){
+    private void doBackgroundWork(){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 SLog.d(TAG, "Starting new scheduled thread");
 
-                SaveState saveState = SaveState.getInstance();
-                Values recordedValues = saveState.loadDataMerged();
-                JsonParser jsonParser = new JsonParser();
+                mSaveState = SaveState.getInstance();
+                Values recordedValues = mSaveState.loadDataMerged();
 
-                JSONObject jsonObject = jsonParser.createLogToSend(recordedValues);
-
-                SLog.d(TAG, "Job finished");
-                saveState.deleteFile();
-
-                cancelScheduler(params);
+                uploadLogs(recordedValues);
             }
         }).start();
+    }
+
+    private void uploadLogs(Values recordedValues){
+        CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
+        customOkHttpClient.sendRegisteredData(this, this, recordedValues);
     }
 
     @Override
@@ -58,5 +63,19 @@ public class DataUploadScheduler extends JobService {
         jobFinished(params, false);
         JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         scheduler.cancel(Constants.JOB_UPLOAD_ID);
+    }
+
+    @Override
+    public void onFailure(Request request, IOException e) {
+        //TODO: Handle onFailure
+        SLog.d(TAG, "Job finished error");
+    }
+
+    @Override
+    public void onResponse(Response response) throws IOException {
+        SLog.d(TAG, "Job finished successfully");
+        mSaveState.deleteFile();
+        cancelScheduler(mJobParameters);
+        SLog.d(TAG, "Job cancelled");
     }
 }
