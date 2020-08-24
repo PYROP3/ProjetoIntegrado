@@ -25,9 +25,11 @@
 
     <!-- Login Activity -->
     <string name="sign_in">Sign In</string>
+    <string name="login_title">Login to \nyour account</string>
     <string name="create_account">Don\'t have an account yet? Sign Up</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
+    <string name="remember_me">Remember me</string>
 
     <!-- Create Account Activity -->
     <string name="create_account_title">Create \nYour account</string>
@@ -36,5 +38,14 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="confirm">CONFIRM</string>
 
+    <!-- Account Recovery Code Activity -->
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="account_recovery_code_text">Don’t worry. Resetting your password is easy,\njust tell us the email address you registered.</string>
+    <string name="security_code">Security Code</string>
+
+    <!-- Account Recovery Reset Activity -->
+    <string name="account_recovery_reset_title">Redefine\n your password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
 
 </resources>
