@@ -121,8 +121,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
         if(!mCustomOkHttpClient.sendLoginRequest(this, this, mTvEmail.getText().toString(), mTvPassword.getText().toString())){
             loadingBarStatus(false);
-            Toast.makeText(this, "Network not detected"
-                    + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, Constants.TOAST_NETWORK_NOT_DETECTED, Toast.LENGTH_LONG).show();
 
             SLog.d(TAG, "Can't login, network error");
         }else{
@@ -134,7 +133,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         SLog.d(TAG, "checkUserPermissions");
         if(mRequestPermissions.checkPermission()){
             if(!isLocationEnabled()){
-                Toast.makeText(this, "Please, turn on device location", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, Constants.TOAST_TURN_ON_LOCATION, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
@@ -160,8 +159,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(mContext, "Sorry, we can't login!" +
-                        "\nFailed to communicate with server", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, Constants.TOAST_LOGIN_FAILURE, Toast.LENGTH_LONG).show();
             }
         });
         SLog.d(TAG, "Login - onFailure");
@@ -197,8 +195,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private void showExplainMessage(){
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setTitle("Success!");
-        dlgAlert.setMessage("Only one more step!\n" +
-                "Please check your mail box to verify your email address!");
+        dlgAlert.setMessage(Constants.ALERT_VERIFY_EMAIL);
         dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int arg1) {
             }

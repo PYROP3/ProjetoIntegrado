@@ -73,7 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     finish();
                 }
                 pressedOnce = true;
-                Toast.makeText(mContext, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, Constants.TOAST_BACK_EXIT, Toast.LENGTH_SHORT).show();
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -106,12 +106,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMyLocationClick(@NonNull Location location){
-        Toast.makeText(this, "You", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, Constants.TOAST_YOU, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "Going to current location", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Constants.TOAST_CURRENT_LOCATION, Toast.LENGTH_SHORT).show();
         return false;
     }
 

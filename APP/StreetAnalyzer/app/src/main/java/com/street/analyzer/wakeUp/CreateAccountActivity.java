@@ -85,8 +85,7 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
 
         if(!customOkHttpClient.sendCreateAccountRequest(mContext, this, email, name, password)){
             loadingBarStatus(false);
-            Toast.makeText(mContext, "Network not detected"
-                    + "\nMake sure you are connected to the internet", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, Constants.TOAST_NETWORK_NOT_DETECTED, Toast.LENGTH_LONG).show();
 
             SLog.d(TAG, "Can't login, network error");
         }else{
@@ -165,7 +164,7 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, Constants.TOAST_UNABLE_OPEN_IMAGE, Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -179,29 +178,29 @@ public class CreateAccountActivity extends AppCompatActivity implements Callback
         //Email validation
         if(TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             valid = false;
-            msg.append("Invalid email!\n");
+            msg.append(Constants.MSG_INVALID_EMAIL);
         }
 
         //Name validation
         if(TextUtils.isEmpty(name) || name.length() < Constants.MIN_NAME_LENGTH){
             valid = false;
-            msg.append("Invalid name, your name must have at least " + Constants.MIN_NAME_LENGTH + " characters!\n");
+            msg.append(Constants.MSG_INVALID_NAME);
         }
 
         //Password validation
         if(TextUtils.isEmpty(password) || password.length() < Constants.MIN_PASSWORD_LENGTH){
             valid = false;
-            msg.append("Invalid password, your password must have at least " + Constants.MIN_PASSWORD_LENGTH + " characters!\n");
+            msg.append(Constants.MSG_INVALID_PASSWORD);
         }else{
             if(!password.equals(confirmPassword)){
                 valid = false;
-                msg.append("Passwords don't match!");
+                msg.append(Constants.MSG_PASSWORD_MISMATCH);
             }
         }
 
         if(!valid) {
             AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-            dlgAlert.setTitle("Input not valid!");
+            dlgAlert.setTitle(Constants.ALERT_INVALID_INPUT);
             dlgAlert.setMessage(msg);
             dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int arg1) {

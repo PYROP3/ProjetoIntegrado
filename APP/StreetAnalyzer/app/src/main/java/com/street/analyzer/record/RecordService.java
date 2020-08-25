@@ -83,7 +83,7 @@ public class RecordService extends Service implements SensorEventListener {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         if(mSensorManager == null){
-            Toast.makeText(this, "Null service!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Constants.TOAST_NULL_SERVICE, Toast.LENGTH_SHORT).show();
             return;
         }
 

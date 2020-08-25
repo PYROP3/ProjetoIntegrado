@@ -49,4 +49,26 @@ public class Constants {
     public static final String REMEMBER_ME_STATUS_KEY = "RememberMeStatusKey";
     public static final String REMEMBER_ME_EMAIL_KEY = "RememberMeEmailKey";
     public static final String REMEMBER_ME_PASSWORD_KEY = "RememberMePasswordKey";
+
+    //MapsActivity
+    public static final String TOAST_BACK_EXIT = "Please click BACK again to exit";
+    public static final String TOAST_YOU = "You";
+    public static final String TOAST_CURRENT_LOCATION = "Going to current location";
+
+    //RecordService
+    public static final String TOAST_NULL_SERVICE = "Null service!";
+
+    //CreateAccountActivity
+    public static final String TOAST_NETWORK_NOT_DETECTED = "Network not detected\nMake sure you are connected to the internet";
+    public static final String TOAST_UNABLE_OPEN_IMAGE = "Unable to open image";
+    public static final String MSG_INVALID_EMAIL = "Invalid email!\n";
+    public static final String MSG_INVALID_NAME = "Invalid name, your name must have at least " + Constants.MIN_NAME_LENGTH + " characters!\n";
+    public static final String MSG_INVALID_PASSWORD = "Invalid password, your password must have at least " + Constants.MIN_PASSWORD_LENGTH + " characters!\n";
+    public static final String MSG_PASSWORD_MISMATCH =  "Passwords don't match!";
+    public static final String ALERT_INVALID_INPUT = "Input not valid!";
+
+    //LoginActivity
+    public static final String TOAST_TURN_ON_LOCATION = "Please, turn on device location";
+    public static final String TOAST_LOGIN_FAILURE = "Sorry, we can't login!\nFailed to communicate with server";
+    public static final String ALERT_VERIFY_EMAIL = "Only one more step!\nPlease check your mail box to verify your email address!";
 }
