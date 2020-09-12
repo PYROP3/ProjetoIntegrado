@@ -4,6 +4,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
@@ -14,6 +15,7 @@ import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.SLog;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class DataUploadScheduler extends JobService implements Callback {
@@ -21,7 +23,7 @@ public class DataUploadScheduler extends JobService implements Callback {
     private final String TAG = getClass().getSimpleName();
     private boolean jobStatus = false;
     private SaveState mSaveState;
-    JobParameters mJobParameters;
+    private JobParameters mJobParameters;
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -34,7 +36,7 @@ public class DataUploadScheduler extends JobService implements Callback {
     }
 
     private void doBackgroundWork(){
-        new Thread(new Runnable() {
+        Thread uploadRegisteredData = new Thread(new Runnable() {
             @Override
             public void run() {
                 SLog.d(TAG, "Starting new scheduled thread");
@@ -44,12 +46,31 @@ public class DataUploadScheduler extends JobService implements Callback {
 
                 uploadLogs(recordedValues);
             }
-        }).start();
+        }, "UploadRegisteredData");
+
+        uploadRegisteredData.start();
     }
 
     private void uploadLogs(Values recordedValues){
         CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
-        customOkHttpClient.sendRegisteredData(this, this, recordedValues);
+
+        customOkHttpClient.sendRegisteredData(this, this, recordedValues,
+                                                getUserName(), getUserToken());
+
+    }
+
+    private String getUserName(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+        String s = sharedPreferences.getString(Constants.USER_NAME_KEY, "");
+        SLog.d(TAG, "USER NAME: " + s);
+        return s;
+    }
+
+    private String getUserToken(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+        String s = sharedPreferences.getString(Constants.USER_TOKEN_KEY, "");
+        SLog.d(TAG, "USER TOKEN: " + s);
+        return s;
     }
 
     @Override
@@ -59,23 +80,22 @@ public class DataUploadScheduler extends JobService implements Callback {
         return true;
     }
 
-    private void cancelScheduler(JobParameters params){
-        jobFinished(params, false);
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        scheduler.cancel(Constants.JOB_UPLOAD_ID);
-    }
-
     @Override
     public void onFailure(Request request, IOException e) {
-        //TODO: Handle onFailure
+        jobFinished(mJobParameters, true);
         SLog.d(TAG, "Job finished error");
     }
 
     @Override
     public void onResponse(Response response) throws IOException {
-        SLog.d(TAG, "Job finished successfully");
-        mSaveState.deleteFile();
-        cancelScheduler(mJobParameters);
-        SLog.d(TAG, "Job cancelled");
+        SLog.d(TAG, "Job finished");
+        if(response.isSuccessful()){
+            mSaveState.deleteFile();
+            jobFinished(mJobParameters, false);
+            SLog.d(TAG, "onResponse: Data sent successfully");
+        } else {
+            jobFinished(mJobParameters, true);
+            SLog.d(TAG, "onResponse: ERROR " + response.message());
+        }
     }
 }

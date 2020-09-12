@@ -71,4 +71,10 @@ public class Constants {
     public static final String TOAST_TURN_ON_LOCATION = "Please, turn on device location";
     public static final String TOAST_LOGIN_FAILURE = "Sorry, we can't login!\nFailed to communicate with server";
     public static final String ALERT_VERIFY_EMAIL = "Only one more step!\nPlease check your mail box to verify your email address!";
+
+    public static final String USER_NAME_KEY = "UserName";
+    public static final String USER_TOKEN_KEY = "UserToken";
+    public static final String USER_EMAIL_KEY = "UserEmail";
+    public static final String USER_PICTURE_KEY = "UserProfilePicture";
+    public static final String USER_DATA = "UserData";
 }

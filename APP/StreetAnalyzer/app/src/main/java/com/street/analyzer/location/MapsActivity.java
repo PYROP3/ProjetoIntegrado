@@ -2,21 +2,19 @@ package com.street.analyzer.location;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,6 +30,7 @@ import com.street.analyzer.record.SaveState;
 import com.street.analyzer.serverCommunication.DataUploadScheduler;
 import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.RequestPermissions;
 import com.street.analyzer.utils.SLog;
 import com.street.analyzer.wakeUp.LoginActivity;
 
@@ -68,7 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if(pressedOnce){
+                if (pressedOnce) {
                     startActivity(new Intent(mContext, LoginActivity.class));
                     finish();
                 }
@@ -86,6 +85,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
+    @Override
+    public void onMyLocationClick(@NonNull Location location){
+        Toast.makeText(this, Constants.TOAST_YOU, Toast.LENGTH_LONG).show();
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -96,8 +100,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
+    @SuppressLint("MissingPermission")
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        RequestPermissions requestPermissions = new RequestPermissions(this);
+
+        if (!requestPermissions.isPermissionsGranted()) {
+            requestPermissions.requestUserPermissions(this);
+            return;
+        }
 
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationClickListener(this);
@@ -105,14 +116,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMyLocationClick(@NonNull Location location){
-        Toast.makeText(this, Constants.TOAST_YOU, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, Constants.TOAST_CURRENT_LOCATION, Toast.LENGTH_SHORT).show();
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+        if(!sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+            //TODO: Close the session
+        }
     }
 
     public void onClickStartRecord(View v){

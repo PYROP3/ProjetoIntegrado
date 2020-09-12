@@ -1,10 +1,15 @@
 package com.street.analyzer.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.street.analyzer.record.Values;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class JsonParser {
 
@@ -30,8 +35,8 @@ public class JsonParser {
         JSONObject jsonObject = new JSONObject();
 
         try{
-            jsonObject.put("user", email);
-            jsonObject.put("pass", password);
+            jsonObject.put("email", email);
+            jsonObject.put("password", password);
         }catch (JSONException e){
             SLog.d(TAG, "Error trying to create JSON");
             e.printStackTrace();
@@ -40,11 +45,12 @@ public class JsonParser {
         return jsonObject;
     }
 
-    public JSONObject createLogToSend(Values values){
+    public JSONObject createLogToSend(Values values, String userName){
         JSONObject jsonObject = new JSONObject();
 
-        try {//TODO: get user name
-            jsonObject.put("usuario", "casalbé");
+        try {
+            SLog.d(TAG, "USER: " + userName);
+            jsonObject.put("usuario", userName);
 
             JSONArray jsonArray = new JSONArray();
             JSONArray aux = new JSONArray();
@@ -84,6 +90,28 @@ public class JsonParser {
         SLog.d(TAG, jsonObject.toString());
 
         return jsonObject;
+    }
+
+    public HashMap<String, String> parseLoginResponse(String response){
+        SLog.d(TAG, "Response: " + response);
+        HashMap<String, String> s = new HashMap<>();
+        try{
+            JSONObject jsonObject = new JSONObject(response);
+
+            String name = jsonObject.getString("name");
+            String token = jsonObject.getString("authToken");
+            String email = jsonObject.getString("email");
+
+            s.put(Constants.USER_NAME_KEY, name);
+            s.put(Constants.USER_EMAIL_KEY, email);
+            s.put(Constants.USER_TOKEN_KEY, token);
+            //s.put(Constants.USER_PICTURE_KEY, jsonObject.getString("email"));
+
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        return s;
     }
 
     public static boolean isResponseSuccessful(String jsonResponse){

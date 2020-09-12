@@ -1,4 +1,4 @@
-package com.street.analyzer.wakeUp;
+package com.street.analyzer.utils;
 
 import android.Manifest;
 import android.app.Activity;
@@ -9,17 +9,17 @@ import android.location.LocationManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-class RequestPermissions extends AppCompatActivity {
+public class RequestPermissions extends AppCompatActivity {
 
     private final int PERMISSION_ID = 44;
     private Context mContext;
 
-    RequestPermissions(Context context){
+    public RequestPermissions(Context context){
         mContext = context;
     }
 
     //Check if permissions needed was grant
-    boolean checkPermission(){
+    public boolean isPermissionsGranted(){
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             return true;
@@ -28,7 +28,7 @@ class RequestPermissions extends AppCompatActivity {
     }
 
     //Request our necessary permissions to the user
-    void requestUserPermissions(Activity context){
+    public void requestUserPermissions(Activity context){
         ActivityCompat.requestPermissions(
                 context,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},

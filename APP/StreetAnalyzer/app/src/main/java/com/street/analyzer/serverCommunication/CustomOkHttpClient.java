@@ -2,6 +2,7 @@ package com.street.analyzer.serverCommunication;
 
 import android.app.slice.Slice;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.HttpUrl;
@@ -88,7 +89,7 @@ public class CustomOkHttpClient implements Callback{
     }
 
     public boolean sendRegisteredData(Context context, Callback callback,
-                                      Values recordedValues){
+                                      Values recordedValues, String name, String token){
 
         if(!isNetworkAvailable(context))
             return false;
@@ -104,12 +105,15 @@ public class CustomOkHttpClient implements Callback{
         SLog.d(TAG, "Sending request to: " + url.toString());
 
         JsonParser jsonParser = new JsonParser();
-        JSONObject jsonObject = jsonParser.createLogToSend(recordedValues);
+        JSONObject jsonObject = jsonParser.createLogToSend(recordedValues, name);
 
         RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
+        SLog.d(TAG, "TOKEN " + token);
+
         Request request = new Request.Builder()
                 .url(url)
+                .addHeader("Authorization", "Bearer " + token)//TODO: move to constants
                 .post(requestBody)
                 .build();
 

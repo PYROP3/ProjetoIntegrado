@@ -21,13 +21,17 @@ import android.widget.Toast;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 import com.street.analyzer.location.MapsActivity;
 import com.street.analyzer.R;
 import com.street.analyzer.serverCommunication.CustomOkHttpClient;
 import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.JsonParser;
+import com.street.analyzer.utils.RequestPermissions;
 import com.street.analyzer.utils.SLog;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity implements Callback {
 
@@ -37,6 +41,8 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     private TextView mTvEmail;
     private Switch mSwRememberMe;
     private TextView mTvPassword;
+
+    private String mEmail, mPassword;
 
     private Context mContext;
     private CustomOkHttpClient mCustomOkHttpClient;
@@ -58,14 +64,12 @@ public class LoginActivity extends AppCompatActivity implements Callback {
                 SLog.d(TAG, "opened by create account");
                 showExplainMessage();
             } else {
-                if(intent.getData() != null) {
-                    Uri data = intent.getData();
-                    if(data.getQueryParameter("token") != null) {
-                        String token = data.getQueryParameter("token");
-                        if (token != null && !token.isEmpty()) {
-                            SLog.d(TAG, "App opened by link");
-                            validateAccount(token);
-                        }
+                SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+                if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+                    String token = sharedPref.getString(Constants.USER_TOKEN_KEY, "");
+                    if(token != null && !token.equals("")) {
+                        SLog.d(TAG, "Skipping Logging");
+                        startMap();
                     }
                 }
             }
@@ -79,7 +83,6 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         mContext = getApplicationContext();
 
         needToRemember = false;
-        getRememberAccount();
 
         mSwRememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -95,17 +98,19 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     //TODO: Do something to retry the authentication if it fails
     //TODO: Receive the email in another activity and instantiate this after confirm the email
-    private void validateAccount(String token){
-        if(!mCustomOkHttpClient.authenticateAccount(LoginActivity.this, null, token)){
-            SLog.d(TAG, "Start validate account request");
-        }else{
-            //TODO: Do something
-            SLog.d(TAG, "Can't start validate account request");
-        }
-    }
+//    private void validateAccount(String token){
+//        if(!mCustomOkHttpClient.authenticateAccount(LoginActivity.this, null, token)){
+//            SLog.d(TAG, "Start validate account request");
+//        }else{
+//            //TODO: Do something
+//            SLog.d(TAG, "Can't start validate account request");
+//        }
+//    }
 
     public void onClickLogin(View v){
         SLog.d(TAG, "onClickLogin");
+        mEmail = mTvEmail.getText().toString();
+        mPassword = mTvPassword.getText().toString();
         login();
     }
 
@@ -116,10 +121,15 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         startActivity(new Intent(this, MapsActivity.class));
     }
 
+    private void startMap(){
+        startActivity(new Intent(this, MapsActivity.class));
+    }
+
     private void login(){
         loadingBarStatus(true);
 
-        if(!mCustomOkHttpClient.sendLoginRequest(this, this, mTvEmail.getText().toString(), mTvPassword.getText().toString())){
+        SLog.d(TAG, "Sending login request: EMAIL: " + mEmail + " PASSWORD: " + mPassword);
+        if(!mCustomOkHttpClient.sendLoginRequest(this, this, mEmail, mPassword)){
             loadingBarStatus(false);
             Toast.makeText(this, Constants.TOAST_NETWORK_NOT_DETECTED, Toast.LENGTH_LONG).show();
 
@@ -131,7 +141,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     //TODO: Check when user don't consent the permission
     private void checkUserPermissions(){
         SLog.d(TAG, "checkUserPermissions");
-        if(mRequestPermissions.checkPermission()){
+        if(mRequestPermissions.isPermissionsGranted()){
             if(!isLocationEnabled()){
                 Toast.makeText(this, Constants.TOAST_TURN_ON_LOCATION, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -153,6 +163,20 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         return false;
     }
 
+    private void parseServerResponse(String response){
+        JsonParser jsonParser = new JsonParser();
+        HashMap<String, String> s = jsonParser.parseLoginResponse(response);
+
+        SharedPreferences sharedPref = getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        SLog.d(TAG, "Value returned from login: " + s.toString());
+        editor.putString(Constants.USER_TOKEN_KEY, s.get(Constants.USER_TOKEN_KEY));
+        editor.putString(Constants.USER_NAME_KEY, s.get(Constants.USER_NAME_KEY));
+        editor.putString(Constants.USER_EMAIL_KEY, s.get(Constants.USER_EMAIL_KEY));
+        //editor.putString(Constants.USER_PICTURE_KEY, s.get(Constants.USER_PICTURE_KEY));
+        editor.apply();
+    }
+
     @Override
     public void onFailure(Request request, IOException e) {
         loadingBarStatus(false);
@@ -168,19 +192,20 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     @Override
     public void onResponse(Response response) throws IOException {
         loadingBarStatus(false);
-        SLog.d(TAG, "Login - onResponse");
         if(response.isSuccessful()){
             SLog.d(TAG, "Successfully response");
-            SLog.d(TAG, "Response: " + response.body().string());
 
+            String res = response.body().string();
+            SLog.d(TAG, "Received: " + res);
+            parseServerResponse(res);
+
+            SLog.d(TAG, "Remember password [" + needToRemember + "]");
             setRememberAccount(needToRemember);
 
-            SLog.d(TAG, "Remember password set");
-
-            startActivity(new Intent(this, MapsActivity.class));
+            startMap();
             finish();
         }else {
-            SLog.d(TAG, "Response fail not successful response");
+            SLog.d(TAG, "Response fail not successful response ["+response.toString()+"]");
         }
     }
 
@@ -205,25 +230,24 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     }
 
     //TODO: Save only the email and the auth token
-    private void getRememberAccount(){
-        SLog.d(TAG, "getRememberAccount");
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
-            mSwRememberMe.setChecked(true);
-            needToRemember = true;
-            mTvEmail.setText(sharedPref.getString(Constants.REMEMBER_ME_EMAIL_KEY, ""));
-            mTvPassword.setText(sharedPref.getString(Constants.REMEMBER_ME_PASSWORD_KEY, ""));
-        }else{
-            SLog.d(TAG, "Remember account false");
-        }
-    }
+//    private void getRememberAccount(){
+//        SLog.d(TAG, "getRememberAccount");
+//        SharedPreferences sharedPref = getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+//        if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+//            mSwRememberMe.setChecked(true);
+//            needToRemember = true;
+//            mTvEmail.setText(sharedPref.getString(Constants.REMEMBER_ME_EMAIL_KEY, ""));
+//            mTvPassword.setText(sharedPref.getString(Constants.REMEMBER_ME_PASSWORD_KEY, ""));
+//        }else{
+//            SLog.d(TAG, "Remember account false");
+//        }
+//    }
+
     private void setRememberAccount(boolean status){
         SLog.d(TAG, "setRememberAccount");
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(Constants.REMEMBER_ME_STATUS_KEY, status);
-        editor.putString(Constants.REMEMBER_ME_EMAIL_KEY, mTvEmail.getText().toString());
-        editor.putString(Constants.REMEMBER_ME_PASSWORD_KEY, mTvPassword.getText().toString());
         editor.apply();
     }
 
