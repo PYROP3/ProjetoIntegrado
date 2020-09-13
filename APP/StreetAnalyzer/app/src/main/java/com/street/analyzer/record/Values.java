@@ -50,6 +50,25 @@ public class Values implements Serializable {
 
     public ArrayList<Integer> getCounters(){ return mCounter;}
 
+    public void splitData(int indice){
+        mLongitude = new ArrayList<Double> (mLongitude.subList(indice, mLongitude.size()));
+        mLatitude  = new ArrayList<Double> (mLatitude.subList(indice, mLatitude.size()));
+
+        //TODO: Remove the condition mCounter.get(i) < mXValue.size()
+        for(int i = 0; i < indice && mCounter.get(i) < mXValue.size(); i++) {
+            mXValue = new ArrayList<Float> (mXValue.subList(mCounter.get(i), mXValue.size()));
+            mYValue = new ArrayList<Float> (mYValue.subList(mCounter.get(i), mYValue.size()));
+            mZValue = new ArrayList<Float> (mZValue.subList(mCounter.get(i), mZValue.size()));
+        }
+        mCounter = new ArrayList<Integer> (mCounter.subList(indice, mCounter.size()));
+    }
+
+    public int getSize(){
+        if(mLatitude.size() == mLongitude.size())
+            return mLatitude.size();
+        return -1;
+    }
+
     void addAllXValues(ArrayList<Float> xValues){
         mXValue.addAll(xValues);
     }

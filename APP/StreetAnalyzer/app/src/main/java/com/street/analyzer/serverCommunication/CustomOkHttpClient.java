@@ -91,10 +91,14 @@ public class CustomOkHttpClient implements Callback{
     public boolean sendRegisteredData(Context context, Callback callback,
                                       Values recordedValues, String name, String token){
 
+        boolean isLast = false;
+
         if(!isNetworkAvailable(context))
             return false;
 
         OkHttpClient okHttpClient = new OkHttpClient();
+        JsonParser jsonParser = new JsonParser();
+        JSONObject jsonObject = null;
 
         HttpUrl url = new HttpUrl.Builder()
                 .scheme(Constants.SERVER_SCHEME_HTTPS)
@@ -104,22 +108,45 @@ public class CustomOkHttpClient implements Callback{
 
         SLog.d(TAG, "Sending request to: " + url.toString());
 
-        JsonParser jsonParser = new JsonParser();
-        JSONObject jsonObject = jsonParser.createLogToSend(recordedValues, name);
+        int size = recordedValues.getSize();
 
-        RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
-        SLog.d(TAG, "TOKEN " + token);
+        while(recordedValues.getSize() > 0) {
 
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)//TODO: move to constants
-                .post(requestBody)
-                .build();
+            if (recordedValues.getSize() > 10){
+                SLog.d(TAG, "Sending 10 LOGS");
+                jsonObject = jsonParser.createLogToSend(recordedValues, name, 10);
+                recordedValues.splitData(10);
+            }else{
+                isLast = true;
+                jsonObject = jsonParser.createLogToSend(recordedValues, name, recordedValues.getSize());
+                SLog.d(TAG, "Last Sending " + (recordedValues.getSize()) + " LOGS");
+            }
 
-        SLog.d(TAG, "Enqueuing new retrofit callback [LogTrip]");
+            RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
-        okHttpClient.newCall(request).enqueue(callback);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", "Bearer " + token)//TODO: move to constants
+                    .post(requestBody)
+                    .build();
+            SLog.d(TAG, "TOKEN " + token);
+            SLog.d(TAG, "Enqueuing new retrofit callback [LogTrip]");
+
+            if (!isLast) {
+                try {
+                    //TODO: Handle the response
+                    Response response = okHttpClient.newCall(request).execute();
+                    SLog.d(TAG, "Response: " + (response.isSuccessful() ? "SUCCESS" : "FAIL"));
+                } catch (IOException e) {
+                    //TODO: TODO
+                    SLog.d(TAG, "Error trying to send log");
+                }
+            } else {
+                okHttpClient.newCall(request).enqueue(callback);
+                break;
+            }
+        }
 
         return true;
     }
@@ -150,6 +177,36 @@ public class CustomOkHttpClient implements Callback{
         return true;
     }
 
+    public synchronized boolean sendEndSession(Context context, String token){
+        if(!isNetworkAvailable(context))
+            return false;
+
+        SLog.d(TAG, "Preparing end session request");
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(Constants.SERVER_SCHEME_HTTPS)
+                .host(Constants.SERVER_HOST)
+                .addPathSegment(Constants.SERVER_LOG_OUT)
+                .build();
+
+        SLog.d(TAG, "Sending request to: " + url.toString());
+
+        Request request = new Request.Builder()
+                .header("Authorization", "Bearer " + token)
+                .url(url)
+                .build();
+
+        SLog.d(TAG, "Enqueuing new retrofit callback [SendEndSession]");
+
+        okHttpClient.newCall(request).enqueue(this);
+
+        SLog.d(TAG, "Logout request sent");
+
+        return true;
+    }
+
     private boolean isNetworkAvailable(Context context){
         if (NetworkStatusManager.isNetworkAvailable(context)){
             return true;
@@ -162,10 +219,10 @@ public class CustomOkHttpClient implements Callback{
     public void onResponse(Response response) throws IOException {
         if(response.isSuccessful()){
             SLog.d(TAG, "Response successfully");
-        }
-        else{
+        }else{
             SLog.d(TAG, "Response is not successfully");
         }
+        SLog.d(TAG, "Return: " + response.body().string());
     }
 
     @Override

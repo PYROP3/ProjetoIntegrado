@@ -36,6 +36,7 @@ public class Constants {
     public static final String SERVER_CREATE_ACCOUNT = "createAccount";
     public static final String SERVER_HOST = "street-analyzer.herokuapp.com";
     public static final String SERVER_VERIFY_ACCOUNT = "verifyAccount";
+    public static final String SERVER_LOG_OUT = "deauth";
     //TODO: Verify if the path is right.
     public static final String SERVER_UPLOAD_LOG = "logTrip";
 

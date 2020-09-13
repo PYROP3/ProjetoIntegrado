@@ -42,8 +42,9 @@ public class DataUploadScheduler extends JobService implements Callback {
                 SLog.d(TAG, "Starting new scheduled thread");
 
                 mSaveState = SaveState.getInstance();
+                mSaveState.setContext(getApplicationContext());
                 Values recordedValues = mSaveState.loadDataMerged();
-
+                SLog.d(TAG, "Number of recorded positions: " + recordedValues.getSize());
                 uploadLogs(recordedValues);
             }
         }, "UploadRegisteredData");

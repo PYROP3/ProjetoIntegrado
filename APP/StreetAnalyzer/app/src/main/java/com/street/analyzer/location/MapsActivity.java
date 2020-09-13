@@ -27,6 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.street.analyzer.R;
 import com.street.analyzer.record.RecordService;
 import com.street.analyzer.record.SaveState;
+import com.street.analyzer.serverCommunication.CustomOkHttpClient;
 import com.street.analyzer.serverCommunication.DataUploadScheduler;
 import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
@@ -123,11 +124,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onDestroy() {
+        //TODO: onDestroy is not always called and the app is killed before it
+        //TODO: send the end session request
+//        SLog.d(TAG, "onDestroy MapsActivity");
+//        SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+//        if(!sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+//            CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
+//            String token = sharedPref.getString(Constants.USER_TOKEN_KEY, "");
+//            if(!token.equals("")) {
+//                SLog.d(TAG, "Token != null");
+//                customOkHttpClient.sendEndSession(this, token);
+//            }else {
+//                SLog.d(TAG, "Error trying to end session (empty token)");
+//            }
+//        }
         super.onDestroy();
-        SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
-        if(!sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
-            //TODO: Close the session
-        }
     }
 
     public void onClickStartRecord(View v){

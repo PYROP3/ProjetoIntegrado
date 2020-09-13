@@ -1,5 +1,6 @@
 package com.street.analyzer.record;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -93,6 +94,7 @@ public class RecordService extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, sensor, Constants.GRAVITY_REGISTER_TIME);
     }
 
+    @SuppressLint("MissingPermission")
     private void registerLocaleListener(){
         final LocationRequest locationRequest = LocationRequest.create()
                 .setInterval(Constants.LOCATION_UPDATE_INTERVAL)
@@ -107,7 +109,6 @@ public class RecordService extends Service implements SensorEventListener {
                 if(locationResult == null) return;
                 Location location = locationResult.getLastLocation();
                 mStorageManager.registerPositionChange(location.getLatitude(), location.getLongitude());
-                SLog.d(TAG, "New location registered");
             }
         };
         mFusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());

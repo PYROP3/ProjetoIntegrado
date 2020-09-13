@@ -45,7 +45,7 @@ public class JsonParser {
         return jsonObject;
     }
 
-    public JSONObject createLogToSend(Values values, String userName){
+    public JSONObject createLogToSend(Values values, String userName, int end){
         JSONObject jsonObject = new JSONObject();
 
         try {
@@ -53,33 +53,68 @@ public class JsonParser {
             jsonObject.put("usuario", userName);
 
             JSONArray jsonArray = new JSONArray();
+            JSONArray jsonArrayAux = new JSONArray();
             JSONArray aux = new JSONArray();
-            for(int i = 0; i < values.getLatitude().size(); i++){
+
+            for(int i = 0; i < end; i++){
                 aux.put(values.getLatitude().get(i));
                 aux.put(values.getLongitude().get(i));
                 jsonArray.put(aux);
                 aux = new JSONArray();
             }
 
+//            for(int i = 0; i < values.getSize(); i++){
+//                aux.put(values.getLatitude().get(i));
+//                aux.put(values.getLongitude().get(i));
+//                jsonArray.put(aux);
+//                aux = new JSONArray();
+//            }
+
             jsonObject.put("pontos", jsonArray);
 
             jsonArray = new JSONArray();
+
             aux = new JSONArray();
 
             int indice = 0;
-            for(Integer x : values.getCounters()){
-                for(int i = 0; i < x; i++){
+
+            for(int i = 0; i < end; i++){
+
+                if(i >= values.getCounters().size())
+                    break;
+
+                for(int j = 0; j < values.getCounters().get(i); j++){
+
+                    if(indice >= values.getXValue().size())
+                        break;
+
                     aux.put(values.getXValue().get(indice));
                     aux.put(values.getYValue().get(indice));
                     aux.put(values.getZValue().get(indice));
 
                     jsonArray.put(aux);
                     aux = new JSONArray();
-                    indice++;
+                    indice += 1;
                 }
+
+                jsonArrayAux.put(jsonArray);
+
             }
 
-            jsonObject.put("dados", jsonArray);
+//            int indice = 0;
+//            for(Integer x : values.getCounters()){
+//                for(int i = 0; i < x; i++){
+//                    aux.put(values.getXValue().get(indice));
+//                    aux.put(values.getYValue().get(indice));
+//                    aux.put(values.getZValue().get(indice));
+//
+//                    jsonArray.put(aux);
+//                    aux = new JSONArray();
+//                    indice++;
+//                }
+//            }
+
+            jsonObject.put("dados", jsonArrayAux);
 
         }catch (JSONException e){
             SLog.d(TAG, "Error trying to create JSON");
@@ -93,7 +128,6 @@ public class JsonParser {
     }
 
     public HashMap<String, String> parseLoginResponse(String response){
-        SLog.d(TAG, "Response: " + response);
         HashMap<String, String> s = new HashMap<>();
         try{
             JSONObject jsonObject = new JSONObject(response);

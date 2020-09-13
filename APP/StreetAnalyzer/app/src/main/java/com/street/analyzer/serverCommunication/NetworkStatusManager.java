@@ -34,7 +34,7 @@ public class NetworkStatusManager {
 
         if (connectivityManager == null) {
             SLog.d(TAG, "Null connectivity manager");
-            return JobInfo.NETWORK_TYPE_ANY;
+            return JobInfo.NETWORK_TYPE_UNMETERED;
         }
 
         long totalData = getCurrentDataToTransmit(context) + getTotalDataTransmitted(context);

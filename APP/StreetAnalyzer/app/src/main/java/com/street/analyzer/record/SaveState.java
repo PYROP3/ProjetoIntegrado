@@ -34,7 +34,7 @@ public class SaveState {
         return instance;
     }
 
-    synchronized void setContext(Context context){
+    public synchronized void setContext(Context context){
         if (mFolder == null) {
             mFolder = context.getExternalFilesDir(null);
         }
@@ -68,7 +68,7 @@ public class SaveState {
             savedData = (ArrayList<Values>) in.readObject();
             in.close();
         } catch (NullPointerException | IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            SLog.d(TAG, "Deu ruinzao aqui");
         }
         if (savedData != null) {
             SLog.d(TAG, "Data loaded successfully size: " + savedData.size());
@@ -152,6 +152,7 @@ public class SaveState {
             merged.addAllLongitudes(val.getLongitude());
             merged.addAllCounters(val.getCounters());
         }
+
         SLog.d(TAG, "Data successfully merged");
         return merged;
     }

@@ -8,6 +8,7 @@ import com.street.analyzer.utils.SLog;
 
 import java.util.ArrayList;
 
+import static java.lang.Math.abs;
 import static java.lang.System.gc;
 
 class StorageManager {
@@ -50,12 +51,14 @@ class StorageManager {
         mLocationCounter++;
 
         if(isFistTime) {
+            mSaveState.deleteFile();
             isFistTime = false;
             mXValue.clear();
             mYValue.clear();
             mZValue.clear();
+            mCounter.clear();
         }else {
-            int val = mXValue.size() - lastValueSize;
+            int val = abs(mXValue.size() - lastValueSize);
             lastValueSize = mXValue.size();
             mCounter.add(val);
         }
