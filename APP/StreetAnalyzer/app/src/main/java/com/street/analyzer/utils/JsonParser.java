@@ -45,75 +45,49 @@ public class JsonParser {
         return jsonObject;
     }
 
-    public JSONObject createLogToSend(Values values, String userName, int end){
+    public JSONObject createLogToSend(Values values, String userName, int start, int end){
         JSONObject jsonObject = new JSONObject();
 
         try {
-            SLog.d(TAG, "USER: " + userName);
             jsonObject.put("usuario", userName);
 
             JSONArray jsonArray = new JSONArray();
             JSONArray jsonArrayAux = new JSONArray();
             JSONArray aux = new JSONArray();
 
-            for(int i = 0; i < end; i++){
-                aux.put(values.getLatitude().get(i));
-                aux.put(values.getLongitude().get(i));
-                jsonArray.put(aux);
-                aux = new JSONArray();
-            }
+            aux.put(values.getLatitude().get(start));
+            aux.put(values.getLongitude().get(start));
 
-//            for(int i = 0; i < values.getSize(); i++){
-//                aux.put(values.getLatitude().get(i));
-//                aux.put(values.getLongitude().get(i));
-//                jsonArray.put(aux);
-//                aux = new JSONArray();
-//            }
+            jsonArray.put(aux);
+            aux = new JSONArray();
 
+            aux.put(values.getLatitude().get(end));
+            aux.put(values.getLongitude().get(end));
+            jsonArray.put(aux);
+
+            SLog.d(TAG, "Locations: " + jsonArray.toString());
             jsonObject.put("pontos", jsonArray);
 
             jsonArray = new JSONArray();
-
             aux = new JSONArray();
 
-            int indice = 0;
+            int index = 0;
+            for(int i = 0; i < start; i++)
+                index = values.getCounters().get(i);
 
-            for(int i = 0; i < end; i++){
-
-                if(i >= values.getCounters().size())
-                    break;
-
-                for(int j = 0; j < values.getCounters().get(i); j++){
-
-                    if(indice >= values.getXValue().size())
-                        break;
-
-                    aux.put(values.getXValue().get(indice));
-                    aux.put(values.getYValue().get(indice));
-                    aux.put(values.getZValue().get(indice));
+            for(int i = 0; i < index; i++){
+                    aux.put(values.getXValue().get(index));
+                    aux.put(values.getYValue().get(index));
+                    aux.put(values.getZValue().get(index));
 
                     jsonArray.put(aux);
                     aux = new JSONArray();
-                    indice += 1;
-                }
-
-                jsonArrayAux.put(jsonArray);
-
             }
 
-//            int indice = 0;
-//            for(Integer x : values.getCounters()){
-//                for(int i = 0; i < x; i++){
-//                    aux.put(values.getXValue().get(indice));
-//                    aux.put(values.getYValue().get(indice));
-//                    aux.put(values.getZValue().get(indice));
-//
-//                    jsonArray.put(aux);
-//                    aux = new JSONArray();
-//                    indice++;
-//                }
-//            }
+            jsonArrayAux.put(jsonArray);
 
+
+            SLog.d(TAG, "Data: " + jsonArrayAux.toString());
             jsonObject.put("dados", jsonArrayAux);
 
         }catch (JSONException e){
@@ -161,3 +135,43 @@ public class JsonParser {
         return false;
     }
 }
+
+//TODO: Delete this comment later, not now because it can still be useful (what I'm doing with my life)
+//            for(int i = 0; i < end; i++){
+//                aux.put(values.getLatitude().get(i));
+//                aux.put(values.getLongitude().get(i));
+//                jsonArray.put(aux);
+//                aux = new JSONArray();
+//            }
+//            for(int i = 0; i < values.getSize(); i++){
+//                aux.put(values.getLatitude().get(i));
+//                aux.put(values.getLongitude().get(i));
+//                jsonArray.put(aux);
+//                aux = new JSONArray();
+//            }
+//            for(int i = 0; i < end; i++){
+//                if(i >= values.getCounters().size())
+//                    break;
+//                for(int j = 0; j < values.getCounters().get(i); j++){
+//                    if(index >= values.getXValue().size())
+//                        break;
+//                    aux.put(values.getXValue().get(index));
+//                    aux.put(values.getYValue().get(index));
+//                    aux.put(values.getZValue().get(index));
+//                    jsonArray.put(aux);
+//                    aux = new JSONArray();
+//                    index += 1;
+//                }
+//                jsonArrayAux.put(jsonArray);
+//            }
+//            int indice = 0;
+//            for(Integer x : values.getCounters()){
+//                for(int i = 0; i < x; i++){
+//                    aux.put(values.getXValue().get(indice));
+//                    aux.put(values.getYValue().get(indice));
+//                    aux.put(values.getZValue().get(indice));
+//                    jsonArray.put(aux);
+//                    aux = new JSONArray();
+//                    indice++;
+//                }
+//            }

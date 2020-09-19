@@ -12,7 +12,7 @@ public class Constants {
     public static final int GRAVITY_REGISTER_TIME = SensorManager.SENSOR_DELAY_NORMAL;
 
     //TODO: Define default value for Location Update and Limit Position Change
-    public static final long LOCATION_UPDATE_INTERVAL = 1000;//30000;
+    public static final long LOCATION_UPDATE_INTERVAL = 2000;//30000;
     public static final long LOCATION_UPDATE_FASTEST_INTERVAL = 1000;//20000;
     public static final int LOCATION_LIMIT_POSITION_CHANGE = 3;
     public static final int LOCATION_PRIORITY_HIGH = LocationRequest.PRIORITY_HIGH_ACCURACY;
@@ -78,4 +78,6 @@ public class Constants {
     public static final String USER_EMAIL_KEY = "UserEmail";
     public static final String USER_PICTURE_KEY = "UserProfilePicture";
     public static final String USER_DATA = "UserData";
+
+    public static final int MAX_SEND_DATA = 2; //The minimum possible value is 2
 }

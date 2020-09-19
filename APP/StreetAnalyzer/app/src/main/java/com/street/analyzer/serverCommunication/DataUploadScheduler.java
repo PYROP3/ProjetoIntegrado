@@ -92,10 +92,13 @@ public class DataUploadScheduler extends JobService implements Callback {
         SLog.d(TAG, "Job finished");
         if(response.isSuccessful()){
             mSaveState.deleteFile();
+            SLog.d(TAG, "All data was sent, unregistering JobScheduler wantsReschedule = FALSE");
             jobFinished(mJobParameters, false);
             SLog.d(TAG, "onResponse: Data sent successfully");
         } else {
-            jobFinished(mJobParameters, true);
+            //TODO: It will need to reschedule but not all logs that was already sent
+            SLog.d(TAG, "All data was sent, return error");
+            jobFinished(mJobParameters, false);
             SLog.d(TAG, "onResponse: ERROR " + response.message());
         }
     }

@@ -48,7 +48,8 @@ public class SaveState {
             out = new ObjectOutputStream(new FileOutputStream(outFile));
             out.writeObject(data);
             out.close();
-            SLog.d(TAG, "Data saved successfully new size: " + data.size());
+            SLog.d(TAG, "Data saved successfully: " + data.size() +
+                    " [Size: " + data.size() * Constants.LOCATION_LIMIT_POSITION_CHANGE + "]");
             mSavedCounter++;
         } catch (Exception e) {
             SLog.d(TAG, "Error when trying to save data");
@@ -71,7 +72,8 @@ public class SaveState {
             SLog.d(TAG, "Deu ruinzao aqui");
         }
         if (savedData != null) {
-            SLog.d(TAG, "Data loaded successfully size: " + savedData.size());
+            SLog.d(TAG, "Data loaded successfully: " + savedData.size() +
+                    " [Size: " + savedData.size() * Constants.LOCATION_LIMIT_POSITION_CHANGE + "]");
             return savedData;
         } else {
            SLog.d(TAG, "Error when trying to read data");

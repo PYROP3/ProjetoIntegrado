@@ -105,39 +105,40 @@ public class CustomOkHttpClient implements Callback{
                 .host(Constants.SERVER_HOST)
                 .addPathSegment(Constants.SERVER_UPLOAD_LOG)
                 .build();
-
         SLog.d(TAG, "Sending request to: " + url.toString());
 
-        int size = recordedValues.getSize();
+        int index = 0;
+        while(index < recordedValues.getSize()-1) {
 
+            jsonObject = jsonParser.createLogToSend(recordedValues, name, index, index + 1);
+            index++;
 
-        while(recordedValues.getSize() > 0) {
-
-            if (recordedValues.getSize() > 10){
-                SLog.d(TAG, "Sending 10 LOGS");
-                jsonObject = jsonParser.createLogToSend(recordedValues, name, 10);
-                recordedValues.splitData(10);
-            }else{
+            if(index == recordedValues.getSize()-1)
                 isLast = true;
-                jsonObject = jsonParser.createLogToSend(recordedValues, name, recordedValues.getSize());
-                SLog.d(TAG, "Last Sending " + (recordedValues.getSize()) + " LOGS");
-            }
 
             RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
+
 
             Request request = new Request.Builder()
                     .url(url)
                     .addHeader("Authorization", "Bearer " + token)//TODO: move to constants
                     .post(requestBody)
                     .build();
-            SLog.d(TAG, "TOKEN " + token);
             SLog.d(TAG, "Enqueuing new retrofit callback [LogTrip]");
 
             if (!isLast) {
                 try {
                     //TODO: Handle the response
+                    SLog.d(TAG, "Sending registered data [" + index + "]");
                     Response response = okHttpClient.newCall(request).execute();
-                    SLog.d(TAG, "Response: " + (response.isSuccessful() ? "SUCCESS" : "FAIL"));
+
+                    if(response.isSuccessful()){
+                        SLog.d(TAG, "Response: SUCCESS");
+                    }else{
+                        SLog.d(TAG, "Response: ERROR");
+                        SLog.d(TAG, "Response body: " + response.body().string());
+
+                    }
                 } catch (IOException e) {
                     //TODO: TODO
                     SLog.d(TAG, "Error trying to send log");
@@ -230,3 +231,15 @@ public class CustomOkHttpClient implements Callback{
         SLog.d(TAG, "Fail onFailure");
     }
 }
+
+//TODO: Delete this comment later, not now because it can still be useful (what I'm doing with my life)
+//            if (recordedValues.getSize() > Constants.MAX_SEND_DATA){
+//                SLog.d(TAG, "Sending " + Constants.MAX_SEND_DATA + " LOGS");
+//                jsonObject = jsonParser.createLogToSend(recordedValues, name, Constants.MAX_SEND_DATA);
+//                recordedValues.splitData(Constants.MAX_SEND_DATA);
+//            }else{
+//                isLast = true;
+//                jsonObject = jsonParser.createLogToSend(recordedValues, name, recordedValues.getSize());
+//                SLog.d(TAG, "Last Sending " + (recordedValues.getSize()) + " LOGS");
+//            }
+//            SLog.d(TAG, "Sending: " + jsonObject.toString());
