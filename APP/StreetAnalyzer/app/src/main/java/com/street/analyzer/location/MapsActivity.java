@@ -5,16 +5,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
 
@@ -146,10 +149,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Intent intent = new Intent(this, RecordService.class);
                 startService(intent);
+
+                Toast.makeText(getApplicationContext(), "Recording Started. Thank you for sharing!", Toast.LENGTH_LONG).show();
             }
         }else{
             stopService(new Intent(this, RecordService.class));
             enableScheduler();
+            Toast.makeText(getApplicationContext(), "Recording stopped", Toast.LENGTH_LONG).show();
         }
 
         mServiceStats = !mServiceStats;
