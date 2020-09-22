@@ -19,8 +19,8 @@ public class Constants {
 
     public static final String NOTIFICATION_CHANNEL_MSG = "Notification_channel";
     public static final String NOTIFICATION_CHANNEL_ID = "Recording_notification";
-    public static final String NOTIFICATION_NAME = "We are recording";
-    public static final String NOTIFICATION_TEXT = "Thank you bla bla bla";
+    public static final String NOTIFICATION_NAME = "StreetAnalyzer is recording";
+    public static final String NOTIFICATION_TEXT = "Thank you for helping. Tap to return to the app";
 
     public static final String DATA_FILE_NAME = "recordData.data";
 
