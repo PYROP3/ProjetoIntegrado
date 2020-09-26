@@ -21,14 +21,14 @@ import java.util.concurrent.TimeUnit;
 public class DataUploadScheduler extends JobService implements Callback {
 
     private final String TAG = getClass().getSimpleName();
-    private boolean jobStatus = false;
+    private boolean isJobEnable = false;
     private SaveState mSaveState;
     private JobParameters mJobParameters;
 
     @Override
     public boolean onStartJob(JobParameters params) {
         SLog.d(TAG, "Job started");
-
+        isJobEnable = true;
         mJobParameters = params;
         doBackgroundWork();
 
@@ -36,6 +36,12 @@ public class DataUploadScheduler extends JobService implements Callback {
     }
 
     private void doBackgroundWork(){
+        if(!isJobEnable){
+            jobFinished(mJobParameters, false);
+            SLog.d(TAG, "Job cancelled, data already sent");
+            return;
+        }
+
         Thread uploadRegisteredData = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -77,7 +83,7 @@ public class DataUploadScheduler extends JobService implements Callback {
     @Override
     public boolean onStopJob(JobParameters params) {
         SLog.d(TAG, "Job cancelled before completion");
-        jobStatus = true;
+        isJobEnable = true;
         return true;
     }
 
@@ -90,6 +96,7 @@ public class DataUploadScheduler extends JobService implements Callback {
     @Override
     public void onResponse(Response response) throws IOException {
         SLog.d(TAG, "Job finished");
+        isJobEnable = false;
         if(response.isSuccessful()){
             mSaveState.deleteFile();
             SLog.d(TAG, "All data was sent, unregistering JobScheduler wantsReschedule = FALSE");
