@@ -29,22 +29,13 @@ public class NetworkStatusManager {
     }
 
     public static int networkAllowedToSend(Context context){
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        long totalData = getCurrentDataToTransmit(context) + getTotalDataTransmitted(context);
 
-        if (connectivityManager == null) {
-            SLog.d(TAG, "Null connectivity manager");
+        if(Constants.TOTAL_DATA_TO_TRANSMIT < totalData){
+            SLog.d(TAG, "Is allowed to send only in unmetered connection");
             return JobInfo.NETWORK_TYPE_UNMETERED;
         }
 
-        long totalData = getCurrentDataToTransmit(context) + getTotalDataTransmitted(context);
-
-        if(connectivityManager.isActiveNetworkMetered()){
-            if(Constants.TOTAL_DATA_TO_TRANSMIT < totalData){
-                SLog.d(TAG, "Is allowed to send only in unmetered connection");
-                return JobInfo.NETWORK_TYPE_UNMETERED;
-            }
-        }
         SLog.d(TAG, "Is allowed to send in any connection");
         return JobInfo.NETWORK_TYPE_ANY;
     }
