@@ -2,6 +2,7 @@ package com.street.analyzer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.street.analyzer.record.Values;
 
@@ -133,6 +134,13 @@ public class JsonParser {
            e.printStackTrace();
        }
         return false;
+    }
+
+    public static String getQueryToken(String dataString) {
+        Uri uri = Uri.parse(dataString);
+        String args = uri.getQueryParameter("token");
+        SLog.d(TAG, "User token: " + args);
+        return args;
     }
 }
 

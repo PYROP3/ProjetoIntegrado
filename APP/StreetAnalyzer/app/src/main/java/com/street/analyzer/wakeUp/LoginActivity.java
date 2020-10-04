@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
@@ -21,10 +20,10 @@ import android.widget.Toast;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
 import com.street.analyzer.location.MapsActivity;
 import com.street.analyzer.R;
 import com.street.analyzer.serverCommunication.CustomOkHttpClient;
+import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.JsonParser;
 import com.street.analyzer.utils.RequestPermissions;
@@ -63,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             if (intent.hasExtra(Constants.EXTRA_CREATE_ACCOUNT)) {
                 SLog.d(TAG, "opened by create account");
                 showExplainMessage();
-            } else {
+            } else if(intent.hasExtra("WakeUp")){
                 SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
                 if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
                     String token = sharedPref.getString(Constants.USER_TOKEN_KEY, "");
@@ -72,6 +71,10 @@ public class LoginActivity extends AppCompatActivity implements Callback {
                         startMap();
                     }
                 }
+            }else{
+                SLog.d(TAG, "Opened by link: " + intent.getDataString());
+                String token = JsonParser.getQueryToken(intent.getDataString());
+                while(!mCustomOkHttpClient.authenticateAccount(this, token));
             }
         }
 
@@ -186,7 +189,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
                 Toast.makeText(mContext, Constants.TOAST_LOGIN_FAILURE, Toast.LENGTH_LONG).show();
             }
         });
-        SLog.d(TAG, "Login - onFailure");
+        SLog.d(TAG, "Login - onFailure: " + request);
     }
 
     @Override
