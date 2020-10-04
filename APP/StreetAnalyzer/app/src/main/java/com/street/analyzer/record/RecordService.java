@@ -72,7 +72,7 @@ public class RecordService extends Service implements SensorEventListener {
         Notification notification = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(Constants.NOTIFICATION_NAME)
                 .setContentText(Constants.NOTIFICATION_TEXT)
-                .setSmallIcon(R.drawable.ic_android)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentIntent(pendingIntent)
                 .build();
 

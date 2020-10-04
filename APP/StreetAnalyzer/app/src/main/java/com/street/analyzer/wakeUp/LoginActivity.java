@@ -213,7 +213,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
     }
 
     public void onClickForgotPassword(View v){
-        startActivity(new Intent(this, CreateAccountActivity.class));
+        startActivity(new Intent(this, AccountRecoveryCode.class));
     }
 
     public void onClickLoginReturn(View v){

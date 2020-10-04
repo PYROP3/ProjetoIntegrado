@@ -13,6 +13,7 @@
     <string name="side_my_information">My information</string>
     <string name="side_about_us">About us</string>
     <string name="side_statistics">Statistics</string>
+    <string name="side_log_out">Log out</string>
     <string name="side_user_icon">User icon</string>
     <string name="side_default_name">Roberto Justos</string>
     <string name="side_default_email">roberj@bol.com.br</string>
@@ -47,5 +48,11 @@
     <string name="account_recovery_reset_title">Redefine\n your password</string>
     <string name="new_password">New Password</string>
     <string name="confirm_new_password">Confirm New Password</string>
+
+    <!-- Menu Maps Activity -->
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="about_us_text">\t\tLorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam finibus non turpis vel tincidunt. Nunc non purus molestie, pellentesque augue vitae, pharetra mi.
+            \n\t\tInteger cursus vestibulum augue eu faucibus. Maecenas sodales nunc ut velit tempus, cursus eleifend augue lobortis. Nulla commodo libero purus, quis euismod magna accumsan non. Phasellus quis enim tincidunt, finibus mauris fermentum, ullamcorper ipsum.</string>
 
 </resources>

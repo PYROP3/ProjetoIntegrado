@@ -20,7 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".wakeUp.AccountRecoveryReset"></activity>
+        <activity android:name=".wakeUp.AboutUs"></activity>
+        <activity android:name=".wakeUp.AccountRecoveryReset" />
         <activity android:name=".wakeUp.AccountRecoveryCode" />
         <activity android:name=".wakeUp.WelcomeActivity">
             <intent-filter>
@@ -53,9 +54,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="street-analyzer.herokuapp.com"
-                    android:path="/verifyAccount" />
+                    android:path="/verifyAccount"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
