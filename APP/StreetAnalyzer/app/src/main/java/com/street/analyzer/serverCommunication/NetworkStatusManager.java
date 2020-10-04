@@ -4,11 +4,15 @@ import android.app.job.JobInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.Uri;
+import android.net.UrlQuerySanitizer;
+
 import com.street.analyzer.record.SaveState;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.SLog;
 
 import java.util.Calendar;
+import java.util.Set;
 
 public class NetworkStatusManager {
 

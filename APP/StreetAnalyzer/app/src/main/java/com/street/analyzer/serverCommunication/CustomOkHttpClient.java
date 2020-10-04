@@ -1,8 +1,7 @@
 package com.street.analyzer.serverCommunication;
 
-import android.app.slice.Slice;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.HttpUrl;
@@ -88,6 +87,50 @@ public class CustomOkHttpClient implements Callback{
         return true;
     }
 
+    public Bitmap requestQualityOverlay(Context context, Callback callback,
+                                        double minLat, double minLong, double maxLat, double maxLong){
+        if(!isNetworkAvailable(context))
+            return null;
+
+        HttpUrl httpUrl = new HttpUrl.Builder()
+                .scheme(Constants.SERVER_SCHEME_HTTPS)
+                .host(Constants.SERVER_HOST)
+                .addPathSegment(Constants.SERVER_QUALITY_OVERLAY)
+                .addQueryParameter("minLatitude", "" + minLat)
+                .addQueryParameter("maxLatitude", "" + maxLat)
+                .addQueryParameter("minLongitude", "" + minLong)
+                .addQueryParameter("maxLongitude", "" + maxLong)
+                .build();
+
+        SLog.d(TAG, "Sending requesto to: " + httpUrl.toString());
+
+//        try {
+//            DownloadImageTask downloadImageTask = new DownloadImageTask();
+//            downloadImageTask.execute(httpUrl.toString())
+//        } catch (ExecutionException e) {
+//            SLog.d(TAG, "Deu ruim ExecutioN");
+//        } catch (InterruptedException e) {
+//            SLog.d(TAG, "Deu ruim Interrupted");
+//        }
+        return null;
+
+//        try {
+//            url = new URL(httpUrl.toString());
+//            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//            SLog.d(TAG, "Returning bitmap");
+//            return bmp;
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//            return null;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        SLog.d(TAG, "Enqueuing new retrofit callback [RequestQualityOverlay]");
+//
+//        okHttpClient.newCall(request).enqueue(callback);
+    }
+
     public boolean sendRegisteredData(Context context, Callback callback,
                                       Values recordedValues, String name, String token){
 
@@ -117,7 +160,6 @@ public class CustomOkHttpClient implements Callback{
                 isLast = true;
 
             RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
-
 
             Request request = new Request.Builder()
                     .url(url)
@@ -152,7 +194,7 @@ public class CustomOkHttpClient implements Callback{
         return true;
     }
 
-    public boolean authenticateAccount(Context context, Callback callback, String token){
+    public boolean authenticateAccount(Context context, String token){
         if(!isNetworkAvailable(context))
             return false;
 
@@ -173,9 +215,20 @@ public class CustomOkHttpClient implements Callback{
 
         SLog.d(TAG, "Enqueuing new retrofit callback [VerifyAccount]");
 
-        okHttpClient.newCall(request).enqueue((callback == null) ? this : callback);
+        try {
+            Response r = okHttpClient.newCall(request).execute();
+            if(r.isSuccessful()){
+                SLog.d(TAG, "ResponseSuccessful!");
+                return true;
+            }else{
+                SLog.d(TAG, "ResponseFailure: " + r.body().string());
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        return true;
+        return false;
     }
 
     public synchronized boolean sendEndSession(Context context, String token){

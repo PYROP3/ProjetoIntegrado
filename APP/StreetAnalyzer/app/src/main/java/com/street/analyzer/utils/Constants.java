@@ -39,6 +39,7 @@ public class Constants {
     public static final String SERVER_LOG_OUT = "deauth";
     //TODO: Verify if the path is right.
     public static final String SERVER_UPLOAD_LOG = "logTrip";
+    public static final String SERVER_QUALITY_OVERLAY = "qualityOverlay";
 
     public static final int MIN_NAME_LENGTH = 4;
     public static final int MIN_PASSWORD_LENGTH = 4;

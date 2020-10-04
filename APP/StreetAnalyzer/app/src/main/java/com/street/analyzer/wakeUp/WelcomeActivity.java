@@ -21,7 +21,9 @@ public class WelcomeActivity extends AppCompatActivity {
         mContext = getApplicationContext();
     }
     public void onClickStartUserActivity(View v){
-        startActivity(new Intent(mContext, LoginActivity.class));
+        Intent intent = new Intent(mContext, LoginActivity.class);
+        intent.putExtra("WakeUp", "");
+        startActivity(intent);
     }
 
     public void onClickRegister(View v){
