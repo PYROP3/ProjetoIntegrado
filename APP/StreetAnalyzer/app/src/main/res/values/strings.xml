@@ -52,5 +52,7 @@
     <!-- Menu Maps Activity -->
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="about_us_text">\t\tLorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam finibus non turpis vel tincidunt. Nunc non purus molestie, pellentesque augue vitae, pharetra mi.
+            \n\t\tInteger cursus vestibulum augue eu faucibus. Maecenas sodales nunc ut velit tempus, cursus eleifend augue lobortis. Nulla commodo libero purus, quis euismod magna accumsan non. Phasellus quis enim tincidunt, finibus mauris fermentum, ullamcorper ipsum.</string>
 
 </resources>

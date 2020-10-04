@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ import com.street.analyzer.serverCommunication.NetworkStatusManager;
 import com.street.analyzer.utils.Constants;
 import com.street.analyzer.utils.RequestPermissions;
 import com.street.analyzer.utils.SLog;
+import com.street.analyzer.wakeUp.AboutUs;
 import com.street.analyzer.wakeUp.LoginActivity;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -92,6 +94,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId())
+                {
+                    case R.id.item_log_out:
+                        // LOG_OUT
+                        break;
+                    case R.id.item_about_us:
+                        startActivity(new Intent(mContext, AboutUs.class));
+                        break;
+
+                }
+
+
+                return true;
+            }
+        });
     }
 
     @Override
