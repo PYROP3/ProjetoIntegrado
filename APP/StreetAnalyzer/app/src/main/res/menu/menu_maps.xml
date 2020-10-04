@@ -2,18 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/a"
-        android:title="@string/side_my_information"
-        />
+        android:title="@string/side_log_out"
+    />
     <item
         android:id="@+id/b"
-        android:title="@string/side_statistics"
-    />
-    <item
-        android:id="@+id/d"
-        android:title="@string/side_settings"
-    />
-    <item
-        android:id="@+id/e"
         android:title="@string/side_about_us"
     />
 </menu>
