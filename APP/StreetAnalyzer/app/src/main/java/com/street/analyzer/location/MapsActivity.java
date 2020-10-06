@@ -95,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mServiceStats = false;
         pressedOnce = false;
         lastCall = 0;
-        mContext = getApplicationContext();
+        mContext = this;
 
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
@@ -126,6 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // LOG_OUT
                         break;
                     case R.id.item_about_us:
+                        SLog.d(TAG, "Side menu, starting AboutUs");
                         startActivity(new Intent(mContext, AboutUs.class));
                         break;
 

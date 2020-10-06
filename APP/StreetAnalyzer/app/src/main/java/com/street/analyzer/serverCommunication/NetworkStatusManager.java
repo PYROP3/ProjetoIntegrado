@@ -22,14 +22,19 @@ public class NetworkStatusManager {
     private static final String TOTAL_DATA_TRANSMITTED = "totalDataTransmitted";
 
     static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (connectivityManager == null)
-            return false;
+            if (connectivityManager == null)
+                return false;
 
             return connectivityManager.getActiveNetworkInfo() != null
                     && connectivityManager.getActiveNetworkInfo().isConnected();
+        }catch(Exception e){
+            SLog.d(TAG, "Android returned null connectivity manager");
+            return true;
+        }
     }
 
     public static int networkAllowedToSend(Context context){
