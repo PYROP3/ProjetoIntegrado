@@ -150,7 +150,7 @@ public class CustomOkHttpClient implements Callback{
                 .build();
         SLog.d(TAG, "Sending request to: " + url.toString());
 
-        int index = 0;
+        int index = 1;
         while(index < recordedValues.getSize()-1) {
 
             jsonObject = jsonParser.createLogToSend(recordedValues, name, index, index + 1);
