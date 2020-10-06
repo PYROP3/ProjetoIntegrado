@@ -142,6 +142,17 @@ public class JsonParser {
         SLog.d(TAG, "User token: " + args);
         return args;
     }
+
+    public static int getErrorResponse(String data){
+        try {
+            JSONObject jsonObject = new JSONObject(data);
+            int returnCode = jsonObject.getInt("Code");
+            return returnCode;
+        }catch(JSONException e){
+            SLog.d(TAG, "Json exception why");
+        }
+        return -1;
+    }
 }
 
 //TODO: Delete this comment later, not now because it can still be useful (what I'm doing with my life)

@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
 
     private Context mContext;
     private CustomOkHttpClient mCustomOkHttpClient;
+    private String mToken;
 
     private boolean needToRemember;
 
@@ -61,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             SLog.d(TAG, "Intent not null");
             if (intent.hasExtra(Constants.EXTRA_CREATE_ACCOUNT)) {
                 SLog.d(TAG, "opened by create account");
-                showExplainMessage();
+                showExplainMessage("Success!", Constants.ALERT_VERIFY_EMAIL);
             } else if(intent.hasExtra("WakeUp")){
                 SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
                 if(sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
@@ -73,8 +74,30 @@ public class LoginActivity extends AppCompatActivity implements Callback {
                 }
             }else{
                 SLog.d(TAG, "Opened by link: " + intent.getDataString());
-                String token = JsonParser.getQueryToken(intent.getDataString());
-                while(!mCustomOkHttpClient.authenticateAccount(this, token));
+                final String token = JsonParser.getQueryToken(intent.getDataString());
+                mToken = token;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!mCustomOkHttpClient.authenticateAccount(mContext, token)){
+                            SLog.d(TAG, "Failed to authenticateAccount, trying again");
+                            try {
+                                do {
+                                    Thread.sleep(500);
+                                    if (mCustomOkHttpClient.authenticateAccount(mContext, mToken)) {
+                                        SLog.d(TAG, "Account authenticated");
+                                        return;
+                                    }
+                                    SLog.d(TAG, "Failed to authenticateAccount");
+                                }while(true);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            SLog.d(TAG, "Account validate Successfully");
+                        }
+                    }
+                }, "ValidateAccount").start();
             }
         }
 
@@ -208,7 +231,11 @@ public class LoginActivity extends AppCompatActivity implements Callback {
             startMap();
             finish();
         }else {
-            SLog.d(TAG, "Response fail not successful response ["+response.toString()+"]");
+            SLog.d(TAG, "Response fail not successful response ["+response.body().string()+"]");
+            int code = JsonParser.getErrorResponse(response.body().string());
+            if(code == Constants.SERVER_ERRO_INVALID_CREDENTIALS){
+                SLog.d(TAG, "Invalid Credentials, retrying authenticate");
+            }
         }
     }
 
@@ -220,10 +247,10 @@ public class LoginActivity extends AppCompatActivity implements Callback {
         finish();
     }
 
-    private void showExplainMessage(){
+    private void showExplainMessage(String title, String message){
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-        dlgAlert.setTitle("Success!");
-        dlgAlert.setMessage(Constants.ALERT_VERIFY_EMAIL);
+        dlgAlert.setTitle(title);
+        dlgAlert.setMessage(message);
         dlgAlert.setPositiveButton(Html.fromHtml("<font color='#9BDE7A'>OK</font>"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int arg1) {
             }

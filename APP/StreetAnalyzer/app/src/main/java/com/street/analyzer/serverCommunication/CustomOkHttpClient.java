@@ -226,9 +226,8 @@ public class CustomOkHttpClient implements Callback{
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     public synchronized boolean sendEndSession(Context context, String token){

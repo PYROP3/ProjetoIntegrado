@@ -41,6 +41,8 @@ public class Constants {
     public static final String SERVER_UPLOAD_LOG = "logTrip";
     public static final String SERVER_QUALITY_OVERLAY = "qualityOverlay";
 
+    public static final int SERVER_ERRO_INVALID_CREDENTIALS = 8;
+
     public static final int MIN_NAME_LENGTH = 4;
     public static final int MIN_PASSWORD_LENGTH = 4;
 
