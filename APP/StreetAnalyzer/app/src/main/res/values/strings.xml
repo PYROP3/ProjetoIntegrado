@@ -1,8 +1,58 @@
 <resources>
     <!-- App -->
     <string name="app_name">StreetAnalyzer</string>
+    <string name="app_title">Street Analyzer</string>
 
     <!-- Google Maps API -->
     <string name="title_activity_maps">Map</string>
     <string name="google_api_key">AIzaSyA1bj_c5SUPi1iIduEGSGRhZSt9vmsE64Y</string>
+    <string name="btn_start">Start</string>
+
+    <!-- Side menu -->
+    <string name="side_settings">Settings</string>
+    <string name="side_my_information">My information</string>
+    <string name="side_about_us">About us</string>
+    <string name="side_statistics">Statistics</string>
+    <string name="side_log_out">Log out</string>
+    <string name="side_user_icon">User icon</string>
+    <string name="side_default_name">Roberto Justos</string>
+    <string name="side_default_email">roberj@bol.com.br</string>
+
+    <!-- Welcome Activity -->
+    <string name="meet_up_title">MEET UP</string>
+    <string name="meet_up_text">Join our community and be aware of the street condition. You’ll be also helping us to analyze it better!</string>
+    <string name="login">LOGIN</string>
+    <string name="register">REGISTER</string>
+
+    <!-- Login Activity -->
+    <string name="sign_in">Sign In</string>
+    <string name="login_title">Login to \nyour account</string>
+    <string name="create_account">Don\'t have an account yet? Sign Up</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="remember_me">Remember me</string>
+
+    <!-- Create Account Activity -->
+    <string name="create_account_title">Create \nYour account</string>
+    <string name="email">E-mail</string>
+    <string name="name">Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm">CONFIRM</string>
+
+    <!-- Account Recovery Code Activity -->
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="account_recovery_code_text">Don’t worry. Resetting your password is easy,\njust tell us the email address you registered.</string>
+    <string name="security_code">Security Code</string>
+
+    <!-- Account Recovery Reset Activity -->
+    <string name="account_recovery_reset_title">Redefine\n your password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+
+    <!-- Menu Maps Activity -->
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="about_us_text">\t\tLorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam finibus non turpis vel tincidunt. Nunc non purus molestie, pellentesque augue vitae, pharetra mi.
+            \n\t\tInteger cursus vestibulum augue eu faucibus. Maecenas sodales nunc ut velit tempus, cursus eleifend augue lobortis. Nulla commodo libero purus, quis euismod magna accumsan non. Phasellus quis enim tincidunt, finibus mauris fermentum, ullamcorper ipsum.</string>
+
 </resources>

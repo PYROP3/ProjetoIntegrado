@@ -1,30 +1,77 @@
 package com.street.analyzer.location;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
+import android.annotation.SuppressLint;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.material.navigation.NavigationView;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.street.analyzer.R;
+import com.street.analyzer.record.RecordService;
+import com.street.analyzer.record.SaveState;
+import com.street.analyzer.serverCommunication.DataUploadScheduler;
+import com.street.analyzer.serverCommunication.NetworkStatusManager;
+import com.street.analyzer.serverCommunication.OverlayRequest;
+import com.street.analyzer.utils.Constants;
+import com.street.analyzer.utils.RequestPermissions;
+import com.street.analyzer.utils.SLog;
+import com.street.analyzer.wakeUp.AboutUs;
+import com.street.analyzer.wakeUp.LoginActivity;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+import java.io.IOException;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, Callback,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener {
 
+    private final String TAG = getClass().getSimpleName();
+
     private GoogleMap mMap;
+
+    private Boolean mServiceStats;
+    private Context mContext;
 
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private NavigationView mNavigationView;
+    private boolean pressedOnce;
+    private long lastCall;
+    private LatLngBounds mLatLngBounds;
+    private GroundOverlay mGroundOverlay = null;
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +81,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mNavigationView = findViewById(R.id.nvMenu);
+        mServiceStats = false;
+        pressedOnce = false;
+        lastCall = 0;
+        mContext = this;
+
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (pressedOnce) {
+                    startActivity(new Intent(mContext, LoginActivity.class));
+                    finish();
+                }
+                pressedOnce = true;
+                Toast.makeText(mContext, Constants.TOAST_BACK_EXIT, Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        pressedOnce = false;
+                    }
+                }, 2000);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId())
+                {
+                    case R.id.item_log_out:
+                        // LOG_OUT
+                        break;
+                    case R.id.item_about_us:
+                        SLog.d(TAG, "Side menu, starting AboutUs");
+                        startActivity(new Intent(mContext, AboutUs.class));
+                        break;
+
+                }
+
+
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location){
+        Toast.makeText(this, Constants.TOAST_YOU, Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -46,22 +144,148 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
+    @SuppressLint("MissingPermission")
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        final RequestPermissions requestPermissions = new RequestPermissions(this);
+
+        if (!requestPermissions.isPermissionsGranted()) {
+            requestPermissions.requestUserPermissions(this);
+            return;
+        }
 
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationClickListener(this);
         mMap.setOnMyLocationButtonClickListener(this);
+
+        requestOverlay();
+
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                final long time = System.currentTimeMillis();
+                if(time - lastCall < 2000){
+                    SLog.d(TAG, "Last call near");
+                    return;
+                }
+                lastCall = time;
+                if(mMap.getCameraPosition().zoom > 14) {
+                    SLog.d(TAG, "Sending request overlay");
+                    requestOverlay();
+                }else{
+                    SLog.d(TAG, "Request not sent! Minimum zum required.");
+                }
+            }
+        });
     }
 
-    @Override
-    public void onMyLocationClick(@NonNull Location location){
-        Toast.makeText(this, "You", Toast.LENGTH_LONG).show();
+    private void requestOverlay(){
+        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+        final LatLng nearLeft = visibleRegion.nearLeft;
+        final LatLng farRight = visibleRegion.farRight;
+
+        mLatLngBounds = new LatLngBounds(nearLeft, farRight);
+
+        OverlayRequest overlayRequest = new OverlayRequest(nearLeft.latitude, farRight.latitude,
+            nearLeft.longitude, farRight.longitude, this);
+
+        Thread t = new Thread(overlayRequest);
+        t.start();
+    }
+
+    public void setNewGroundOverlay(Bitmap bitmap){
+        SLog.d(TAG, "setNewGroundOverlay");
+
+        if(mGroundOverlay != null)
+            mGroundOverlay.remove();
+
+        GroundOverlayOptions overlayOptions = new GroundOverlayOptions();
+        overlayOptions.image(BitmapDescriptorFactory.fromBitmap(bitmap));
+        overlayOptions.positionFromBounds(mLatLngBounds);
+        mGroundOverlay = mMap.addGroundOverlay(overlayOptions);
+
+        SLog.d(TAG, "setNewGroundOverlay done!");
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "Going to current location", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Constants.TOAST_CURRENT_LOCATION, Toast.LENGTH_SHORT).show();
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        //TODO: onDestroy is not always called and the app is killed before it
+        //TODO: send the end session request
+//        SLog.d(TAG, "onDestroy MapsActivity");
+//        SharedPreferences sharedPref = this.getSharedPreferences(Constants.USER_DATA, Context.MODE_PRIVATE);
+//        if(!sharedPref.getBoolean(Constants.REMEMBER_ME_STATUS_KEY, false)){
+//            CustomOkHttpClient customOkHttpClient = new CustomOkHttpClient();
+//            String token = sharedPref.getString(Constants.USER_TOKEN_KEY, "");
+//            if(!token.equals("")) {
+//                SLog.d(TAG, "Token != null");
+//                customOkHttpClient.sendEndSession(this, token);
+//            }else {
+//                SLog.d(TAG, "Error trying to end session (empty token)");
+//            }
+//        }
+        super.onDestroy();
+    }
+
+    public void onClickStartRecord(View v){
+        if(!mServiceStats){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Intent intent = new Intent(this, RecordService.class);
+                startService(intent);
+
+                Toast.makeText(getApplicationContext(), "Recording Started. Thank you for sharing!", Toast.LENGTH_LONG).show();
+            }
+        }else{
+            stopService(new Intent(this, RecordService.class));
+            enableScheduler();
+            Toast.makeText(getApplicationContext(), "Recording stopped", Toast.LENGTH_LONG).show();
+        }
+
+        mServiceStats = !mServiceStats;
+    }
+
+    private void enableScheduler(){
+        SLog.d(TAG, "Trying to active job scheduler");
+        if(SaveState.getInstance().getSavedCounter() > 0) {
+            ComponentName componentName = new ComponentName(this, DataUploadScheduler.class);
+            int requiredNetwork = NetworkStatusManager.networkAllowedToSend(this);
+            JobInfo jobInfo = null;
+            jobInfo = new JobInfo.Builder(Constants.JOB_UPLOAD_ID, componentName)
+                    .setRequiredNetworkType(requiredNetwork)
+                    .setPersisted(true)
+                    .setPeriodic(Constants.JOB_SCHEDULER_PERIOD)
+                    .build();
+            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            int result = scheduler.schedule(jobInfo);
+            SLog.d(TAG, "Scheduler result : " + (result == JobScheduler.RESULT_SUCCESS ? "SUCCESS" : "FAILURE"));
+        }
+    }
+
+    @Override
+    public void onResponse(Response response) throws IOException {
+        SLog.d(TAG, "onResponse: ");
+
+//        final Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
+////        SLog.d(TAG, "" + BitmapFactory.decodeStream(response.body().byteStream()));
+//
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                GroundOverlayOptions overlayOptions = new GroundOverlayOptions()
+//                        .image(BitmapDescriptorFactory.fromBitmap(bmp))
+//                        .position(mLatLng, 8600f);
+//                mMap.addGroundOverlay(overlayOptions);
+//            }
+//        });
+    }
+
+    @Override
+    public void onFailure(Request request, IOException e) {
+        SLog.d(TAG, "onFailure: " + request.toString());
     }
 }
