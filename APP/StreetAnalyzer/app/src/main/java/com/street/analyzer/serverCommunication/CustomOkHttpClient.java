@@ -2,7 +2,12 @@ package com.street.analyzer.serverCommunication;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
@@ -17,7 +22,14 @@ import com.street.analyzer.utils.SLog;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.logging.Handler;
 
 public class CustomOkHttpClient implements Callback{
 
@@ -87,48 +99,37 @@ public class CustomOkHttpClient implements Callback{
         return true;
     }
 
-    public Bitmap requestQualityOverlay(Context context, Callback callback,
-                                        double minLat, double minLong, double maxLat, double maxLong){
-        if(!isNetworkAvailable(context))
-            return null;
+    private Bitmap request(Context context, final String stringUrl){
+        final Bitmap[] result = {null};
 
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme(Constants.SERVER_SCHEME_HTTPS)
-                .host(Constants.SERVER_HOST)
-                .addPathSegment(Constants.SERVER_QUALITY_OVERLAY)
-                .addQueryParameter("minLatitude", "" + minLat)
-                .addQueryParameter("maxLatitude", "" + maxLat)
-                .addQueryParameter("minLongitude", "" + minLong)
-                .addQueryParameter("maxLongitude", "" + maxLong)
-                .build();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(stringUrl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(60000 /* milliseconds */);
+                    conn.setConnectTimeout(65000 /* milliseconds */);
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                    conn.connect();
 
-        SLog.d(TAG, "Sending requesto to: " + httpUrl.toString());
+                    int response = conn.getResponseCode();
+                    SLog.d(TAG, "The response is: " + response);
 
-//        try {
-//            DownloadImageTask downloadImageTask = new DownloadImageTask();
-//            downloadImageTask.execute(httpUrl.toString())
-//        } catch (ExecutionException e) {
-//            SLog.d(TAG, "Deu ruim ExecutioN");
-//        } catch (InterruptedException e) {
-//            SLog.d(TAG, "Deu ruim Interrupted");
-//        }
-        return null;
+                    InputStream is = conn.getInputStream();
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
+                    Bitmap bmpImage = BitmapFactory.decodeStream(bufferedInputStream);
+                    result[0] = bmpImage;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
-//        try {
-//            url = new URL(httpUrl.toString());
-//            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//            SLog.d(TAG, "Returning bitmap");
-//            return bmp;
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//            return null;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//        SLog.d(TAG, "Enqueuing new retrofit callback [RequestQualityOverlay]");
-//
-//        okHttpClient.newCall(request).enqueue(callback);
+        SLog.d(TAG, "Bitmap received status: " + (result[0] == null ? "ERROR" : "SUCCESS"));
+
+        return result[0];
     }
 
     public boolean sendRegisteredData(Context context, Callback callback,
@@ -295,3 +296,29 @@ public class CustomOkHttpClient implements Callback{
 //                SLog.d(TAG, "Last Sending " + (recordedValues.getSize()) + " LOGS");
 //            }
 //            SLog.d(TAG, "Sending: " + jsonObject.toString());
+
+
+//        try {
+//            DownloadImageTask downloadImageTask = new DownloadImageTask();
+//            downloadImageTask.execute(httpUrl.toString())
+//        } catch (ExecutionException e) {
+//            SLog.d(TAG, "Deu ruim ExecutioN");
+//        } catch (InterruptedException e) {
+//            SLog.d(TAG, "Deu ruim Interrupted");
+//        }
+
+//        try {
+//            url = new URL(httpUrl.toString());
+//            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//            SLog.d(TAG, "Returning bitmap");
+//            return bmp;
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//            return null;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        SLog.d(TAG, "Enqueuing new retrofit callback [RequestQualityOverlay]");
+//
+//        okHttpClient.newCall(request).enqueue(callback);
